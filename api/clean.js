@@ -9,12 +9,18 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing references or format' });
     }
 
+    const apiKey = process.env.GROQ_API_KEY;
+    
+    if (!apiKey) {
+        return res.status(500).json({ error: 'API key not configured' });
+    }
+
     try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
                 model: 'llama-3.3-70b-versatile',
@@ -31,11 +37,16 @@ export default async function handler(req, res) {
             })
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            return res.status(500).json({ error: `Groq API error: ${JSON.stringify(errorData)}` });
+        }
+
         const data = await response.json();
         const result = data.choices[0].message.content;
         return res.status(200).json({ result });
 
     } catch (error) {
-        return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+        return res.status(500).json({ error: `Server error: ${error.message}` });
     }
 }
