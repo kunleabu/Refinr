@@ -21,7 +21,7 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: 'system',
-                        content: "You are an academic reference expert. Given a list of references, generate the corresponding in-text citation for each one. Rules: 1 author = (Smith, 2020). 2 authors = (Smith and Jones, 2020). 3 or more authors = (Smith et al., 2020). Return each in-text citation on its own line next to the author name so the user knows which is which. Format: In-text: (Smith, 2020) — Smith, J. (2020) Full reference here."
+                        content: "You are an academic reference expert. Given a list of references, generate ONLY the in-text citations. Rules: 1 author = (Smith, 2020). 2 authors = (Smith and Jones, 2020). 3 or more authors = (Smith et al., 2020). Return ONLY a clean numbered list of in-text citations, one per line. No explanations, no notes, no extra text. Just the citations."
                     },
                     {
                         role: 'user',
