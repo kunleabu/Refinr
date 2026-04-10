@@ -1,25 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refinr — Format. Verify. Submit with confidence.</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #F5F7FA;
+            --card: #ffffff;
+            --text: #2D2D2D;
+            --muted: #6B7280;
+            --border: #e0e7ef;
+            --input-bg: #ffffff;
+            --header-bg: #1B3A6B;
+            --output-bg: #F8FAFF;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0F172A;
+            --card: #1E293B;
+            --text: #E2E8F0;
+            --muted: #94A3B8;
+            --border: #334155;
+            --input-bg: #1E293B;
+            --header-bg: #0F172A;
+            --output-bg: #0F172A;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #F5F7FA;
-            color: #2D2D2D;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            cursor: default;
+        }
+
+        /* Cursor glow */
+        .cursor-glow {
+            position: fixed;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.07) 0%, transparent 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: left 0.1s ease, top 0.1s ease;
+            z-index: 0;
+        }
+
+        [data-theme="dark"] .cursor-glow {
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
         }
 
         header {
-            background: #1B3A6B;
+            background: var(--header-bg);
             padding: 20px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         header h1 {
@@ -35,18 +85,42 @@
             margin-top: 5px;
         }
 
+        .theme-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            padding: 6px 14px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
         .container {
             max-width: 800px;
             margin: 40px auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .card {
-            background: white;
+            background: var(--card);
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.08);
             margin-bottom: 24px;
+            border: 1px solid var(--border);
+            transition: background 0.3s, border 0.3s;
         }
 
         .card label {
@@ -57,17 +131,20 @@
             font-size: 0.95rem;
         }
 
+        [data-theme="dark"] .card label { color: #60A5FA; }
+
         textarea {
             width: 100%;
             height: 200px;
             padding: 14px;
-            border: 2px solid #e0e7ef;
+            border: 2px solid var(--border);
             border-radius: 8px;
             font-family: 'Poppins', sans-serif;
             font-size: 0.9rem;
             resize: vertical;
-            transition: border-color 0.2s;
-            color: #2D2D2D;
+            transition: border-color 0.2s, background 0.3s, color 0.3s;
+            color: var(--text);
+            background: var(--input-bg);
         }
 
         textarea:focus {
@@ -75,42 +152,91 @@
             border-color: #1B3A6B;
         }
 
-        textarea::placeholder { color: #9CA3AF; }
+        [data-theme="dark"] textarea:focus { border-color: #60A5FA; }
+        textarea::placeholder { color: var(--muted); }
 
         .buttons-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
             margin-top: 20px;
         }
 
         .btn {
-            padding: 13px 10px;
+            padding: 13px 8px;
             border: none;
             border-radius: 8px;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
+            text-align: center;
         }
 
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
         .btn:active { transform: translateY(0); }
 
         .btn-clean { background: #1B3A6B; color: white; }
         .btn-verify { background: #2D9B6F; color: white; }
         .btn-intext { background: #7C3AED; color: white; }
+        .btn-lookup { background: #D97706; color: white; }
 
         .btn .badge {
             background: rgba(255,255,255,0.25);
             border-radius: 4px;
             padding: 2px 5px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
+        }
+
+        /* Progress */
+        .progress-container { display: none; margin-top: 20px; }
+        .progress-container.visible { display: block; }
+
+        .progress-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #2D9B6F;
+            animation: bounce 1.2s infinite;
+        }
+
+        .progress-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .progress-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        .progress-bar-bg {
+            background: var(--border);
+            border-radius: 99px;
+            height: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #2D9B6F, #00FFFF);
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.4s ease;
+            width: 0%;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
         }
 
         /* Output */
@@ -130,10 +256,12 @@
             font-weight: 600;
         }
 
+        [data-theme="dark"] .output-header h3 { color: #60A5FA; }
+
         .btn-copy {
-            background: #F0F4FF;
+            background: transparent;
             color: #1B3A6B;
-            border: 1px solid #1B3A6B;
+            border: 1.5px solid #1B3A6B;
             border-radius: 6px;
             padding: 6px 14px;
             font-family: 'Poppins', sans-serif;
@@ -144,116 +272,40 @@
         }
 
         .btn-copy:hover { background: #1B3A6B; color: white; }
+        [data-theme="dark"] .btn-copy { color: #60A5FA; border-color: #60A5FA; }
+        [data-theme="dark"] .btn-copy:hover { background: #60A5FA; color: #0F172A; }
 
         .output-content {
-            background: #F8FAFF;
-            border: 2px solid #e0e7ef;
+            background: var(--output-bg);
+            border: 1.5px solid var(--border);
             border-radius: 8px;
             padding: 16px;
             font-size: 0.9rem;
             line-height: 1.8;
             white-space: pre-wrap;
             min-height: 120px;
-            color: #2D2D2D;
+            color: var(--text);
+            transition: background 0.3s;
         }
 
-        /* Progress bar */
-        .progress-container { display: none; margin-top: 16px; }
-        .progress-container.visible { display: block; }
-
-        .progress-label {
-            font-size: 0.85rem;
-            color: #6B7280;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-bg {
-            background: #e0e7ef;
-            border-radius: 99px;
-            height: 8px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            background: #2D9B6F;
-            height: 100%;
-            border-radius: 99px;
-            transition: width 0.4s ease;
-            width: 0%;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.visible { display: flex; }
-
-        .modal {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            width: 90%;
-            max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-
-        .modal h3 {
-            color: #1B3A6B;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .modal p {
-            color: #6B7280;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .modal select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e7ef;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            color: #2D2D2D;
-            margin-bottom: 20px;
-            appearance: none;
-            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231B3A6B' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 14px center;
-        }
-
-        .modal select:focus { outline: none; border-color: #1B3A6B; }
-
-        .modal-buttons { display: flex; gap: 10px; }
-
-        .btn-confirm { background: #1B3A6B; color: white; flex: 1; }
-        .btn-confirm-green { background: #2D9B6F; color: white; flex: 1; }
-        .btn-cancel { background: #F3F4F6; color: #6B7280; flex: 1; }
-
-        /* Credits badge */
+        /* Credits bar */
         .credits-bar {
-            background: white;
+            background: var(--card);
             border-radius: 8px;
             padding: 10px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
-            border: 1px solid #e0e7ef;
+            border: 1px solid var(--border);
             font-size: 0.85rem;
+            transition: background 0.3s;
         }
 
-        .credits-bar span { color: #6B7280; }
+        .credits-bar span { color: var(--muted); }
         .credits-count { color: #1B3A6B; font-weight: 700; }
+        [data-theme="dark"] .credits-count { color: #60A5FA; }
+
         .btn-get-credits {
             background: #1B3A6B;
             color: white;
@@ -264,58 +316,141 @@
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
         }
+
+        .btn-get-credits:hover { background: #2D4F8A; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.visible { display: flex; }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            color: #1B3A6B;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        [data-theme="dark"] .modal h3 { color: #60A5FA; }
+
+        .modal p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .modal select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--input-bg);
+            margin-bottom: 20px;
+            appearance: none;
+        }
+
+        .modal select:focus { outline: none; border-color: #1B3A6B; }
+
+        .modal-buttons { display: flex; gap: 10px; }
+
+        .btn-confirm { background: #1B3A6B; color: white; flex: 1; }
+        .btn-confirm-green { background: #2D9B6F; color: white; flex: 1; }
+        .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
+        .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
         footer {
             text-align: center;
             padding: 30px 20px;
-            color: #9CA3AF;
+            color: var(--muted);
             font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
         }
 
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
-            .buttons-row { grid-template-columns: 1fr; }
-            .btn { padding: 14px; font-size: 0.9rem; }
+            .buttons-row { grid-template-columns: repeat(2, 1fr); }
+            .theme-toggle { display: none; }
         }
     </style>
 </head>
 <body>
 
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
 <header>
-    <h1>REFINR</h1>
-    <p>Format. Verify. Submit with confidence.</p>
+    <div class="header-inner">
+        <div>
+            <h1>REFINR</h1>
+            <p>Format. Verify. Submit with confidence.</p>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark mode</button>
+    </div>
 </header>
 
 <div class="container">
 
-    <!-- Credits bar -->
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
         <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
     </div>
 
-    <!-- Input card -->
     <div class="card">
-        <label>Paste your references below</label>
+        <label>Paste your references, DOIs, or ISBNs below</label>
         <textarea id="referencesInput" placeholder="Paste ONLY references here..."></textarea>
 
         <div class="buttons-row">
-            <button class="btn btn-clean" onclick="openCleanModal()">📋 Clean my references</button>
-            <button class="btn btn-verify" onclick="openVerifyModal()">🔍 Verify references <span class="badge">Pro</span></button>
-            <button class="btn btn-intext" onclick="generateIntext()">📝 In-text citations <span class="badge">Pro</span></button>
+            <button class="btn btn-clean" onclick="openCleanModal()">📋 Clean references</button>
+            <button class="btn btn-verify" onclick="openVerifyModal()">🔍 Verify <span class="badge">Pro</span></button>
+            <button class="btn btn-intext" onclick="generateIntext()">📝 In-text <span class="badge">Pro</span></button>
+            <button class="btn btn-lookup" onclick="openLookupModal()">🔎 DOI / ISBN lookup</button>
         </div>
 
-        <!-- Progress bar -->
         <div class="progress-container" id="progressContainer">
-            <div class="progress-label" id="progressLabel">Verifying references...</div>
+            <div class="progress-label">
+                <span id="progressLabel">Verifying references...</span>
+                <div class="progress-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBar"></div>
             </div>
         </div>
     </div>
 
-    <!-- Output card -->
     <div class="card output-card" id="outputCard">
         <div class="output-header">
             <h3 id="outputTitle">Results</h3>
@@ -350,10 +485,28 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p>Refinr will check each reference against 130 million academic records in the CrossRef database and flag any mismatches in year, author or title.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records).<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Lookup Modal -->
+<div class="modal-overlay" id="lookupModal">
+    <div class="modal">
+        <h3>DOI / ISBN Lookup</h3>
+        <p>Paste one DOI or ISBN per line. Refinr will fetch the full reference details and format them automatically.</p>
+        <select id="lookupFormatSelect">
+            <option value="Harvard">Harvard</option>
+            <option value="APA">APA</option>
+            <option value="MLA">MLA</option>
+            <option value="Chicago">Chicago</option>
+        </select>
+        <div class="modal-buttons">
+            <button class="btn btn-confirm-orange" onclick="lookupIdentifiers()">Look up references</button>
+            <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
         </div>
     </div>
 </div>
@@ -362,6 +515,26 @@
 
 <script>
     let credits = 5;
+
+    // Cursor glow
+    const glow = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', (e) => {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+    });
+
+    // Dark mode
+    function toggleTheme() {
+        const html = document.documentElement;
+        const btn = document.getElementById('themeBtn');
+        if (html.getAttribute('data-theme') === 'light') {
+            html.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ Light mode';
+        } else {
+            html.setAttribute('data-theme', 'light');
+            btn.textContent = '🌙 Dark mode';
+        }
+    }
 
     function openCleanModal() {
         const input = document.getElementById('referencesInput').value.trim();
@@ -372,9 +545,15 @@
     function openVerifyModal() {
         const input = document.getElementById('referencesInput').value.trim();
         if (!input) { alert('Please paste your references first.'); return; }
-        if (credits <= 0) { alert('You have no credits remaining. Please purchase more credits to verify references.'); return; }
+        if (credits <= 0) { alert('You have no credits remaining. Please purchase more credits.'); return; }
         document.getElementById('creditsInModal').textContent = credits;
         document.getElementById('verifyModal').classList.add('visible');
+    }
+
+    function openLookupModal() {
+        const input = document.getElementById('referencesInput').value.trim();
+        if (!input) { alert('Please paste your DOIs or ISBNs first.'); return; }
+        document.getElementById('lookupModal').classList.add('visible');
     }
 
     function closeModal(modalId) {
@@ -392,31 +571,28 @@
         const content = document.getElementById('outputContent').textContent;
         navigator.clipboard.writeText(content).then(() => {
             const btn = document.querySelector('.btn-copy');
-            btn.textContent = 'Copied!';
+            btn.textContent = '✅ Copied!';
             setTimeout(() => btn.textContent = 'Copy results', 2000);
         });
     }
 
-   async function cleanReferences() {
-    closeModal('cleanModal');
-    const references = document.getElementById('referencesInput').value.trim();
-    const format = document.getElementById('formatSelect').value;
-
-    showOutput('Cleaning references...', 'Please wait while Refinr formats your references...');
-
-    try {
-        const response = await fetch('/api/clean', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ references, format })
-        });
-        const data = await response.json();
-        showOutput(`Cleaned References — ${format}`, data.result);
-
-    } catch (error) {
-        showOutput('Error', 'Something went wrong. Please try again.');
+    async function cleanReferences() {
+        closeModal('cleanModal');
+        const references = document.getElementById('referencesInput').value.trim();
+        const format = document.getElementById('formatSelect').value;
+        showOutput('Cleaning references...', 'Please wait while Refinr formats your references...');
+        try {
+            const response = await fetch('/api/clean', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ references, format })
+            });
+            const data = await response.json();
+            showOutput(`Cleaned References — ${format}`, data.result);
+        } catch (error) {
+            showOutput('Error', 'Something went wrong. Please try again.');
+        }
     }
-}
 
     async function verifyReferences() {
         closeModal('verifyModal');
@@ -451,7 +627,6 @@
                 });
                 const data = await response.json();
                 results.push(data.result);
-
             } catch (error) {
                 results.push(`⚠️ ERROR checking — ${ref}`);
             }
@@ -459,7 +634,7 @@
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
-        progressLabel.textContent = `Verification complete — ${referenceList.length} references checked`;
+        progressLabel.textContent = `✅ Verification complete — ${referenceList.length} references checked`;
         progressBar.style.width = '100%';
         showOutput('Verification Report', results.join('\n\n'));
 
@@ -472,9 +647,7 @@
     async function generateIntext() {
         const input = document.getElementById('referencesInput').value.trim();
         if (!input) { alert('Please paste your references first.'); return; }
-
         showOutput('Generating in-text citations...', 'Please wait...');
-
         try {
             const response = await fetch('/api/intext', {
                 method: 'POST',
@@ -483,6 +656,44 @@
             });
             const data = await response.json();
             showOutput('In-text Citations', data.result);
+        } catch (error) {
+            showOutput('Error', 'Something went wrong. Please try again.');
+        }
+    }
+
+    async function lookupIdentifiers() {
+        closeModal('lookupModal');
+        const identifiers = document.getElementById('referencesInput').value.trim();
+        const format = document.getElementById('lookupFormatSelect').value;
+
+        const lines = identifiers.split('\n').filter(l => l.trim().length > 0);
+        const progressContainer = document.getElementById('progressContainer');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressBar = document.getElementById('progressBar');
+
+        progressContainer.classList.add('visible');
+        progressLabel.textContent = `Looking up ${lines.length} identifiers...`;
+        progressBar.style.width = '30%';
+
+        showOutput('Looking up references...', 'Fetching reference details...');
+
+        try {
+            const response = await fetch('/api/lookup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifiers, format })
+            });
+            const data = await response.json();
+
+            progressBar.style.width = '100%';
+            progressLabel.textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
+
+            showOutput(`DOI/ISBN Lookup — ${format}`, data.results.join('\n\n'));
+
+            setTimeout(() => {
+                progressContainer.classList.remove('visible');
+                progressBar.style.width = '0%';
+            }, 3000);
 
         } catch (error) {
             showOutput('Error', 'Something went wrong. Please try again.');
