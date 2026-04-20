@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refinr — Format. Verify. Submit with confidence.</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script async src="https://tally.so/widgets/embed.js"></script>
     <style>
         :root {
             --bg: #F5F7FA;
@@ -36,7 +37,6 @@
             color: var(--text);
             min-height: 100vh;
             transition: background 0.3s, color 0.3s;
-            cursor: default;
         }
 
         /* Cursor glow */
@@ -45,7 +45,7 @@
             width: 350px;
             height: 350px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.07) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0,255,255,0.07) 0%, transparent 70%);
             pointer-events: none;
             transform: translate(-50%, -50%);
             transition: left 0.1s ease, top 0.1s ease;
@@ -53,7 +53,7 @@
         }
 
         [data-theme="dark"] .cursor-glow {
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0,255,255,0.12) 0%, transparent 70%);
         }
 
         header {
@@ -70,6 +70,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         header h1 {
@@ -87,7 +89,7 @@
 
         .theme-toggle {
             position: absolute;
-            right: 20px;
+            right: 0;
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255,255,255,0.15);
@@ -99,11 +101,10 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .theme-toggle:hover {
-            background: rgba(255,255,255,0.25);
-        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.25); }
 
         .container {
             max-width: 800px;
@@ -133,6 +134,93 @@
 
         [data-theme="dark"] .card label { color: #60A5FA; }
 
+        /* Before/After Demo Section */
+        .demo-section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .demo-section h2 {
+            color: #1B3A6B;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        [data-theme="dark"] .demo-section h2 { color: #60A5FA; }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .demo-box {
+            background: var(--output-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: var(--text);
+        }
+
+        .demo-box.before { border-color: #FCA5A5; }
+        .demo-box.after { border-color: #6EE7B7; }
+
+        .demo-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .demo-box.before .demo-label { color: #EF4444; }
+        .demo-box.after .demo-label { color: #10B981; }
+
+        .demo-arrow {
+            font-size: 1.5rem;
+            color: #1B3A6B;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* Example button */
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-example {
+            background: transparent;
+            color: #1B3A6B;
+            border: 1.5px solid #1B3A6B;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-example:hover { background: #1B3A6B; color: white; }
+        [data-theme="dark"] .btn-example { color: #60A5FA; border-color: #60A5FA; }
+        [data-theme="dark"] .btn-example:hover { background: #60A5FA; color: #0F172A; }
+
         textarea {
             width: 100%;
             height: 200px;
@@ -147,11 +235,7 @@
             background: var(--input-bg);
         }
 
-        textarea:focus {
-            outline: none;
-            border-color: #1B3A6B;
-        }
-
+        textarea:focus { outline: none; border-color: #1B3A6B; }
         [data-theme="dark"] textarea:focus { border-color: #60A5FA; }
         textarea::placeholder { color: var(--muted); }
 
@@ -176,6 +260,7 @@
             justify-content: center;
             gap: 5px;
             text-align: center;
+            line-height: 1.3;
         }
 
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
@@ -236,7 +321,7 @@
             border-radius: 99px;
             transition: width 0.4s ease;
             width: 0%;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 8px rgba(0,255,255,0.5);
         }
 
         /* Output */
@@ -389,6 +474,48 @@
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
+        /* Feedback bar */
+        .feedback-bar {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .feedback-bar p {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .feedback-bar strong {
+            color: var(--text);
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .btn-feedback {
+            background: transparent;
+            color: #1B3A6B;
+            border: 1.5px solid #1B3A6B;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-feedback:hover { background: #1B3A6B; color: white; }
+        [data-theme="dark"] .btn-feedback { color: #60A5FA; border-color: #60A5FA; }
+        [data-theme="dark"] .btn-feedback:hover { background: #60A5FA; color: #0F172A; }
+
         footer {
             text-align: center;
             padding: 30px 20px;
@@ -398,16 +525,28 @@
             z-index: 1;
         }
 
+        /* Mobile */
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
+            header p { font-size: 0.8rem; }
+            .theme-toggle { 
+                position: static;
+                transform: none;
+                margin-top: 10px;
+                display: inline-block;
+            }
+            .header-inner { flex-direction: column; gap: 8px; }
             .buttons-row { grid-template-columns: repeat(2, 1fr); }
-            .theme-toggle { display: none; }
+            .demo-grid { grid-template-columns: 1fr; }
+            .demo-arrow { transform: rotate(90deg); }
+            .feedback-bar { flex-direction: column; gap: 12px; text-align: center; }
+            .credits-bar { flex-direction: column; gap: 8px; text-align: center; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Cursor glow -->
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <header>
@@ -422,20 +561,47 @@
 
 <div class="container">
 
+    <!-- Credits bar -->
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
         <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
     </div>
 
+    <!-- Before/After Demo -->
+    <div class="demo-section">
+        <h2>✨ See what Refinr does</h2>
+        <div class="demo-grid">
+            <div class="demo-box before">
+                <div class="demo-label">Before</div>
+                smith j 2020 academic writing oxford press<br>
+                jones mary 2019 research methods cambridge<br>
+                Smith J 2020 Academic Writing Oxford Press<br>
+                brown t 2021 scientific writing wiley
+            </div>
+            <div class="demo-arrow">→</div>
+            <div class="demo-box after">
+                <div class="demo-label">After — Harvard</div>
+                Brown, T. (2021) <em>Scientific writing.</em> Wiley.<br>
+                Jones, M. (2019) <em>Research methods.</em> Cambridge University Press.<br>
+                Smith, J. (2020) <em>Academic writing.</em> Oxford Press.<br>
+                <small style="color:#10B981">✅ 1 duplicate removed</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main input card -->
     <div class="card">
-        <label>Paste your references, DOIs, or ISBNs below</label>
-        <textarea id="referencesInput" placeholder="Paste ONLY references here..."></textarea>
+        <div class="input-header">
+            <label style="margin-bottom:0">Paste your references, DOIs, or ISBNs below</label>
+            <button class="btn-example" onclick="loadExample()">📋 See example</button>
+        </div>
+        <textarea id="referencesInput" placeholder="Example:&#10;Smith J 2020 academic writing oxford press&#10;jones mary 2019 research methods cambridge&#10;10.1038/nature04244&#10;9780140449136"></textarea>
 
         <div class="buttons-row">
             <button class="btn btn-clean" onclick="openCleanModal()">📋 Clean references</button>
             <button class="btn btn-verify" onclick="openVerifyModal()">🔍 Verify <span class="badge">Pro</span></button>
             <button class="btn btn-intext" onclick="generateIntext()">📝 In-text citations</button>
-            <button class="btn btn-lookup" onclick="openLookupModal()">🔎 DOI / ISBN lookup</button>
+            <button class="btn btn-lookup" onclick="openLookupModal()">🔎 DOI / ISBN</button>
         </div>
 
         <div class="progress-container" id="progressContainer">
@@ -451,12 +617,29 @@
         </div>
     </div>
 
+    <!-- Output card -->
     <div class="card output-card" id="outputCard">
         <div class="output-header">
             <h3 id="outputTitle">Results</h3>
             <button class="btn-copy" onclick="copyResults()">Copy results</button>
         </div>
         <div class="output-content" id="outputContent"></div>
+    </div>
+
+    <!-- Feedback bar -->
+    <div class="feedback-bar">
+        <div>
+            <strong>Help us improve Refinr</strong>
+            <p>Share feedback, report a bug, or suggest a feature</p>
+        </div>
+        <button class="btn-feedback"
+            data-tally-open="GxJNNz"
+            data-tally-layout="modal"
+            data-tally-overlay="1"
+            data-tally-auto-close="1000"
+            data-tally-form-events-forwarding="1">
+            Give feedback
+        </button>
     </div>
 
 </div>
@@ -485,7 +668,7 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records).<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches in year, author or title.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
@@ -534,6 +717,15 @@
             html.setAttribute('data-theme', 'light');
             btn.textContent = '🌙 Dark mode';
         }
+    }
+
+    // Load example
+    function loadExample() {
+        document.getElementById('referencesInput').value = `smith j 2020 academic writing oxford press
+jones mary 2019 research methods cambridge university press london
+brown t 2021 scientific writing wiley
+Smith J 2020 Academic Writing Oxford Press
+Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.`;
     }
 
     function openCleanModal() {
@@ -687,7 +879,6 @@
 
             progressBar.style.width = '100%';
             progressLabel.textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
-
             showOutput(`DOI/ISBN Lookup — ${format}`, data.results.join('\n\n'));
 
             setTimeout(() => {
