@@ -850,9 +850,9 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
 
       // Calculate accuracy score
 const total = results.length;
-const confirmed = results.filter(r => r.startsWith('✅')).length;
-const mismatches = results.filter(r => r.startsWith('⚠️')).length;
-const notFound = results.filter(r => r.startsWith('❌')).length;
+const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
+const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
+const notFound = results.filter(r => r.includes('❌ NOT FOUND')).length;
 const score = Math.round((confirmed / total) * 100);
 
 const scoreText = `📊 ACCURACY REPORT
