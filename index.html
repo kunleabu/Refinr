@@ -848,9 +848,28 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
-        progressLabel.textContent = `✅ Verification complete — ${referenceList.length} references checked`;
-        progressBar.style.width = '100%';
-        showOutput('Verification Report', results.join('\n\n'));
+      // Calculate accuracy score
+const total = results.length;
+const confirmed = results.filter(r => r.startsWith('✅')).length;
+const mismatches = results.filter(r => r.startsWith('⚠️')).length;
+const notFound = results.filter(r => r.startsWith('❌')).length;
+const score = Math.round((confirmed / total) * 100);
+
+const scoreText = `📊 ACCURACY REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Overall Score: ${score}%
+✅ Confirmed: ${confirmed} of ${total}
+⚠️ Mismatches found: ${mismatches}
+❌ Not found in database: ${notFound}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DETAILED RESULTS:
+
+${results.join('\n\n')}`;
+
+progressLabel.textContent = `✅ Verification complete — ${referenceList.length} references checked`;
+progressBar.style.width = '100%';
+showOutput('Verification Report', scoreText);
 
         setTimeout(() => {
             progressContainer.classList.remove('visible');
