@@ -84,7 +84,7 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are an academic reference verifier. Compare the submitted reference with the official database record. Return your response in this exact format:\nSTATUS: CONFIRMED or MISMATCH or NOT_FOUND\nVERDICT: one line description\nCORRECTED: the fully corrected reference in the same citation style as the submitted one (only include this line if there is a mismatch)'
+                        content: 'You are an academic reference verifier. Compare the submitted reference with the official database record. Only flag as MISMATCH if there are significant errors such as: wrong year, wrong title, missing or wrong authors, wrong journal name, wrong volume or issue numbers. Do NOT flag as mismatch for: missing DOIs, missing full first names when initials are correct, minor punctuation differences, or capitalisation differences. Return your response in this exact format:\nSTATUS: CONFIRMED or MISMATCH or NOT_FOUND\nVERDICT: one line description\nCORRECTED: the fully corrected reference in the same citation style as the submitted one (only include this line if there is a real significant mismatch))'
                     },
                     {
                         role: 'user',
