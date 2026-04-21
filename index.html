@@ -37,6 +37,7 @@
             color: var(--text);
             min-height: 100vh;
             transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
         }
 
         .cursor-glow {
@@ -259,6 +260,7 @@
             box-shadow: 0 0 8px rgba(0,255,255,0.5);
         }
 
+        /* Output card */
         .output-card { display: none; }
         .output-card.visible { display: block; }
 
@@ -277,22 +279,69 @@
 
         [data-theme="dark"] .output-header h3 { color: #60A5FA; }
 
-        .btn-copy {
-            background: transparent;
-            color: #1B3A6B;
-            border: 1.5px solid #1B3A6B;
-            border-radius: 6px;
-            padding: 6px 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+        /* Icon buttons */
+        .icon-btns {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-        .btn-copy:hover { background: #1B3A6B; color: white; }
-        [data-theme="dark"] .btn-copy { color: #60A5FA; border-color: #60A5FA; }
-        [data-theme="dark"] .btn-copy:hover { background: #60A5FA; color: #0F172A; }
+        .icon-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        .icon-btn.copy-btn:hover { border-color: #1B3A6B; background: #1B3A6B; color: white; }
+        .icon-btn.share-btn:hover { border-color: #2D9B6F; background: #2D9B6F; color: white; }
+
+        /* Tooltip */
+        .icon-btn .tooltip {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2D2D2D;
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        [data-theme="dark"] .icon-btn .tooltip { background: #E2E8F0; color: #0F172A; }
+
+        .icon-btn:hover .tooltip { opacity: 1; }
+
+        /* Colour splash effect */
+        .splash {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: splashAnim 0.6s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes splashAnim {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+        }
 
         .output-content {
             background: var(--output-bg);
@@ -307,6 +356,7 @@
             transition: background 0.3s;
         }
 
+        /* Credits bar */
         .credits-bar {
             background: var(--card);
             border-radius: 8px;
@@ -339,7 +389,7 @@
 
         .btn-get-credits:hover { background: #2D4F8A; }
 
-        /* Before/After Demo */
+        /* Demo section */
         .demo-section {
             background: var(--card);
             border-radius: 12px;
@@ -537,6 +587,19 @@
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
+        /* Share modal */
+        .share-url-box {
+            background: var(--output-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            word-break: break-all;
+            margin-bottom: 16px;
+            font-family: 'Courier New', monospace;
+        }
+
         footer {
             text-align: center;
             padding: 30px 20px;
@@ -620,7 +683,16 @@
     <div class="card output-card" id="outputCard">
         <div class="output-header">
             <h3 id="outputTitle">Results</h3>
-            <button class="btn-copy" onclick="copyResults()">Copy results</button>
+            <div class="icon-btns">
+                <button class="icon-btn copy-btn" onclick="copyResults(event)" title="Copy">
+                    📋
+                    <span class="tooltip">Copy results</span>
+                </button>
+                <button class="icon-btn share-btn" id="shareBtn" onclick="shareReport(event)" style="display:none;" title="Share">
+                    🔗
+                    <span class="tooltip">Share report</span>
+                </button>
+            </div>
         </div>
         <div class="output-content" id="outputContent"></div>
     </div>
@@ -719,17 +791,33 @@
     </div>
 </div>
 
+<!-- Share Modal -->
+<div class="modal-overlay" id="shareModal">
+    <div class="modal">
+        <h3>Share verification report</h3>
+        <p>Anyone with this link can view the full verification report — no account needed. Perfect for sharing with your supervisor.</p>
+        <div class="share-url-box" id="shareUrlBox">Generating link...</div>
+        <div class="modal-buttons">
+            <button class="btn btn-confirm-green" onclick="copyShareLink()">Copy link</button>
+            <button class="btn btn-cancel" onclick="closeModal('shareModal')">Close</button>
+        </div>
+    </div>
+</div>
+
 <footer>© 2026 Refinr. All rights reserved.</footer>
 
 <script>
     let credits = 5;
+    let currentShareUrl = '';
 
+    // Cursor glow
     const glow = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', (e) => {
         glow.style.left = e.clientX + 'px';
         glow.style.top = e.clientY + 'px';
     });
 
+    // Dark mode
     function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
@@ -742,6 +830,25 @@
         }
     }
 
+    // Colour splash effect
+    function createSplash(e) {
+        const colours = ['#1B3A6B', '#2D9B6F', '#7C3AED', '#D97706', '#00FFFF', '#F59E0B'];
+        const colour = colours[Math.floor(Math.random() * colours.length)];
+        const splash = document.createElement('div');
+        splash.className = 'splash';
+        splash.style.cssText = `
+            left: ${e.clientX}px;
+            top: ${e.clientY}px;
+            width: 40px;
+            height: 40px;
+            background: ${colour};
+            opacity: 0.4;
+        `;
+        document.body.appendChild(splash);
+        setTimeout(() => splash.remove(), 600);
+    }
+
+    // Load example
     function loadExample() {
         document.getElementById('referencesInput').value = `smith j 2020 academic writing oxford press
 jones mary 2019 research methods cambridge university press london
@@ -778,16 +885,79 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('outputTitle').textContent = title;
         document.getElementById('outputContent').textContent = content;
         document.getElementById('outputCard').classList.add('visible');
+
+        // Show share button only for verification reports
+        const shareBtn = document.getElementById('shareBtn');
+        if (title === 'Verification Report') {
+            shareBtn.style.display = 'flex';
+        } else {
+            shareBtn.style.display = 'none';
+        }
+
         document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function copyResults() {
+    function copyResults(e) {
         const content = document.getElementById('outputContent').textContent;
         navigator.clipboard.writeText(content).then(() => {
-            const btn = document.querySelector('.btn-copy');
-            btn.textContent = '✅ Copied!';
-            setTimeout(() => btn.textContent = 'Copy results', 2000);
+            createSplash(e);
+            const btn = e.currentTarget;
+            const tooltip = btn.querySelector('.tooltip');
+            tooltip.textContent = 'Copied!';
+            btn.textContent = '✅';
+            btn.appendChild(tooltip);
+            setTimeout(() => {
+                btn.textContent = '📋';
+                btn.appendChild(tooltip);
+                tooltip.textContent = 'Copy results';
+            }, 2000);
         });
+    }
+
+    async function shareReport(e) {
+        const content = document.getElementById('outputContent').textContent;
+        const title = document.getElementById('outputTitle').textContent;
+
+        document.getElementById('shareUrlBox').textContent = 'Generating link...';
+        document.getElementById('shareModal').classList.add('visible');
+
+        try {
+            const response = await fetch('/api/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    reportData: {
+                        title,
+                        content,
+                        date: new Date().toLocaleDateString('en-GB', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        })
+                    }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.binId) {
+                currentShareUrl = `${window.location.origin}?report=${data.binId}`;
+                document.getElementById('shareUrlBox').textContent = currentShareUrl;
+            } else {
+                document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
+            }
+
+        } catch (error) {
+            document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
+        }
+    }
+
+    function copyShareLink() {
+        if (currentShareUrl) {
+            navigator.clipboard.writeText(currentShareUrl).then(() => {
+                const btn = event.currentTarget;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = 'Copy link', 2000);
+            });
+        }
     }
 
     async function cleanReferences() {
@@ -848,14 +1018,14 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
-      // Calculate accuracy score
-const total = results.length;
-const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
-const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
-const notFound = results.filter(r => r.includes('❌ NOT FOUND')).length;
-const score = Math.round((confirmed / total) * 100);
+        // Calculate accuracy score
+        const total = results.length;
+        const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
+        const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
+        const notFound = results.filter(r => r.includes('❌ NOT FOUND')).length;
+        const score = Math.round((confirmed / total) * 100);
 
-const scoreText = `📊 ACCURACY REPORT
+        const scoreText = `📊 ACCURACY REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Overall Score: ${score}%
 ✅ Confirmed: ${confirmed} of ${total}
@@ -867,9 +1037,9 @@ DETAILED RESULTS:
 
 ${results.join('\n\n')}`;
 
-progressLabel.textContent = `✅ Verification complete — ${referenceList.length} references checked`;
-progressBar.style.width = '100%';
-showOutput('Verification Report', scoreText);
+        progressLabel.textContent = `✅ Verification complete — ${referenceList.length} references checked`;
+        progressBar.style.width = '100%';
+        showOutput('Verification Report', scoreText);
 
         setTimeout(() => {
             progressContainer.classList.remove('visible');
@@ -931,6 +1101,31 @@ showOutput('Verification Report', scoreText);
             showOutput('Error', 'Something went wrong. Please try again.');
         }
     }
+
+    // Load shared report if URL has report parameter
+    async function loadSharedReport() {
+        const params = new URLSearchParams(window.location.search);
+        const reportId = params.get('report');
+
+        if (reportId) {
+            try {
+                const response = await fetch(`/api/report?id=${reportId}`);
+                const data = await response.json();
+
+                if (data.reportData) {
+                    showOutput(
+                        `${data.reportData.title} — ${data.reportData.date}`,
+                        data.reportData.content
+                    );
+                    document.getElementById('shareBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.log('Could not load shared report');
+            }
+        }
+    }
+
+    loadSharedReport();
 </script>
 
 </body>
