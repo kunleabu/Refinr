@@ -11,12 +11,18 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     try {
-        // Step 1 — Try CrossRef first
         let officialTitle = null;
         let officialYear = null;
         let officialAuthors = null;
+        let officialJournal = null;
+        let officialVolume = null;
+        let officialIssue = null;
+        let officialPages = null;
+        let officialPublisher = null;
+        let officialDOI = null;
         let source = 'CrossRef';
 
+        // Step 1 — Try CrossRef first
         const crossrefResponse = await fetch(
             `https://api.crossref.org/works?query=${encodeURIComponent(reference)}&rows=1`
         );
@@ -24,14 +30,20 @@ export default async function handler(req, res) {
         const item = crossrefData.message.items[0];
 
         if (item && item.score >= 5) {
-            officialTitle = item.title ? item.title[0] : null;
+            officialTitle = item.title?.[0] || null;
             officialYear = item.issued?.['date-parts']?.[0]?.[0] || null;
             officialAuthors = item.author
                 ? item.author.map(a => `${a.family || ''}, ${a.given || ''}`).join('; ')
                 : null;
+            officialJournal = item['container-title']?.[0] || null;
+            officialVolume = item.volume || null;
+            officialIssue = item.issue || null;
+            officialPages = item.page || null;
+            officialPublisher = item.publisher || null;
+            officialDOI = item.DOI || null;
         }
 
-        // Step 2 — If CrossRef didn't find it, try OpenAlex as backup
+        // Step 2 — Try OpenAlex as backup
         if (!officialTitle) {
             source = 'OpenAlex';
             const openAlexResponse = await fetch(
@@ -46,17 +58,20 @@ export default async function handler(req, res) {
                 officialAuthors = alexItem.authorships
                     ? alexItem.authorships.map(a => a.author?.display_name || '').join('; ')
                     : null;
+                officialJournal = alexItem.primary_location?.source?.display_name || null;
+                officialDOI = alexItem.doi || null;
             }
         }
 
-        // Step 3 — If neither database found it
+        // Step 3 — Not found in either database
         if (!officialTitle) {
             return res.status(200).json({
-                result: `❌ NOT FOUND in CrossRef or OpenAlex — please verify manually\n   Reference: ${reference}`
+                result: `❌ NOT FOUND in CrossRef or OpenAlex — please verify manually\n   Reference: ${reference}`,
+                status: 'not_found'
             });
         }
 
-        // Step 4 — Use Groq to compare and give verdict
+        // Step 4 — Use Groq to compare and give verdict with correction
         const compareResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -65,27 +80,54 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 model: 'llama-3.3-70b-versatile',
-                max_tokens: 200,
+                max_tokens: 400,
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are an academic reference verifier. Compare the submitted reference with the official database record and return a one-line verdict. Format: ✅ CONFIRMED or ⚠️ MISMATCH: [brief description of what is wrong]. Be concise.'
+                        content: 'You are an academic reference verifier. Compare the submitted reference with the official database record. Return your response in this exact format:\nSTATUS: CONFIRMED or MISMATCH or NOT_FOUND\nVERDICT: one line description\nCORRECTED: the fully corrected reference in the same citation style as the submitted one (only include this line if there is a mismatch)'
                     },
                     {
                         role: 'user',
-                        content: `Submitted reference: ${reference}\n\nOfficial record from ${source}:\nTitle: ${officialTitle}\nYear: ${officialYear}\nAuthors: ${officialAuthors}\n\nCompare and give verdict.`
+                        content: `Submitted reference: ${reference}\n\nOfficial record from ${source}:\nTitle: ${officialTitle}\nYear: ${officialYear}\nAuthors: ${officialAuthors}\nJournal: ${officialJournal || 'N/A'}\nVolume: ${officialVolume || 'N/A'}\nIssue: ${officialIssue || 'N/A'}\nPages: ${officialPages || 'N/A'}\nPublisher: ${officialPublisher || 'N/A'}\nDOI: ${officialDOI || 'N/A'}\n\nCompare carefully and return the STATUS, VERDICT, and CORRECTED reference if needed.`
                     }
                 ]
             })
         });
 
         const compareData = await compareResponse.json();
-        const verdict = compareData.choices[0].message.content.trim();
+        const response_text = compareData.choices[0].message.content.trim();
+
+        // Parse the structured response
+        const statusMatch = response_text.match(/STATUS:\s*(CONFIRMED|MISMATCH|NOT_FOUND)/i);
+        const verdictMatch = response_text.match(/VERDICT:\s*(.+)/i);
+        const correctedMatch = response_text.match(/CORRECTED:\s*(.+)/i);
+
+        const status = statusMatch?.[1]?.toUpperCase() || 'MISMATCH';
+        const verdict = verdictMatch?.[1]?.trim() || response_text;
+        const corrected = correctedMatch?.[1]?.trim() || null;
+
+        let resultText = '';
+
+        if (status === 'CONFIRMED') {
+            resultText = `✅ CONFIRMED\n   Reference: ${reference}\n   Source: ${source}`;
+        } else if (status === 'NOT_FOUND') {
+            resultText = `❌ NOT FOUND — ${verdict}\n   Reference: ${reference}`;
+        } else {
+            resultText = `⚠️ MISMATCH: ${verdict}\n   Reference: ${reference}\n   Source: ${source}`;
+            if (corrected) {
+                resultText += `\n   ✏️ Suggested correction: ${corrected}`;
+            }
+        }
+
         return res.status(200).json({
-            result: `${verdict}\n   Reference: ${reference}\n   Source: ${source}`
+            result: resultText,
+            status: status.toLowerCase()
         });
 
     } catch (error) {
-        return res.status(500).json({ error: `⚠️ ERROR checking — ${reference}` });
+        return res.status(500).json({
+            result: `⚠️ ERROR checking — ${reference}`,
+            status: 'error'
+        });
     }
 }
