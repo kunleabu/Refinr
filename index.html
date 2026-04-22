@@ -982,6 +982,7 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         const progressBar = document.getElementById('progressBar');
 
         progressContainer.classList.add('visible');
+        document.getElementById('progressContainer').scrollIntoView({ behavior: 'smooth' });
         showOutput('Verification Report', 'Starting verification...');
 
         let results = [];
