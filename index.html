@@ -260,7 +260,6 @@
             box-shadow: 0 0 8px rgba(0,255,255,0.5);
         }
 
-        /* Output card */
         .output-card { display: none; }
         .output-card.visible { display: block; }
 
@@ -279,7 +278,6 @@
 
         [data-theme="dark"] .output-header h3 { color: #60A5FA; }
 
-        /* Icon buttons */
         .icon-btns {
             display: flex;
             gap: 8px;
@@ -297,17 +295,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
             transition: all 0.2s;
             color: var(--text);
         }
 
         .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-
         .icon-btn.copy-btn:hover { border-color: #1B3A6B; background: #1B3A6B; color: white; }
         .icon-btn.share-btn:hover { border-color: #2D9B6F; background: #2D9B6F; color: white; }
 
-        /* Tooltip */
+        .icon-btn svg { pointer-events: none; }
+
         .icon-btn .tooltip {
             position: absolute;
             bottom: calc(100% + 6px);
@@ -326,22 +323,7 @@
         }
 
         [data-theme="dark"] .icon-btn .tooltip { background: #E2E8F0; color: #0F172A; }
-
         .icon-btn:hover .tooltip { opacity: 1; }
-
-        /* Colour splash effect */
-        .splash {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: splashAnim 0.6s ease-out forwards;
-            z-index: 9999;
-        }
-
-        @keyframes splashAnim {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
-        }
 
         .output-content {
             background: var(--output-bg);
@@ -356,7 +338,6 @@
             transition: background 0.3s;
         }
 
-        /* Credits bar */
         .credits-bar {
             background: var(--card);
             border-radius: 8px;
@@ -389,7 +370,6 @@
 
         .btn-get-credits:hover { background: #2D4F8A; }
 
-        /* Demo section */
         .demo-section {
             background: var(--card);
             border-radius: 12px;
@@ -476,7 +456,6 @@
             50% { transform: scale(1.2); opacity: 0.7; }
         }
 
-        /* Feedback bar */
         .feedback-bar {
             background: var(--card);
             border-radius: 12px;
@@ -519,7 +498,6 @@
         [data-theme="dark"] .btn-feedback { color: #60A5FA; border-color: #60A5FA; }
         [data-theme="dark"] .btn-feedback:hover { background: #60A5FA; color: #0F172A; }
 
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -579,15 +557,12 @@
         }
 
         .modal select:focus { outline: none; border-color: #1B3A6B; }
-
         .modal-buttons { display: flex; gap: 10px; }
-
         .btn-confirm { background: #1B3A6B; color: white; flex: 1; }
         .btn-confirm-green { background: #2D9B6F; color: white; flex: 1; }
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
-        /* Share modal */
         .share-url-box {
             background: var(--output-bg);
             border: 1.5px solid var(--border);
@@ -609,16 +584,10 @@
             z-index: 1;
         }
 
-        /* Mobile */
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
             header p { font-size: 0.8rem; }
-            .theme-toggle {
-                position: static;
-                transform: none;
-                margin-top: 10px;
-                display: inline-block;
-            }
+            .theme-toggle { position: static; transform: none; margin-top: 10px; display: inline-block; }
             .header-inner { flex-direction: column; gap: 8px; }
             .buttons-row { grid-template-columns: repeat(2, 1fr); }
             .demo-grid { grid-template-columns: 1fr; }
@@ -645,13 +614,11 @@
 
 <div class="container">
 
-    <!-- Credits bar -->
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
         <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
     </div>
 
-    <!-- Main input card -->
     <div class="card">
         <div class="input-header">
             <label style="margin-bottom:0">Paste your references, DOIs, or ISBNs below</label>
@@ -679,25 +646,30 @@
         </div>
     </div>
 
-    <!-- Output card -->
     <div class="card output-card" id="outputCard">
         <div class="output-header">
             <h3 id="outputTitle">Results</h3>
             <div class="icon-btns">
-                <button class="icon-btn copy-btn" onclick="copyResults(event)" title="Copy">
-                    📋
-                    <span class="tooltip">Copy results</span>
+                <button class="icon-btn copy-btn" onclick="copyResults(event)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    <span class="tooltip">Copy</span>
                 </button>
-                <button class="icon-btn share-btn" id="shareBtn" onclick="shareReport(event)" style="display:none;" title="Share">
-                    🔗
-                    <span class="tooltip">Share report</span>
+                <button class="icon-btn share-btn" id="shareBtn" onclick="shareReport(event)" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                    </svg>
+                    <span class="tooltip">Share</span>
                 </button>
             </div>
         </div>
         <div class="output-content" id="outputContent"></div>
     </div>
 
-    <!-- Before/After Demo -->
     <div class="demo-section">
         <h2>✨ See what Refinr does</h2>
         <div class="demo-grid">
@@ -723,7 +695,6 @@
         </div>
     </div>
 
-    <!-- Feedback bar -->
     <div class="feedback-bar">
         <div>
             <strong>Help us improve Refinr</strong>
@@ -810,14 +781,12 @@
     let credits = 5;
     let currentShareUrl = '';
 
-    // Cursor glow
     const glow = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', (e) => {
         glow.style.left = e.clientX + 'px';
         glow.style.top = e.clientY + 'px';
     });
 
-    // Dark mode
     function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
@@ -830,25 +799,46 @@
         }
     }
 
-    // Colour splash effect
     function createSplash(e) {
-        const colours = ['#1B3A6B', '#2D9B6F', '#7C3AED', '#D97706', '#00FFFF', '#F59E0B'];
-        const colour = colours[Math.floor(Math.random() * colours.length)];
-        const splash = document.createElement('div');
-        splash.className = 'splash';
-        splash.style.cssText = `
-            left: ${e.clientX}px;
-            top: ${e.clientY}px;
-            width: 40px;
-            height: 40px;
-            background: ${colour};
-            opacity: 0.4;
-        `;
-        document.body.appendChild(splash);
-        setTimeout(() => splash.remove(), 600);
+        const colours = ['#1B3A6B', '#2D9B6F', '#7C3AED', '#D97706', '#00FFFF', '#F59E0B', '#EF4444', '#EC4899'];
+        for (let i = 0; i < 16; i++) {
+            const particle = document.createElement('div');
+            const colour = colours[Math.floor(Math.random() * colours.length)];
+            const angle = (i / 16) * 360 + Math.random() * 20;
+            const distance = 30 + Math.random() * 70;
+            const size = 5 + Math.random() * 8;
+
+            particle.style.cssText = `
+                position: fixed;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${colour};
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.55s ease-out;
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            `;
+
+            document.body.appendChild(particle);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const rad = (angle * Math.PI) / 180;
+                    const x = Math.cos(rad) * distance;
+                    const y = Math.sin(rad) * distance;
+                    particle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                    particle.style.opacity = '0';
+                });
+            });
+
+            setTimeout(() => particle.remove(), 600);
+        }
     }
 
-    // Load example
     function loadExample() {
         document.getElementById('referencesInput').value = `smith j 2020 academic writing oxford press
 jones mary 2019 research methods cambridge university press london
@@ -885,15 +875,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('outputTitle').textContent = title;
         document.getElementById('outputContent').textContent = content;
         document.getElementById('outputCard').classList.add('visible');
-
-        // Show share button only for verification reports
         const shareBtn = document.getElementById('shareBtn');
         if (title === 'Verification Report') {
             shareBtn.style.display = 'flex';
         } else {
             shareBtn.style.display = 'none';
         }
-
         document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -903,13 +890,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             createSplash(e);
             const btn = e.currentTarget;
             const tooltip = btn.querySelector('.tooltip');
+            const svg = btn.querySelector('svg');
             tooltip.textContent = 'Copied!';
-            btn.textContent = '✅';
-            btn.appendChild(tooltip);
+            if (svg) svg.style.stroke = '#2D9B6F';
             setTimeout(() => {
-                btn.textContent = '📋';
-                btn.appendChild(tooltip);
-                tooltip.textContent = 'Copy results';
+                tooltip.textContent = 'Copy';
+                if (svg) svg.style.stroke = 'currentColor';
             }, 2000);
         });
     }
@@ -917,7 +903,6 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
     async function shareReport(e) {
         const content = document.getElementById('outputContent').textContent;
         const title = document.getElementById('outputTitle').textContent;
-
         document.getElementById('shareUrlBox').textContent = 'Generating link...';
         document.getElementById('shareModal').classList.add('visible');
 
@@ -937,14 +922,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             });
 
             const data = await response.json();
-
             if (data.binId) {
                 currentShareUrl = `${window.location.origin}?report=${data.binId}`;
                 document.getElementById('shareUrlBox').textContent = currentShareUrl;
             } else {
                 document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
             }
-
         } catch (error) {
             document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
         }
@@ -1018,7 +1001,6 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
-        // Calculate accuracy score
         const total = results.length;
         const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
         const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
@@ -1077,7 +1059,6 @@ ${results.join('\n\n')}`;
         progressContainer.classList.add('visible');
         progressLabel.textContent = `Looking up ${lines.length} identifiers...`;
         progressBar.style.width = '30%';
-
         showOutput('Looking up references...', 'Fetching reference details...');
 
         try {
@@ -1087,31 +1068,25 @@ ${results.join('\n\n')}`;
                 body: JSON.stringify({ identifiers, format })
             });
             const data = await response.json();
-
             progressBar.style.width = '100%';
             progressLabel.textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
             showOutput(`DOI/ISBN Lookup — ${format}`, data.results.join('\n\n'));
-
             setTimeout(() => {
                 progressContainer.classList.remove('visible');
                 progressBar.style.width = '0%';
             }, 3000);
-
         } catch (error) {
             showOutput('Error', 'Something went wrong. Please try again.');
         }
     }
 
-    // Load shared report if URL has report parameter
     async function loadSharedReport() {
         const params = new URLSearchParams(window.location.search);
         const reportId = params.get('report');
-
         if (reportId) {
             try {
                 const response = await fetch(`/api/report?id=${reportId}`);
                 const data = await response.json();
-
                 if (data.reportData) {
                     showOutput(
                         `${data.reportData.title} — ${data.reportData.date}`,
