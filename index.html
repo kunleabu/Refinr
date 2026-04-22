@@ -780,6 +780,12 @@
 <script>
     let credits = 5;
     let currentShareUrl = '';
+    // Restore saved theme
+    const savedTheme = localStorage.getItem('refinr-theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeBtn').textContent = '☀️ Light mode';
+    }
 
     const glow = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', (e) => {
@@ -787,15 +793,17 @@
         glow.style.top = e.clientY + 'px';
     });
 
-    function toggleTheme() {
+  function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
         if (html.getAttribute('data-theme') === 'light') {
             html.setAttribute('data-theme', 'dark');
             btn.textContent = '☀️ Light mode';
+            localStorage.setItem('refinr-theme', 'dark');
         } else {
             html.setAttribute('data-theme', 'light');
             btn.textContent = '🌙 Dark mode';
+            localStorage.setItem('refinr-theme', 'light');
         }
     }
 
