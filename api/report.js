@@ -19,7 +19,8 @@ export default async function handler(req, res) {
             });
 
             const data = await response.json();
-            const binId = data.metadata?.id;
+            console.log('JSONBin response:', JSON.stringify(data));
+const binId = data.metadata?.id;
 
             if (!binId) {
                 return res.status(500).json({ error: 'Failed to save report' });
