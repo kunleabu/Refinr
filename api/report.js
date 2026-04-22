@@ -12,6 +12,7 @@ export default async function handler(req, res) {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': process.env.JSONBIN_API_KEY,
+'X-Access-Key': process.env.JSONBIN_API_KEY,
                     'X-Bin-Name': `refinr-report-${Date.now()}`,
                     'X-Bin-Private': 'false'
                 },
