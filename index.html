@@ -85,11 +85,8 @@
             letter-spacing: 2px;
         }
 
-        header p {
-            color: #A8C4E0;
-            font-size: 0.95rem;
-            margin-top: 5px;
-        }
+        header p { color: #A8C4E0; font-size: 0.95rem; margin-top: 5px; }
+        header p.sub { color: #7DD3FC; font-size: 0.8rem; margin-top: 4px; }
 
         .theme-toggle {
             position: absolute;
@@ -306,7 +303,6 @@
         .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .icon-btn.copy-btn:hover { border-color: #1B3A6B; background: #1B3A6B; color: white; }
         .icon-btn.share-btn:hover { border-color: #2D9B6F; background: #2D9B6F; color: white; }
-
         .icon-btn svg { pointer-events: none; }
 
         .icon-btn .tooltip {
@@ -387,8 +383,15 @@
             color: #1B3A6B;
             font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
             text-align: center;
+        }
+
+        .demo-section .demo-subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
         }
 
         [data-theme="dark"] .demo-section h2 { color: #60A5FA; }
@@ -472,17 +475,8 @@
             transition: background 0.3s;
         }
 
-        .feedback-bar p {
-            color: var(--muted);
-            font-size: 0.85rem;
-        }
-
-        .feedback-bar strong {
-            color: var(--text);
-            display: block;
-            font-size: 0.95rem;
-            margin-bottom: 3px;
-        }
+        .feedback-bar p { color: var(--muted); font-size: 0.85rem; }
+        .feedback-bar strong { color: var(--text); display: block; font-size: 0.95rem; margin-bottom: 3px; }
 
         .btn-feedback {
             background: transparent;
@@ -520,10 +514,12 @@
             border-radius: 16px;
             padding: 30px;
             width: 90%;
-            max-width: 440px;
+            max-width: 460px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
             border: 1px solid var(--border);
             animation: slideUp 0.2s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes slideUp {
@@ -531,21 +527,10 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .modal h3 {
-            color: #1B3A6B;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
+        .modal h3 { color: #1B3A6B; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
         [data-theme="dark"] .modal h3 { color: #60A5FA; }
 
-        .modal p {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
+        .modal p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.6; }
 
         .modal select {
             width: 100%;
@@ -556,7 +541,7 @@
             font-size: 0.9rem;
             color: var(--text);
             background: var(--input-bg);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             appearance: none;
         }
 
@@ -566,6 +551,62 @@
         .btn-confirm-green { background: #2D9B6F; color: white; flex: 1; }
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
+
+        /* Lookup tabs */
+        .lookup-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .lookup-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            padding: 8px 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lookup-tab.active { color: #D97706; border-bottom-color: #D97706; }
+        .lookup-tab:hover { color: #D97706; }
+
+        .lookup-textarea {
+            height: 100px;
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            background: var(--input-bg);
+            color: var(--text);
+            resize: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .lookup-textarea:focus { outline: none; border-color: #D97706; }
+
+        .lookup-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: var(--input-bg);
+            margin-bottom: 16px;
+            appearance: none;
+        }
 
         .share-url-box {
             background: var(--output-bg);
@@ -599,6 +640,7 @@
             .feedback-bar { flex-direction: column; gap: 12px; text-align: center; }
             .credits-bar { flex-direction: column; gap: 8px; text-align: center; }
             .card { padding: 20px; }
+            .lookup-tab { padding: 6px 10px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -610,8 +652,8 @@
     <div class="header-inner">
         <div>
             <h1>REFINR</h1>
-<p>Format. Verify. Submit with confidence.</p>
-<p style="color:#7DD3FC; font-size:0.8rem; margin-top:4px;">Paste messy references → get them cleaned, formatted and verified in seconds</p>
+            <p>Format. Verify. Submit with confidence.</p>
+            <p class="sub">Paste messy references → get them cleaned, formatted and verified in seconds</p>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark mode</button>
     </div>
@@ -635,12 +677,12 @@
             <button class="btn btn-clean" onclick="openCleanModal()">📋 Clean references</button>
             <button class="btn btn-verify" onclick="openVerifyModal()">🔍 Verify <span class="badge">Pro</span></button>
             <button class="btn btn-intext" onclick="generateIntext()">📝 In-text citations</button>
-            <button class="btn btn-lookup" onclick="openLookupModal()">🔎 DOI / ISBN</button>
+            <button class="btn btn-lookup" onclick="openLookupModal()">🔎 Lookup tools</button>
         </div>
 
         <div class="progress-container" id="progressContainer">
             <div class="progress-label">
-                <span id="progressLabel">Verifying references...</span>
+                <span id="progressLabel">Processing...</span>
                 <div class="progress-dots">
                     <span></span><span></span><span></span>
                 </div>
@@ -676,8 +718,8 @@
     </div>
 
     <div class="demo-section">
-      <h2>✨ Watch Refinr clean and format messy references in real time</h2>
-<p style="text-align:center; color:var(--muted); font-size:0.85rem; margin-top:-12px; margin-bottom:16px;">Four messy references go in → duplicates removed, alphabetised, Harvard formatted</p>
+        <h2>✨ Watch Refinr clean and format messy references in real time</h2>
+        <p class="demo-subtitle">Four messy references go in → duplicates removed, alphabetised, Harvard formatted</p>
         <div class="demo-grid">
             <div class="demo-box before">
                 <div class="demo-label">Before</div>
@@ -750,20 +792,63 @@
     </div>
 </div>
 
-<!-- Lookup Modal -->
+<!-- Lookup Modal — Tabbed -->
 <div class="modal-overlay" id="lookupModal">
     <div class="modal">
-        <h3>DOI / ISBN Lookup</h3>
-        <p>Paste one DOI or ISBN per line. Refinr will fetch the full reference details and format them automatically.</p>
-        <select id="lookupFormatSelect">
-            <option value="Harvard">Harvard</option>
-            <option value="APA">APA</option>
-            <option value="MLA">MLA</option>
-            <option value="Chicago">Chicago</option>
-        </select>
-        <div class="modal-buttons">
-            <button class="btn btn-confirm-orange" onclick="lookupIdentifiers()">Look up references</button>
-            <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
+        <h3>🔎 Reference Lookup Tools</h3>
+
+        <div class="lookup-tabs">
+            <button class="lookup-tab active" id="tab-btn-doi" onclick="switchTab('doi', event)">DOI / ISBN</button>
+            <button class="lookup-tab" id="tab-btn-url" onclick="switchTab('url', event)">URL</button>
+            <button class="lookup-tab" id="tab-btn-title" onclick="switchTab('title', event)">Find by Title</button>
+        </div>
+
+        <!-- DOI/ISBN Tab -->
+        <div class="lookup-panel" id="tab-doi">
+            <p>Paste one DOI or ISBN per line. Refinr fetches full reference details automatically.</p>
+            <textarea class="lookup-textarea" id="doiInput" placeholder="10.1038/nature04244&#10;9780140449136&#10;10.1126/science.1157996"></textarea>
+            <select class="lookup-select" id="lookupFormatSelect">
+                <option value="Harvard">Harvard</option>
+                <option value="APA">APA</option>
+                <option value="MLA">MLA</option>
+                <option value="Chicago">Chicago</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm-orange" onclick="lookupIdentifiers()">Look up references</button>
+                <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
+            </div>
+        </div>
+
+        <!-- URL Tab -->
+        <div class="lookup-panel" id="tab-url" style="display:none;">
+            <p>Paste a webpage URL — Refinr extracts the reference details and formats them automatically.</p>
+            <textarea class="lookup-textarea" id="urlInput" placeholder="https://www.nature.com/articles/nature04244&#10;https://pubmed.ncbi.nlm.nih.gov/12345678/"></textarea>
+            <select class="lookup-select" id="urlFormatSelect">
+                <option value="Harvard">Harvard</option>
+                <option value="APA">APA</option>
+                <option value="MLA">MLA</option>
+                <option value="Chicago">Chicago</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm-orange" onclick="lookupByURL()">Extract reference</button>
+                <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Find by Title Tab -->
+        <div class="lookup-panel" id="tab-title" style="display:none;">
+            <p>Enter an article title or author name. Refinr searches CrossRef and returns the DOI and full reference.</p>
+            <textarea class="lookup-textarea" id="titleInput" placeholder="Quantum teleportation between light and matter&#10;Sherson Krauter 2006 Nature"></textarea>
+            <select class="lookup-select" id="titleFormatSelect">
+                <option value="Harvard">Harvard</option>
+                <option value="APA">APA</option>
+                <option value="MLA">MLA</option>
+                <option value="Chicago">Chicago</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm-orange" onclick="lookupByTitle()">Find reference</button>
+                <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
+            </div>
         </div>
     </div>
 </div>
@@ -771,8 +856,8 @@
 <!-- Share Modal -->
 <div class="modal-overlay" id="shareModal">
     <div class="modal">
-        <h3>Share verification report</h3>
-        <p>Anyone with this link can view the full verification report — no account needed. Perfect for sharing with your supervisor.</p>
+        <h3>Share report</h3>
+        <p>Anyone with this link can view the full report — no account needed.</p>
         <div class="share-url-box" id="shareUrlBox">Generating link...</div>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="copyShareLink()">Copy link</button>
@@ -786,6 +871,7 @@
 <script>
     let credits = 5;
     let currentShareUrl = '';
+
     // Restore saved theme
     const savedTheme = localStorage.getItem('refinr-theme');
     if (savedTheme === 'dark') {
@@ -793,13 +879,15 @@
         document.getElementById('themeBtn').textContent = '☀️ Light mode';
     }
 
+    // Cursor glow
     const glow = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', (e) => {
         glow.style.left = e.clientX + 'px';
         glow.style.top = e.clientY + 'px';
     });
 
-  function toggleTheme() {
+    // Dark mode
+    function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
         if (html.getAttribute('data-theme') === 'light') {
@@ -813,6 +901,7 @@
         }
     }
 
+    // Particle splash
     function createSplash(e) {
         const colours = ['#1B3A6B', '#2D9B6F', '#7C3AED', '#D97706', '#00FFFF', '#F59E0B', '#EF4444', '#EC4899'];
         for (let i = 0; i < 16; i++) {
@@ -821,44 +910,34 @@
             const angle = (i / 16) * 360 + Math.random() * 20;
             const distance = 30 + Math.random() * 70;
             const size = 5 + Math.random() * 8;
-
-            particle.style.cssText = `
-                position: fixed;
-                left: ${e.clientX}px;
-                top: ${e.clientY}px;
-                width: ${size}px;
-                height: ${size}px;
-                background: ${colour};
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.55s ease-out;
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            `;
-
+            particle.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;width:${size}px;height:${size}px;background:${colour};border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.55s ease-out;transform:translate(-50%,-50%);opacity:1;`;
             document.body.appendChild(particle);
-
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     const rad = (angle * Math.PI) / 180;
-                    const x = Math.cos(rad) * distance;
-                    const y = Math.sin(rad) * distance;
-                    particle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                    particle.style.transform = `translate(calc(-50% + ${Math.cos(rad) * distance}px), calc(-50% + ${Math.sin(rad) * distance}px))`;
                     particle.style.opacity = '0';
                 });
             });
-
             setTimeout(() => particle.remove(), 600);
         }
     }
 
+    // Load example
     function loadExample() {
         document.getElementById('referencesInput').value = `smith j 2020 academic writing oxford press
 jones mary 2019 research methods cambridge university press london
 brown t 2021 scientific writing wiley
 Smith J 2020 Academic Writing Oxford Press
 Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.`;
+    }
+
+    // Tab switcher
+    function switchTab(tab, e) {
+        document.querySelectorAll('.lookup-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.lookup-panel').forEach(p => p.style.display = 'none');
+        document.getElementById(`tab-${tab}`).style.display = 'block';
+        if (e && e.currentTarget) e.currentTarget.classList.add('active');
     }
 
     function openCleanModal() {
@@ -876,8 +955,6 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
     }
 
     function openLookupModal() {
-        const input = document.getElementById('referencesInput').value.trim();
-        if (!input) { alert('Please paste your DOIs or ISBNs first.'); return; }
         document.getElementById('lookupModal').classList.add('visible');
     }
 
@@ -890,12 +967,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('outputContent').textContent = content;
         document.getElementById('outputCard').classList.add('visible');
         const shareBtn = document.getElementById('shareBtn');
-const noShare = ['Cleaning references...', 'Generating in-text citations...', 'Looking up references...', 'Starting verification...'];
-if (noShare.some(t => title.includes(t))) {
-    shareBtn.style.display = 'none';
-} else {
-    shareBtn.style.display = 'flex';
-}
+        const noShare = ['Cleaning references...', 'Generating in-text citations...', 'Looking up references...', 'Starting verification...', 'Searching...', 'Extracting references...'];
+        if (noShare.some(t => title.includes(t))) {
+            shareBtn.style.display = 'none';
+        } else {
+            shareBtn.style.display = 'flex';
+        }
         document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -920,22 +997,12 @@ if (noShare.some(t => title.includes(t))) {
         const title = document.getElementById('outputTitle').textContent;
         document.getElementById('shareUrlBox').textContent = 'Generating link...';
         document.getElementById('shareModal').classList.add('visible');
-
         try {
             const response = await fetch('/api/report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    reportData: {
-                        title,
-                        content,
-                        date: new Date().toLocaleDateString('en-GB', {
-                            day: 'numeric', month: 'long', year: 'numeric'
-                        })
-                    }
-                })
+                body: JSON.stringify({ reportData: { title, content, date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) } })
             });
-
             const data = await response.json();
             if (data.binId) {
                 currentShareUrl = `${window.location.origin}?report=${data.binId}`;
@@ -962,7 +1029,10 @@ if (noShare.some(t => title.includes(t))) {
         closeModal('cleanModal');
         const references = document.getElementById('referencesInput').value.trim();
         const format = document.getElementById('formatSelect').value;
-        showOutput('Cleaning references...', 'Please wait while Refinr formats your references...');
+        document.getElementById('outputTitle').textContent = 'Cleaning references...';
+        document.getElementById('outputContent').textContent = 'Please wait while Refinr formats your references...';
+        document.getElementById('outputCard').classList.add('visible');
+        document.getElementById('shareBtn').style.display = 'none';
         try {
             const response = await fetch('/api/clean', {
                 method: 'POST',
@@ -988,22 +1058,22 @@ if (noShare.some(t => title.includes(t))) {
         const progressLabel = document.getElementById('progressLabel');
         const progressBar = document.getElementById('progressBar');
 
-      progressContainer.classList.add('visible');
-progressContainer.scrollIntoView({ behavior: 'smooth' });
-document.getElementById('outputTitle').textContent = 'Verification Report';
-document.getElementById('outputContent').textContent = 'Starting verification...';
-document.getElementById('outputCard').classList.add('visible');
-document.getElementById('shareBtn').style.display = 'none';
+        progressContainer.classList.add('visible');
+        progressContainer.scrollIntoView({ behavior: 'smooth' });
+
+        document.getElementById('outputTitle').textContent = 'Verification Report';
+        document.getElementById('outputContent').textContent = 'Starting verification...';
+        document.getElementById('outputCard').classList.add('visible');
+        document.getElementById('shareBtn').style.display = 'none';
+
         let results = [];
 
         for (let i = 0; i < referenceList.length; i++) {
             const ref = referenceList[i].trim();
             if (!ref) continue;
-
             const percent = Math.round(((i + 1) / referenceList.length) * 100);
             progressLabel.textContent = `Verifying reference ${i + 1} of ${referenceList.length}...`;
             progressBar.style.width = percent + '%';
-
             try {
                 const response = await fetch('/api/verify', {
                     method: 'POST',
@@ -1015,7 +1085,6 @@ document.getElementById('shareBtn').style.display = 'none';
             } catch (error) {
                 results.push(`⚠️ ERROR checking — ${ref}`);
             }
-
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
@@ -1023,7 +1092,7 @@ document.getElementById('shareBtn').style.display = 'none';
         const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
         const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
         const notFound = results.filter(r => r.includes('❌ NOT FOUND')).length;
-        const score = Math.round((confirmed / total) * 100);
+        const score = total > 0 ? Math.round((confirmed / total) * 100) : 0;
 
         const scoreText = `📊 ACCURACY REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1066,8 +1135,9 @@ ${results.join('\n\n')}`;
 
     async function lookupIdentifiers() {
         closeModal('lookupModal');
-        const identifiers = document.getElementById('referencesInput').value.trim();
+        const identifiers = document.getElementById('doiInput').value.trim();
         const format = document.getElementById('lookupFormatSelect').value;
+        if (!identifiers) { alert('Please paste your DOIs or ISBNs first.'); return; }
 
         const lines = identifiers.split('\n').filter(l => l.trim().length > 0);
         const progressContainer = document.getElementById('progressContainer');
@@ -1088,24 +1158,110 @@ ${results.join('\n\n')}`;
             const data = await response.json();
             progressBar.style.width = '100%';
             progressLabel.textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
+
             const lookupResults = data.results.join('\n');
-showOutput(`DOI/ISBN Lookup — ${format}`, lookupResults);
+            showOutput(`DOI/ISBN Lookup — ${format}`, lookupResults);
 
-// Auto populate input box with results for one-click clean
-document.getElementById('referencesInput').value = lookupResults
-    .split('\n')
-    .map(r => r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim())
-    .filter(r => r.length > 0)
-    .join('\n');
+            document.getElementById('referencesInput').value = data.results
+                .map(r => r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/,'').trim())
+                .filter(r => r.length > 0)
+                .join('\n');
 
-// Show one-click clean prompt
-document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them in any citation style.';
+            document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them in any citation style.';
+
             setTimeout(() => {
                 progressContainer.classList.remove('visible');
                 progressBar.style.width = '0%';
             }, 3000);
         } catch (error) {
             showOutput('Error', 'Something went wrong. Please try again.');
+        }
+    }
+
+    async function lookupByURL() {
+        closeModal('lookupModal');
+        const urls = document.getElementById('urlInput').value.trim();
+        const format = document.getElementById('urlFormatSelect').value;
+        if (!urls) { alert('Please paste at least one URL.'); return; }
+
+        const urlList = urls.split('\n').filter(u => u.trim().length > 0);
+        const progressContainer = document.getElementById('progressContainer');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressBar = document.getElementById('progressBar');
+
+        progressContainer.classList.add('visible');
+        progressLabel.textContent = `Extracting ${urlList.length} URL(s)...`;
+        progressBar.style.width = '20%';
+        showOutput('Extracting references...', 'Fetching page details...');
+
+        try {
+            const response = await fetch('/api/urllookup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urls, format })
+            });
+            const data = await response.json();
+            progressBar.style.width = '100%';
+            progressLabel.textContent = `✅ Extracted ${urlList.length} reference(s)`;
+
+            const results = data.results || [data.result] || ['Could not extract reference'];
+            const outputText = results.join('\n\n');
+            showOutput(`URL Lookup — ${format}`, outputText);
+
+            document.getElementById('referencesInput').value = results
+                .map(r => r.replace(/^✅\s*/, '').trim())
+                .filter(r => r.length > 0)
+                .join('\n');
+
+            setTimeout(() => {
+                progressContainer.classList.remove('visible');
+                progressBar.style.width = '0%';
+            }, 3000);
+        } catch (error) {
+            showOutput('Error', 'Could not extract reference from URL. Please try again.');
+        }
+    }
+
+    async function lookupByTitle() {
+        closeModal('lookupModal');
+        const titles = document.getElementById('titleInput').value.trim();
+        const format = document.getElementById('titleFormatSelect').value;
+        if (!titles) { alert('Please enter a title or author name.'); return; }
+
+        const titleList = titles.split('\n').filter(t => t.trim().length > 0);
+        const progressContainer = document.getElementById('progressContainer');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressBar = document.getElementById('progressBar');
+
+        progressContainer.classList.add('visible');
+        progressLabel.textContent = `Searching for ${titleList.length} reference(s)...`;
+        progressBar.style.width = '20%';
+        showOutput('Searching...', 'Looking up references by title...');
+
+        try {
+            const response = await fetch('/api/titlelookup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titles, format })
+            });
+            const data = await response.json();
+            progressBar.style.width = '100%';
+            progressLabel.textContent = `✅ Found ${titleList.length} reference(s)`;
+
+            const results = data.results || ['Could not find reference'];
+            showOutput(`Title Lookup — ${format}`, results.join('\n\n'));
+
+            document.getElementById('referencesInput').value = results
+                .map(r => r.replace(/^✅\s*/, '').trim())
+                .filter(r => r.length > 0)
+                .join('\n');
+
+            setTimeout(() => {
+                progressContainer.classList.remove('visible');
+                progressBar.style.width = '0%';
+            }, 3000);
+        } catch (error) {
+            showOutput('Error', 'Could not find reference. Please try again.');
         }
     }
 
