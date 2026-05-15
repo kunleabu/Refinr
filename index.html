@@ -1083,7 +1083,18 @@ ${results.join('\n\n')}`;
             const data = await response.json();
             progressBar.style.width = '100%';
             progressLabel.textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
-            showOutput(`DOI/ISBN Lookup — ${format}`, data.results.join('\n\n'));
+            const lookupResults = data.results.join('\n');
+showOutput(`DOI/ISBN Lookup — ${format}`, lookupResults);
+
+// Auto populate input box with results for one-click clean
+document.getElementById('referencesInput').value = lookupResults
+    .split('\n')
+    .map(r => r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim())
+    .filter(r => r.length > 0)
+    .join('\n');
+
+// Show one-click clean prompt
+document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them in any citation style.';
             setTimeout(() => {
                 progressContainer.classList.remove('visible');
                 progressBar.style.width = '0%';
