@@ -886,11 +886,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('outputContent').textContent = content;
         document.getElementById('outputCard').classList.add('visible');
         const shareBtn = document.getElementById('shareBtn');
-        if (title === 'Verification Report') {
-            shareBtn.style.display = 'flex';
-        } else {
-            shareBtn.style.display = 'none';
-        }
+const noShare = ['Cleaning references...', 'Generating in-text citations...', 'Looking up references...', 'Starting verification...'];
+if (noShare.some(t => title.includes(t))) {
+    shareBtn.style.display = 'none';
+} else {
+    shareBtn.style.display = 'flex';
+}
         document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
     }
 
