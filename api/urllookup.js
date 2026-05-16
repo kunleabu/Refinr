@@ -17,70 +17,101 @@ export default async function handler(req, res) {
         if (!trimmed) continue;
 
         try {
-            // Step 1 — Try to extract DOI from URL first
-            const doiMatch = trimmed.match(/10\.\d{4,}\/[^\s]+/);
+            let rawRef = null;
+
+            // Step 1 — Extract DOI from URL (standard format)
+            const doiMatch = trimmed.match(/10\.\d{4,9}\/[^\s&?#]+/);
 
             if (doiMatch) {
-                // Found a DOI in the URL — use CrossRef directly
                 const doi = doiMatch[0].replace(/[.,;)\]]+$/, '');
                 const crossrefResponse = await fetch(
                     `https://api.crossref.org/works/${encodeURIComponent(doi)}`
                 );
-
                 if (crossrefResponse.ok) {
-                    const crossrefData = await crossrefResponse.json();
-                    const item = crossrefData.message;
-
-                    const authors = item.author
-                        ? item.author.map(a => `${a.family || ''}, ${a.given || ''}`).join('; ')
-                        : 'Unknown Author';
-                    const year = item.issued?.['date-parts']?.[0]?.[0] || 'n.d.';
-                    const title = item.title?.[0] || 'Unknown Title';
-                    const journal = item['container-title']?.[0] || '';
-                    const volume = item.volume || '';
-                    const issue = item.issue || '';
-                    const pages = item.page || '';
-                    const publisher = item.publisher || '';
-
-                    let rawRef = `${authors} (${year}) ${title}`;
-                    if (journal) rawRef += `. ${journal}`;
-                    if (volume) rawRef += `, ${volume}`;
-                    if (issue) rawRef += `(${issue})`;
-                    if (pages) rawRef += `, pp. ${pages}`;
-                    if (publisher && !journal) rawRef += `. ${publisher}`;
-                    rawRef += `. doi: ${doi}`;
-
-                    const formatted = await formatWithGroq(rawRef, format, apiKey);
-                    results.push(`✅ ${formatted}`);
-                    continue;
+                    const data = await crossrefResponse.json();
+                    const item = data.message;
+                    rawRef = buildRawRef(item, doi);
                 }
             }
 
-            // Step 2 — No DOI found, use Groq to extract metadata from the URL itself
-            const extractResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
-                    max_tokens: 400,
-                    messages: [
-                        {
-                            role: 'system',
-                            content: `You are an academic reference extractor. Given a URL, extract as much bibliographic information as you can from the URL structure itself (domain, path, identifiers). Then format it as a ${format} citation for a webpage or online resource. Include the URL and access date. Return only the formatted citation.`
-                        },
-                        {
-                            role: 'user',
-                            content: `Extract and format a ${format} reference for this URL:\n${trimmed}\n\nAccess date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
-                        }
-                    ]
-                })
-            });
+            // Step 2 — PubMed URL — extract PMID and query PubMed API
+            if (!rawRef && trimmed.includes('pubmed.ncbi.nlm.nih.gov')) {
+                const pmidMatch = trimmed.match(/\/(\d+)\/?$/);
+                if (pmidMatch) {
+                    const pmid = pmidMatch[1];
+                    const pubmedResponse = await fetch(
+                        `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${pmid}&retmode=json`
+                    );
+                    if (pubmedResponse.ok) {
+                        const pubmedData = await pubmedResponse.json();
+                        const article = pubmedData.result?.[pmid];
+                        if (article) {
+                            const authors = article.authors
+                                ? article.authors.map(a => a.name).join('; ')
+                                : 'Unknown Author';
+                            const year = article.pubdate?.split(' ')?.[0] || 'n.d.';
+                            const title = article.title || 'Unknown Title';
+                            const journal = article.fulljournalname || article.source || '';
+                            const volume = article.volume || '';
+                            const issue = article.issue || '';
+                            const pages = article.pages || '';
+                            const doi = article.elocationid?.replace('doi: ', '') || '';
 
-            const extractData = await extractResponse.json();
-            const formatted = extractData.choices[0].message.content.trim();
+                            rawRef = `${authors} (${year}) ${title}`;
+                            if (journal) rawRef += `. ${journal}`;
+                            if (volume) rawRef += `, ${volume}`;
+                            if (issue) rawRef += `(${issue})`;
+                            if (pages) rawRef += `, pp. ${pages}`;
+                            if (doi) rawRef += `. doi: ${doi}`;
+                        }
+                    }
+                }
+            }
+
+            // Step 3 — Nature/journal URLs — try to find DOI via CrossRef title search
+            if (!rawRef && (trimmed.includes('nature.com') || trimmed.includes('science.org') || trimmed.includes('cell.com'))) {
+                const slug = trimmed.split('/').pop().replace(/-/g, ' ');
+                const crossrefResponse = await fetch(
+                    `https://api.crossref.org/works?query=${encodeURIComponent(slug)}&rows=1`
+                );
+                if (crossrefResponse.ok) {
+                    const data = await crossrefResponse.json();
+                    const item = data.message.items?.[0];
+                    if (item && item.score > 5) {
+                        rawRef = buildRawRef(item, item.DOI);
+                    }
+                }
+            }
+
+            // Step 4 — Fallback: use Groq to format as a webpage citation
+            if (!rawRef) {
+                const extractResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        max_tokens: 300,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are an academic reference formatter. Format this URL as a ${format} online/webpage citation. Include the URL and today's access date. Return only the formatted citation.`
+                            },
+                            {
+                                role: 'user',
+                                content: `Format a ${format} citation for this URL:\n${trimmed}\nAccess date: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                            }
+                        ]
+                    })
+                });
+                const extractData = await extractResponse.json();
+                results.push(`✅ ${extractData.choices[0].message.content.trim()}`);
+                continue;
+            }
+
+            const formatted = await formatWithGroq(rawRef, format, apiKey);
             results.push(`✅ ${formatted}`);
 
         } catch (error) {
@@ -89,6 +120,28 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({ results });
+}
+
+function buildRawRef(item, doi) {
+    const authors = item.author
+        ? item.author.map(a => `${a.family || ''}, ${a.given || ''}`).join('; ')
+        : 'Unknown Author';
+    const year = item.issued?.['date-parts']?.[0]?.[0] || 'n.d.';
+    const title = item.title?.[0] || 'Unknown Title';
+    const journal = item['container-title']?.[0] || '';
+    const volume = item.volume || '';
+    const issue = item.issue || '';
+    const pages = item.page || '';
+    const publisher = item.publisher || '';
+
+    let rawRef = `${authors} (${year}) ${title}`;
+    if (journal) rawRef += `. ${journal}`;
+    if (volume) rawRef += `, ${volume}`;
+    if (issue) rawRef += `(${issue})`;
+    if (pages) rawRef += `, pp. ${pages}`;
+    if (publisher && !journal) rawRef += `. ${publisher}`;
+    if (doi) rawRef += `. doi: ${doi}`;
+    return rawRef;
 }
 
 async function formatWithGroq(rawRef, format, apiKey) {
