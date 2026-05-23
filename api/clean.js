@@ -5,6 +5,15 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    // Rate limiting
+    const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+    const limit = rateLimit(ip, 'clean', 30);
+    if (!limit.allowed) {
+        return res.status(429).json({ 
+            error: `Too many requests. Please wait ${limit.resetIn} minutes before trying again.` 
+        });
+    }
+
     const { references, format } = req.body;
 
     if (!references || !format) {
