@@ -1,6 +1,17 @@
+import { rateLimit } from './ratelimit.js';
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Rate limiting
+    const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+    const limit = rateLimit(ip, 'verify', 10);
+    if (!limit.allowed) {
+        return res.status(429).json({ 
+            error: `Too many requests. Please wait ${limit.resetIn} minutes before trying again.` 
+        });
     }
 
     const { reference } = req.body;
