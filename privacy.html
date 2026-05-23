@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Refinr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5F7FA;
+            --card: #ffffff;
+            --text: #2D2D2D;
+            --muted: #6B7280;
+            --border: #e0e7ef;
+            --header-bg: #1B3A6B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--header-bg);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        header h1 { color: white; font-size: 2rem; font-weight: 700; letter-spacing: 2px; }
+        header p { color: #A8C4E0; font-size: 0.9rem; margin-top: 5px; }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            color: #1B3A6B;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 30px 0 10px;
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        p {
+            color: var(--text);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        ul li {
+            color: var(--text);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin-bottom: 6px;
+        }
+
+        .last-updated {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #1B3A6B;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.7; }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        a { color: #1B3A6B; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>REFINR</h1>
+    <p>Format. Verify. Submit with confidence.</p>
+</header>
+
+<div class="container">
+    <a href="/" class="back-link">← Back to Refinr</a>
+
+    <div class="card">
+        <h2>Privacy Policy</h2>
+        <p class="last-updated">Last updated: May 2026</p>
+
+        <h2>1. Who We Are</h2>
+        <p>Refinr is an academic reference formatting and verification tool available at refinr-murex.vercel.app. Refinr is operated by an independent developer. For any privacy-related questions, contact us at hello.refinr@gmail.com.</p>
+
+        <h2>2. What Data We Collect</h2>
+        <p>Refinr is designed to collect as little data as possible. Here is exactly what we collect:</p>
+        <ul>
+            <li><strong>References you paste</strong> — the text you submit is sent to our AI processing service (Groq) and academic databases (CrossRef, OpenAlex) to format and verify your references. We do not store this text permanently.</li>
+            <li><strong>Anonymous usage analytics</strong> — we use Vercel Analytics to collect anonymous page visit data including country, device type and browser. No personal information is collected.</li>
+            <li><strong>Feedback form responses</strong> — if you submit feedback via our Tally form, your responses including any email address you voluntarily provide are stored by Tally.so and sent to hello.refinr@gmail.com.</li>
+            <li><strong>Shared reports</strong> — if you use the Share Report feature, your verification report is stored temporarily on JSONBin.io and accessible to anyone with the link.</li>
+        </ul>
+
+        <h2>3. What We Do Not Collect</h2>
+        <ul>
+            <li>We do not collect your name, email or any personal information unless you voluntarily provide it via our feedback form</li>
+            <li>We do not use cookies for tracking</li>
+            <li>We do not sell any data to third parties</li>
+            <li>We do not use your references to train AI models</li>
+            <li>We do not store your references after processing is complete</li>
+        </ul>
+
+        <h2>4. Third Party Services</h2>
+        <p>Refinr uses the following third party services to operate:</p>
+        <ul>
+            <li><strong>Groq API</strong> — processes your references using AI. See Groq's privacy policy at groq.com</li>
+            <li><strong>CrossRef API</strong> — verifies references against academic records. See crossref.org</li>
+            <li><strong>OpenAlex API</strong> — backup verification database. See openalex.org</li>
+            <li><strong>Vercel</strong> — hosts Refinr and provides anonymous analytics. See vercel.com/legal/privacy-policy</li>
+            <li><strong>Tally.so</strong> — powers our feedback form. See tally.so/privacy</li>
+            <li><strong>JSONBin.io</strong> — temporarily stores shared verification reports. See jsonbin.io</li>
+        </ul>
+
+        <h2>5. How Long We Keep Data</h2>
+        <ul>
+            <li>References submitted for processing — not stored, processed in real time only</li>
+            <li>Shared reports — stored on JSONBin until manually deleted or their free tier limit is reached</li>
+            <li>Feedback form responses — stored by Tally.so per their data retention policy</li>
+            <li>Analytics data — anonymous, retained by Vercel per their policy</li>
+        </ul>
+
+        <h2>6. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Request deletion of any feedback you submitted — email hello.refinr@gmail.com</li>
+            <li>Request deletion of a shared report — email hello.refinr@gmail.com with the report link</li>
+            <li>Know what data we hold about you — email hello.refinr@gmail.com</li>
+        </ul>
+
+        <h2>7. Children's Privacy</h2>
+        <p>Refinr is designed for academic and research use. We do not knowingly collect data from anyone under the age of 13. If you believe a child has submitted data via Refinr, please contact us at hello.refinr@gmail.com.</p>
+
+        <h2>8. Changes to This Policy</h2>
+        <p>We may update this privacy policy as Refinr grows. Any significant changes will be noted at the top of this page with an updated date. Continued use of Refinr after changes constitutes acceptance of the updated policy.</p>
+
+        <h2>9. Contact</h2>
+        <p>For any privacy questions or data requests, contact us at <a href="mailto:hello.refinr@gmail.com">hello.refinr@gmail.com</a></p>
+    </div>
+</div>
+
+<footer>© 2026 Refinr. All rights reserved.</footer>
+
+</body>
+</html>
