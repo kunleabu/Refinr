@@ -62,8 +62,7 @@
 
         header {
             background: var(--header-bg);
-            padding: 20px;
-            text-align: center;
+            padding: 16px 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
             position: relative;
             z-index: 10;
@@ -72,34 +71,145 @@
         .header-inner {
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
+            justify-content: space-between;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        header h1 { color: white; font-size: 2.5rem; font-weight: 700; letter-spacing: 2px; }
-        header p { color: #A8C4E0; font-size: 0.95rem; margin-top: 5px; }
-        header p.sub { color: #7DD3FC; font-size: 0.8rem; margin-top: 4px; }
+        .header-brand { text-align: center; flex: 1; }
+        header h1 { color: white; font-size: 2rem; font-weight: 700; letter-spacing: 2px; }
+        header p { color: #A8C4E0; font-size: 0.85rem; margin-top: 3px; }
+        header p.sub { color: #7DD3FC; font-size: 0.75rem; margin-top: 2px; }
+
+        .header-left { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+        .header-right { display: flex; align-items: center; gap: 8px; min-width: 120px; justify-content: flex-end; }
 
         .theme-toggle {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
             background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.3);
             border-radius: 50px;
-            padding: 6px 14px;
+            padding: 5px 12px;
             color: white;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
         }
 
         .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+
+        /* Auth buttons in header */
+        .btn-signin {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            padding: 5px 14px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-signin:hover { background: rgba(255,255,255,0.25); }
+
+        .btn-signup-header {
+            background: white;
+            border: none;
+            border-radius: 50px;
+            padding: 5px 14px;
+            color: #1B3A6B;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-signup-header:hover { background: #e8f0fe; }
+
+        /* User avatar */
+        .user-avatar {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-avatar.visible { display: flex; }
+
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            color: #1B3A6B;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .avatar-name {
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Dropdown menu */
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 200;
+        }
+
+        .user-dropdown.visible { display: block; }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover { background: var(--bg); }
+        .dropdown-item.danger { color: #EF4444; }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+        .dropdown-credits {
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+        }
+
+        .dropdown-credits strong { color: #1B3A6B; font-size: 1rem; display: block; }
+        [data-theme="dark"] .dropdown-credits strong { color: #60A5FA; }
 
         .container {
             max-width: 800px;
@@ -241,7 +351,6 @@
         .output-card.visible { display: block; }
 
         .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-
         .output-header h3 { color: #1B3A6B; font-size: 1rem; font-weight: 600; }
         [data-theme="dark"] .output-header h3 { color: #60A5FA; }
 
@@ -300,6 +409,7 @@
             transition: background 0.3s;
         }
 
+        /* Credits bar */
         .credits-bar {
             background: var(--card);
             border-radius: 8px;
@@ -332,6 +442,7 @@
 
         .btn-get-credits:hover { background: #2D4F8A; }
 
+        /* Demo section */
         .demo-section {
             background: var(--card);
             border-radius: 12px;
@@ -393,6 +504,7 @@
             50% { transform: scale(1.2); opacity: 0.7; }
         }
 
+        /* Feedback bar */
         .feedback-bar {
             background: var(--card);
             border-radius: 12px;
@@ -427,13 +539,7 @@
         [data-theme="dark"] .btn-feedback:hover { background: #60A5FA; color: #0F172A; }
 
         /* Social footer */
-        .social-footer {
-            text-align: center;
-            padding: 20px;
-            border-top: 1px solid var(--border);
-            margin-top: 10px;
-        }
-
+        .social-footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); margin-top: 10px; }
         .social-icons { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
 
         .social-icon {
@@ -448,7 +554,6 @@
             color: var(--muted);
             text-decoration: none;
             transition: all 0.2s;
-            cursor: pointer;
         }
 
         .social-icon:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -476,6 +581,7 @@
 
         .social-icon:hover .tooltip { opacity: 1; }
 
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -511,6 +617,68 @@
         [data-theme="dark"] .modal h3 { color: #60A5FA; }
         .modal p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.6; }
 
+        /* Auth form styles */
+        .auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+
+        .auth-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            padding: 8px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-tab.active { color: #1B3A6B; border-bottom-color: #1B3A6B; }
+        [data-theme="dark"] .auth-tab.active { color: #60A5FA; border-bottom-color: #60A5FA; }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--input-bg);
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .auth-input:focus { outline: none; border-color: #1B3A6B; }
+        .auth-input::placeholder { color: var(--muted); }
+
+        .auth-error {
+            background: #FEF2F2;
+            border: 1px solid #FCA5A5;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #EF4444;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .auth-error.visible { display: block; }
+
+        .auth-success {
+            background: #F0FDF4;
+            border: 1px solid #6EE7B7;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #10B981;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .auth-success.visible { display: block; }
+
         .modal select {
             width: 100%;
             padding: 12px;
@@ -531,7 +699,8 @@
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
-        .lookup-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+        /* Lookup tabs */
+        .lookup-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
 
         .lookup-tab {
             background: transparent;
@@ -602,15 +771,14 @@
         }
 
         @media (max-width: 600px) {
-            header h1 { font-size: 1.8rem; }
-            header p { font-size: 0.8rem; }
-            .theme-toggle { position: static; transform: none; margin-top: 10px; display: inline-block; }
-            .header-inner { flex-direction: column; gap: 8px; }
+            header h1 { font-size: 1.5rem; }
+            header p { font-size: 0.75rem; }
+            header p.sub { display: none; }
+            .avatar-name { display: none; }
             .buttons-row { grid-template-columns: repeat(2, 1fr); }
             .demo-grid { grid-template-columns: 1fr; }
             .demo-arrow { transform: rotate(90deg); display: block; text-align: center; }
             .feedback-bar { flex-direction: column; gap: 12px; text-align: center; }
-            .credits-bar { flex-direction: column; gap: 8px; text-align: center; }
             .card { padding: 20px; }
             .lookup-tab { padding: 6px 10px; font-size: 0.75rem; }
         }
@@ -622,12 +790,39 @@
 
 <header>
     <div class="header-inner">
-        <div>
+        <div class="header-left">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+        </div>
+        <div class="header-brand">
             <h1>REFINR</h1>
             <p>Format. Verify. Submit with confidence.</p>
-            <p class="sub">Paste messy references → get them cleaned, formatted and verified in seconds</p>
+            <p class="sub">Paste messy references → cleaned, formatted and verified in seconds</p>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark mode</button>
+        <div class="header-right">
+            <!-- Logged out state -->
+            <div id="authButtons">
+                <button class="btn-signin" onclick="openAuthModal('signin')" style="margin-right:6px;">Sign in</button>
+                <button class="btn-signup-header" onclick="openAuthModal('signup')">Sign up free</button>
+            </div>
+            <!-- Logged in state -->
+            <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">
+                <div class="avatar-circle" id="avatarInitial">?</div>
+                <span class="avatar-name" id="avatarName"></span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-credits">
+                        <strong id="dropdownCredits">5</strong>
+                        verification credits remaining
+                    </div>
+                    <div class="dropdown-item" onclick="copyReferralCode()">
+                        🎁 Copy referral code
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" onclick="signOut()">
+                        🚪 Sign out
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -635,7 +830,7 @@
 
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
-        <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
+        <button class="btn-get-credits" onclick="alert('Payment system coming soon! Credits will be available to purchase shortly.')">Get more credits</button>
     </div>
 
     <div class="card">
@@ -728,37 +923,69 @@
         </button>
     </div>
 
-    <!-- Social footer -->
     <div class="social-footer">
         <div class="social-icons">
-            <!-- X / Twitter -->
             <a href="https://x.com/GetRefinr" target="_blank" class="social-icon x-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
                 <span class="tooltip">@GetRefinr on X</span>
             </a>
-            <!-- LinkedIn -->
-            <div class="social-icon linkedin-icon" style="cursor:default;">
+            <a href="https://www.linkedin.com/company/refinr" target="_blank" class="social-icon linkedin-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
                     <circle cx="4" cy="4" r="2"/>
                 </svg>
                 <span class="tooltip">LinkedIn — coming soon</span>
-            </div>
-            <!-- Instagram -->
-            <div class="social-icon instagram-icon" style="cursor:default;">
+            </a>
+            <a href="https://www.instagram.com/getrefinrapp" target="_blank" class="social-icon instagram-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                     <circle cx="12" cy="12" r="4"/>
                     <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
                 </svg>
-                <span class="tooltip">Instagram — coming soon</span>
-            </div>
+                <span class="tooltip">@getrefinrapp on Instagram</span>
+            </a>
         </div>
-       <p style="font-size:0.75rem;">© 2026 Refinr. All rights reserved. | <a href="/privacy" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--muted);">Privacy Policy</a></p>
+        <p style="font-size:0.75rem;">© 2026 Refinr. All rights reserved. | <a href="/privacy" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--muted);">Privacy Policy</a></p>
     </div>
 
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal">
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="signinTab" onclick="switchAuthTab('signin')">Sign in</button>
+            <button class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign up free</button>
+        </div>
+
+        <div id="authError" class="auth-error"></div>
+        <div id="authSuccess" class="auth-success"></div>
+
+        <!-- Sign in form -->
+        <div id="signinForm">
+            <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
+            <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
+            <div class="modal-buttons">
+                <button class="btn btn-confirm" onclick="handleSignIn()">Sign in</button>
+                <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Sign up form -->
+        <div id="signupForm" style="display:none;">
+            <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
+            <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
+            <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
+            <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You'll get 5 free verification credits on signup</p>
+            <div class="modal-buttons">
+                <button class="btn btn-confirm" onclick="handleSignUp()">Create free account</button>
+                <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Clean Modal -->
@@ -785,7 +1012,7 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches in year, author or title.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <p id="verifyModalText">Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
@@ -804,8 +1031,8 @@
         </div>
 
         <div class="lookup-panel" id="tab-doi">
-            <p>Paste one DOI or ISBN per line. Refinr fetches full reference details automatically.</p>
-            <textarea class="lookup-textarea" id="doiInput" placeholder="10.1038/nature04244&#10;9780140449136&#10;10.1126/science.1157996"></textarea>
+            <p>Paste one DOI or ISBN per line.</p>
+            <textarea class="lookup-textarea" id="doiInput" placeholder="10.1038/nature04244&#10;9780140449136"></textarea>
             <select class="lookup-select" id="lookupFormatSelect">
                 <option value="Harvard">Harvard</option>
                 <option value="APA">APA</option>
@@ -819,7 +1046,7 @@
         </div>
 
         <div class="lookup-panel" id="tab-url" style="display:none;">
-            <p>Paste a webpage URL — Refinr extracts the reference details and formats them automatically.</p>
+            <p>Paste a webpage URL to extract reference details.</p>
             <textarea class="lookup-textarea" id="urlInput" placeholder="https://www.nature.com/articles/nature04244&#10;https://pubmed.ncbi.nlm.nih.gov/12345678/"></textarea>
             <select class="lookup-select" id="urlFormatSelect">
                 <option value="Harvard">Harvard</option>
@@ -834,7 +1061,7 @@
         </div>
 
         <div class="lookup-panel" id="tab-title" style="display:none;">
-            <p>Enter an article title or author name. Refinr searches CrossRef and returns the DOI and full reference.</p>
+            <p>Enter a title or author name to find the reference and DOI.</p>
             <textarea class="lookup-textarea" id="titleInput" placeholder="Quantum teleportation between light and matter&#10;Sherson Krauter 2006 Nature"></textarea>
             <select class="lookup-select" id="titleFormatSelect">
                 <option value="Harvard">Harvard</option>
@@ -864,15 +1091,29 @@
 </div>
 
 <script>
-    let credits = 5;
+    // State
+    let currentUser = null;
+    let currentSession = null;
     let currentShareUrl = '';
 
     // Restore saved theme
     const savedTheme = localStorage.getItem('refinr-theme');
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('themeBtn').textContent = '☀️ Light mode';
+        document.getElementById('themeBtn').textContent = '☀️ Dark';
     }
+
+    // Check for saved session on load
+    window.addEventListener('load', () => {
+        const savedSession = localStorage.getItem('refinr-session');
+        const savedUser = localStorage.getItem('refinr-user');
+        if (savedSession && savedUser) {
+            currentSession = JSON.parse(savedSession);
+            currentUser = JSON.parse(savedUser);
+            updateUIForLoggedInUser(currentUser);
+        }
+        loadSharedReport();
+    });
 
     // Cursor glow
     const glow = document.getElementById('cursorGlow');
@@ -881,19 +1122,203 @@
         glow.style.top = e.clientY + 'px';
     });
 
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const avatar = document.getElementById('userAvatar');
+        const dropdown = document.getElementById('userDropdown');
+        if (!avatar.contains(e.target)) {
+            dropdown.classList.remove('visible');
+        }
+    });
+
     // Dark mode
     function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
         if (html.getAttribute('data-theme') === 'light') {
             html.setAttribute('data-theme', 'dark');
-            btn.textContent = '☀️ Light mode';
+            btn.textContent = '☀️ Dark';
             localStorage.setItem('refinr-theme', 'dark');
         } else {
             html.setAttribute('data-theme', 'light');
-            btn.textContent = '🌙 Dark mode';
+            btn.textContent = '🌙 Dark';
             localStorage.setItem('refinr-theme', 'light');
         }
+    }
+
+    // Auth UI helpers
+    function updateUIForLoggedInUser(user) {
+        document.getElementById('authButtons').style.display = 'none';
+        const avatar = document.getElementById('userAvatar');
+        avatar.classList.add('visible');
+        const initial = (user.full_name || user.email || '?')[0].toUpperCase();
+        document.getElementById('avatarInitial').textContent = initial;
+        document.getElementById('avatarName').textContent = user.full_name || user.email.split('@')[0];
+        updateCreditsDisplay(user.credits ?? 5);
+    }
+
+    function updateCreditsDisplay(credits) {
+        document.getElementById('creditsCount').textContent = credits;
+        document.getElementById('creditsInModal').textContent = credits;
+        document.getElementById('dropdownCredits').textContent = credits;
+        if (currentUser) currentUser.credits = credits;
+    }
+
+    function toggleDropdown() {
+        document.getElementById('userDropdown').classList.toggle('visible');
+    }
+
+    function openAuthModal(tab) {
+        document.getElementById('authModal').classList.add('visible');
+        switchAuthTab(tab);
+        document.getElementById('authError').classList.remove('visible');
+        document.getElementById('authSuccess').classList.remove('visible');
+    }
+
+    function switchAuthTab(tab) {
+        document.getElementById('signinForm').style.display = tab === 'signin' ? 'block' : 'none';
+        document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+        document.getElementById('signinTab').classList.toggle('active', tab === 'signin');
+        document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+        document.getElementById('authError').classList.remove('visible');
+        document.getElementById('authSuccess').classList.remove('visible');
+    }
+
+    async function handleSignIn() {
+        const email = document.getElementById('signinEmail').value.trim();
+        const password = document.getElementById('signinPassword').value;
+        const errorEl = document.getElementById('authError');
+
+        if (!email || !password) {
+            errorEl.textContent = 'Please enter your email and password.';
+            errorEl.classList.add('visible');
+            return;
+        }
+
+        const btn = event.currentTarget;
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'signin', email, password })
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                errorEl.textContent = data.error;
+                errorEl.classList.add('visible');
+                btn.textContent = 'Sign in';
+                btn.disabled = false;
+                return;
+            }
+
+            currentUser = data.user;
+            currentSession = data.session;
+            localStorage.setItem('refinr-session', JSON.stringify(data.session));
+            localStorage.setItem('refinr-user', JSON.stringify(data.user));
+            updateUIForLoggedInUser(data.user);
+            closeModal('authModal');
+
+        } catch (error) {
+            errorEl.textContent = 'Something went wrong. Please try again.';
+            errorEl.classList.add('visible');
+            btn.textContent = 'Sign in';
+            btn.disabled = false;
+        }
+    }
+
+    async function handleSignUp() {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const referral = document.getElementById('signupReferral').value.trim();
+        const errorEl = document.getElementById('authError');
+        const successEl = document.getElementById('authSuccess');
+
+        if (!email || !password) {
+            errorEl.textContent = 'Please enter your email and password.';
+            errorEl.classList.add('visible');
+            return;
+        }
+
+        if (password.length < 6) {
+            errorEl.textContent = 'Password must be at least 6 characters.';
+            errorEl.classList.add('visible');
+            return;
+        }
+
+        const btn = event.currentTarget;
+        btn.textContent = 'Creating account...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'signup', email, password, full_name: name })
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                errorEl.textContent = data.error;
+                errorEl.classList.add('visible');
+                btn.textContent = 'Create free account';
+                btn.disabled = false;
+                return;
+            }
+
+            // Auto sign in after signup
+            const signinResponse = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'signin', email, password })
+            });
+            const signinData = await signinResponse.json();
+
+            if (signinData.user) {
+                currentUser = signinData.user;
+                currentSession = signinData.session;
+                localStorage.setItem('refinr-session', JSON.stringify(signinData.session));
+                localStorage.setItem('refinr-user', JSON.stringify(signinData.user));
+                updateUIForLoggedInUser(signinData.user);
+                closeModal('authModal');
+            } else {
+                successEl.textContent = 'Account created! Please sign in.';
+                successEl.classList.add('visible');
+                switchAuthTab('signin');
+                btn.textContent = 'Create free account';
+                btn.disabled = false;
+            }
+
+        } catch (error) {
+            errorEl.textContent = 'Something went wrong. Please try again.';
+            errorEl.classList.add('visible');
+            btn.textContent = 'Create free account';
+            btn.disabled = false;
+        }
+    }
+
+    async function signOut() {
+        localStorage.removeItem('refinr-session');
+        localStorage.removeItem('refinr-user');
+        currentUser = null;
+        currentSession = null;
+        document.getElementById('authButtons').style.display = 'flex';
+        document.getElementById('userAvatar').classList.remove('visible');
+        document.getElementById('userDropdown').classList.remove('visible');
+        updateCreditsDisplay(5);
+    }
+
+    function copyReferralCode() {
+        if (currentUser?.referral_code) {
+            navigator.clipboard.writeText(currentUser.referral_code).then(() => {
+                alert(`Referral code copied: ${currentUser.referral_code}\n\nShare this with colleagues and students!`);
+            });
+        }
+        document.getElementById('userDropdown').classList.remove('visible');
     }
 
     // Particle splash
@@ -960,7 +1385,13 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
     function openVerifyModal() {
         const input = document.getElementById('referencesInput').value.trim();
         if (!input) { alert('Please paste your references first.'); return; }
-        if (credits <= 0) { alert('You have no credits remaining. Please purchase more credits.'); return; }
+
+        const credits = parseInt(document.getElementById('creditsCount').textContent);
+        if (credits <= 0) {
+            alert('You have no credits remaining. Please sign up for free to get 5 credits, or purchase more.');
+            return;
+        }
+
         document.getElementById('creditsInModal').textContent = credits;
         document.getElementById('verifyModal').classList.add('visible');
     }
@@ -1047,7 +1478,7 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             document.getElementById('progressBar').style.width = '100%';
             showOutput(`Cleaned References — ${format}`, data.result);
             hideProgress();
-        } catch (error) {
+        } catch {
             showOutput('Error', 'Something went wrong. Please try again.');
             hideProgress();
         }
@@ -1055,8 +1486,30 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
 
     async function verifyReferences() {
         closeModal('verifyModal');
-        credits--;
-        document.getElementById('creditsCount').textContent = credits;
+
+        // Deduct credit from database if logged in
+        if (currentUser && currentSession) {
+            try {
+                const creditResponse = await fetch('/api/credits', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentSession.access_token}`
+                    },
+                    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+                });
+                const creditData = await creditResponse.json();
+                if (creditData.error) {
+                    alert(creditData.error);
+                    return;
+                }
+                updateCreditsDisplay(creditData.credits);
+            } catch {}
+        } else {
+            // Guest user — use local counter
+            const current = parseInt(document.getElementById('creditsCount').textContent);
+            updateCreditsDisplay(current - 1);
+        }
 
         const referencesText = document.getElementById('referencesInput').value.trim();
         const referenceList = referencesText.split('\n').filter(r => r.trim().length > 0);
@@ -1161,7 +1614,7 @@ ${results.join('\n\n')}`;
                 .filter(r => r.length > 0)
                 .join('\n');
 
-            document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them in any citation style.';
+            document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.';
             hideProgress();
         } catch {
             showOutput('Error', 'Something went wrong. Please try again.');
@@ -1198,7 +1651,7 @@ ${results.join('\n\n')}`;
 
             hideProgress();
         } catch {
-            showOutput('Error', 'Could not extract reference from URL. Please try again.');
+            showOutput('Error', 'Could not extract reference from URL.');
             hideProgress();
         }
     }
@@ -1232,7 +1685,7 @@ ${results.join('\n\n')}`;
 
             hideProgress();
         } catch {
-            showOutput('Error', 'Could not find reference. Please try again.');
+            showOutput('Error', 'Could not find reference.');
             hideProgress();
         }
     }
@@ -1253,8 +1706,6 @@ ${results.join('\n\n')}`;
             }
         }
     }
-
-    loadSharedReport();
 </script>
 
 </body>
