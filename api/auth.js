@@ -1,11 +1,11 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const { createClient } = require('@supabase/supabase-js')
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_ANON_KEY
 )
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' })
     }
@@ -17,42 +17,30 @@ export default async function handler(req, res) {
     }
 
     try {
-        // SIGN UP
         if (action === 'signup') {
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
-                options: {
-                    data: { full_name: full_name || '' }
-                }
+                options: { data: { full_name: full_name || '' } }
             })
 
-            if (error) {
-                return res.status(400).json({ error: error.message })
-            }
+            if (error) return res.status(400).json({ error: error.message })
 
             return res.status(200).json({
                 message: 'Account created successfully',
-                user: {
-                    id: data.user?.id,
-                    email: data.user?.email
-                },
+                user: { id: data.user?.id, email: data.user?.email },
                 session: data.session
             })
         }
 
-        // SIGN IN
         if (action === 'signin') {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password
             })
 
-            if (error) {
-                return res.status(400).json({ error: error.message })
-            }
+            if (error) return res.status(400).json({ error: error.message })
 
-            // Get user profile with credits
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('credits, full_name, referral_code')
@@ -72,26 +60,17 @@ export default async function handler(req, res) {
             })
         }
 
-        // SIGN OUT
         if (action === 'signout') {
-            const { error } = await supabase.auth.signOut()
-            if (error) {
-                return res.status(400).json({ error: error.message })
-            }
+            await supabase.auth.signOut()
             return res.status(200).json({ message: 'Signed out successfully' })
         }
 
-        // GET PROFILE
         if (action === 'profile') {
             const token = req.headers.authorization?.replace('Bearer ', '')
-            if (!token) {
-                return res.status(401).json({ error: 'No token provided' })
-            }
+            if (!token) return res.status(401).json({ error: 'No token provided' })
 
             const { data: { user }, error } = await supabase.auth.getUser(token)
-            if (error || !user) {
-                return res.status(401).json({ error: 'Invalid token' })
-            }
+            if (error || !user) return res.status(401).json({ error: 'Invalid token' })
 
             const { data: profile } = await supabase
                 .from('profiles')
