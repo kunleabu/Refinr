@@ -1381,9 +1381,10 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('cleanModal').classList.add('visible');
     }
 
-    function openVerifyModal() {
-        const input = document.getElementById('referencesInput').value.trim();
-        if (!input) { alert('Please paste your references first.'); return; }
+   function openVerifyModal() {
+    const input = document.getElementById('referencesInput').value.trim();
+    if (!input) { alert('Please paste your references first.'); return; }
+    if (!currentUser) { openAuthModal('signin'); return; }
 
         const credits = parseInt(document.getElementById('creditsCount').textContent);
         if (credits <= 0) {
@@ -1429,11 +1430,12 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         });
     }
 
-    async function shareReport(e) {
-        const content = document.getElementById('outputContent').textContent;
-        const title = document.getElementById('outputTitle').textContent;
-        document.getElementById('shareUrlBox').textContent = 'Generating link...';
-        document.getElementById('shareModal').classList.add('visible');
+   async function shareReport(e) {
+    if (!currentUser) { openAuthModal('signin'); return; }
+    const content = document.getElementById('outputContent').textContent;
+    const title = document.getElementById('outputTitle').textContent;
+    document.getElementById('shareUrlBox').textContent = 'Generating link...';
+    document.getElementById('shareModal').classList.add('visible');
         try {
             const response = await fetch('/api/report', {
                 method: 'POST',
