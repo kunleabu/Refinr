@@ -1,10 +1,3 @@
-const { createClient } = require('@supabase/supabase-js')
-
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
-)
-
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' })
@@ -15,39 +8,94 @@ module.exports = async function handler(req, res) {
 
     if (!token) return res.status(401).json({ error: 'Not authenticated' })
 
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY
+
     try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-        if (authError || !user) return res.status(401).json({ error: 'Invalid token' })
+        // Verify token and get user
+        const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'apikey': SUPABASE_ANON_KEY
+            }
+        })
 
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('credits')
-            .eq('id', user.id)
-            .single()
+        if (!userResponse.ok) {
+            return res.status(401).json({ error: 'Invalid token' })
+        }
 
-        if (!profile) return res.status(500).json({ error: 'Could not fetch credits' })
+        const user = await userResponse.json()
+        const userId = user.id
+
+        // Get current credits
+        const profileResponse = await fetch(
+            `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=credits`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+
+        const profiles = await profileResponse.json()
+        const profile = profiles[0]
+
+        if (!profile) {
+            return res.status(500).json({ error: 'Could not fetch profile' })
+        }
 
         if (action === 'deduct') {
             const creditAmount = amount || 1
+
             if (profile.credits < creditAmount) {
-                return res.status(400).json({ error: 'Insufficient credits', credits: profile.credits })
+                return res.status(400).json({
+                    error: 'Insufficient credits. Please purchase more credits to continue verifying.',
+                    credits: profile.credits
+                })
             }
 
-            await supabase
-                .from('profiles')
-                .update({ credits: profile.credits - creditAmount })
-                .eq('id', user.id)
+            // Deduct credits
+            const updateResponse = await fetch(
+                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ credits: profile.credits - creditAmount })
+                }
+            )
 
-            await supabase
-                .from('credit_transactions')
-                .insert({
-                    user_id: user.id,
+            if (!updateResponse.ok) {
+                return res.status(500).json({ error: 'Could not update credits' })
+            }
+
+            // Log transaction
+            await fetch(`${SUPABASE_URL}/rest/v1/credit_transactions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
                     amount: -creditAmount,
                     type: 'deduction',
                     description: description || 'Verification'
                 })
+            })
 
-            return res.status(200).json({ success: true, credits: profile.credits - creditAmount })
+            return res.status(200).json({
+                success: true,
+                credits: profile.credits - creditAmount
+            })
         }
 
         if (action === 'balance') {
