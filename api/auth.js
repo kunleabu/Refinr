@@ -1,10 +1,3 @@
-const { createClient } = require('@supabase/supabase-js')
-
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY
-)
-
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' })
@@ -16,15 +9,29 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Missing required fields' })
     }
 
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY
+
     try {
         if (action === 'signup') {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { full_name: full_name || '' } }
+            const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    data: { full_name: full_name || '' }
+                })
             })
 
-            if (error) return res.status(400).json({ error: error.message })
+            const data = await response.json()
+
+            if (data.error || data.msg) {
+                return res.status(400).json({ error: data.error?.message || data.msg || 'Signup failed' })
+            }
 
             return res.status(200).json({
                 message: 'Account created successfully',
@@ -34,18 +41,34 @@ module.exports = async function handler(req, res) {
         }
 
         if (action === 'signin') {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
+            const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify({ email, password })
             })
 
-            if (error) return res.status(400).json({ error: error.message })
+            const data = await response.json()
 
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('credits, full_name, referral_code')
-                .eq('id', data.user.id)
-                .single()
+            if (data.error || !data.access_token) {
+                return res.status(400).json({ error: data.error_description || data.error || 'Invalid email or password' })
+            }
+
+            // Get profile with credits
+            const profileResponse = await fetch(
+                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${data.user.id}&select=credits,full_name,referral_code`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${data.access_token}`,
+                        'apikey': SUPABASE_ANON_KEY
+                    }
+                }
+            )
+
+            const profiles = await profileResponse.json()
+            const profile = profiles[0]
 
             return res.status(200).json({
                 message: 'Signed in successfully',
@@ -56,12 +79,24 @@ module.exports = async function handler(req, res) {
                     credits: profile?.credits ?? 5,
                     referral_code: profile?.referral_code || ''
                 },
-                session: data.session
+                session: {
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token
+                }
             })
         }
 
         if (action === 'signout') {
-            await supabase.auth.signOut()
+            const token = req.headers.authorization?.replace('Bearer ', '')
+            if (token) {
+                await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': SUPABASE_ANON_KEY
+                    }
+                })
+            }
             return res.status(200).json({ message: 'Signed out successfully' })
         }
 
@@ -69,14 +104,29 @@ module.exports = async function handler(req, res) {
             const token = req.headers.authorization?.replace('Bearer ', '')
             if (!token) return res.status(401).json({ error: 'No token provided' })
 
-            const { data: { user }, error } = await supabase.auth.getUser(token)
-            if (error || !user) return res.status(401).json({ error: 'Invalid token' })
+            const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'apikey': SUPABASE_ANON_KEY
+                }
+            })
 
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('credits, full_name, referral_code, total_verifications, created_at')
-                .eq('id', user.id)
-                .single()
+            if (!userResponse.ok) return res.status(401).json({ error: 'Invalid token' })
+
+            const user = await userResponse.json()
+
+            const profileResponse = await fetch(
+                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}&select=credits,full_name,referral_code,total_verifications,created_at`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': SUPABASE_ANON_KEY
+                    }
+                }
+            )
+
+            const profiles = await profileResponse.json()
+            const profile = profiles[0]
 
             return res.status(200).json({
                 user: {
