@@ -81,8 +81,8 @@
         header p { color: #A8C4E0; font-size: 0.85rem; margin-top: 3px; }
         header p.sub { color: #7DD3FC; font-size: 0.75rem; margin-top: 2px; }
 
-        .header-left { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-        .header-right { display: flex; align-items: center; gap: 8px; min-width: 120px; justify-content: flex-end; }
+        .header-left { display: flex; align-items: center; gap: 8px; min-width: 80px; }
+        .header-right { display: flex; align-items: center; gap: 8px; min-width: 80px; justify-content: flex-end; }
 
         .theme-toggle {
             background: rgba(255,255,255,0.15);
@@ -99,24 +99,7 @@
 
         .theme-toggle:hover { background: rgba(255,255,255,0.25); }
 
-        /* Auth buttons in header */
         .btn-signin {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50px;
-            padding: 5px 14px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-signin:hover { background: rgba(255,255,255,0.25); }
-
-        .btn-signup-header {
             background: white;
             border: none;
             border-radius: 50px;
@@ -130,9 +113,8 @@
             white-space: nowrap;
         }
 
-        .btn-signup-header:hover { background: #e8f0fe; }
+        .btn-signin:hover { background: #e8f0fe; }
 
-        /* User avatar */
         .user-avatar {
             display: none;
             align-items: center;
@@ -154,7 +136,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .avatar-name {
@@ -167,7 +148,6 @@
             white-space: nowrap;
         }
 
-        /* Dropdown menu */
         .user-dropdown {
             position: absolute;
             top: calc(100% + 10px);
@@ -409,7 +389,6 @@
             transition: background 0.3s;
         }
 
-        /* Credits bar */
         .credits-bar {
             background: var(--card);
             border-radius: 8px;
@@ -442,7 +421,6 @@
 
         .btn-get-credits:hover { background: #2D4F8A; }
 
-        /* Demo section */
         .demo-section {
             background: var(--card);
             border-radius: 12px;
@@ -504,7 +482,6 @@
             50% { transform: scale(1.2); opacity: 0.7; }
         }
 
-        /* Feedback bar */
         .feedback-bar {
             background: var(--card);
             border-radius: 12px;
@@ -538,7 +515,6 @@
         [data-theme="dark"] .btn-feedback { color: #60A5FA; border-color: #60A5FA; }
         [data-theme="dark"] .btn-feedback:hover { background: #60A5FA; color: #0F172A; }
 
-        /* Social footer */
         .social-footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); margin-top: 10px; }
         .social-icons { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
 
@@ -581,7 +557,6 @@
 
         .social-icon:hover .tooltip { opacity: 1; }
 
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -617,7 +592,6 @@
         [data-theme="dark"] .modal h3 { color: #60A5FA; }
         .modal p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.6; }
 
-        /* Auth form styles */
         .auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
 
         .auth-tab {
@@ -699,7 +673,6 @@
         .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
         .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
 
-        /* Lookup tabs */
         .lookup-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
 
         .lookup-tab {
@@ -799,11 +772,9 @@
             <p class="sub">Paste messy references → cleaned, formatted and verified in seconds</p>
         </div>
         <div class="header-right">
-            <!-- Logged out state -->
             <div id="authButtons">
-    <button class="btn-signup-header" onclick="openAuthModal('signin')">Sign in</button>
-</div>
-            <!-- Logged in state -->
+                <button class="btn-signin" onclick="openAuthModal('signin')">Sign in</button>
+            </div>
             <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">
                 <div class="avatar-circle" id="avatarInitial">?</div>
                 <span class="avatar-name" id="avatarName"></span>
@@ -829,7 +800,7 @@
 
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
-        <button class="btn-get-credits" onclick="alert('Payment system coming soon! Credits will be available to purchase shortly.')">Get more credits</button>
+        <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
     </div>
 
     <div class="card">
@@ -958,11 +929,8 @@
             <button class="auth-tab active" id="signinTab" onclick="switchAuthTab('signin')">Sign in</button>
             <button class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Sign up free</button>
         </div>
-
         <div id="authError" class="auth-error"></div>
         <div id="authSuccess" class="auth-success"></div>
-
-        <!-- Sign in form -->
         <div id="signinForm">
             <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
             <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
@@ -971,14 +939,12 @@
                 <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
             </div>
         </div>
-
-        <!-- Sign up form -->
         <div id="signupForm" style="display:none;">
             <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
             <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
             <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
             <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
-            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You'll get 5 free verification credits on signup</p>
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You will get 5 free verification credits on signup</p>
             <div class="modal-buttons">
                 <button class="btn btn-confirm" onclick="handleSignUp()">Create free account</button>
                 <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
@@ -1011,7 +977,7 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p id="verifyModalText">Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
@@ -1028,7 +994,6 @@
             <button class="lookup-tab" id="tab-btn-url" onclick="switchTab('url', event)">URL</button>
             <button class="lookup-tab" id="tab-btn-title" onclick="switchTab('title', event)">Find by Title</button>
         </div>
-
         <div class="lookup-panel" id="tab-doi">
             <p>Paste one DOI or ISBN per line.</p>
             <textarea class="lookup-textarea" id="doiInput" placeholder="10.1038/nature04244&#10;9780140449136"></textarea>
@@ -1043,7 +1008,6 @@
                 <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
             </div>
         </div>
-
         <div class="lookup-panel" id="tab-url" style="display:none;">
             <p>Paste a webpage URL to extract reference details.</p>
             <textarea class="lookup-textarea" id="urlInput" placeholder="https://www.nature.com/articles/nature04244&#10;https://pubmed.ncbi.nlm.nih.gov/12345678/"></textarea>
@@ -1058,7 +1022,6 @@
                 <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
             </div>
         </div>
-
         <div class="lookup-panel" id="tab-title" style="display:none;">
             <p>Enter a title or author name to find the reference and DOI.</p>
             <textarea class="lookup-textarea" id="titleInput" placeholder="Quantum teleportation between light and matter&#10;Sherson Krauter 2006 Nature"></textarea>
@@ -1090,7 +1053,6 @@
 </div>
 
 <script>
-    // State
     let currentUser = null;
     let currentSession = null;
     let currentShareUrl = '';
@@ -1103,7 +1065,7 @@
     }
 
     // Check for saved session on load
-    window.addEventListener('load', () => {
+    window.addEventListener('load', function() {
         const savedSession = localStorage.getItem('refinr-session');
         const savedUser = localStorage.getItem('refinr-user');
         if (savedSession && savedUser) {
@@ -1116,21 +1078,20 @@
 
     // Cursor glow
     const glow = document.getElementById('cursorGlow');
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', function(e) {
         glow.style.left = e.clientX + 'px';
         glow.style.top = e.clientY + 'px';
     });
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', function(e) {
         const avatar = document.getElementById('userAvatar');
         const dropdown = document.getElementById('userDropdown');
-        if (!avatar.contains(e.target)) {
+        if (avatar && !avatar.contains(e.target)) {
             dropdown.classList.remove('visible');
         }
     });
 
-    // Dark mode
     function toggleTheme() {
         const html = document.documentElement;
         const btn = document.getElementById('themeBtn');
@@ -1145,7 +1106,6 @@
         }
     }
 
-    // Auth UI helpers
     function updateUIForLoggedInUser(user) {
         document.getElementById('authButtons').style.display = 'none';
         const avatar = document.getElementById('userAvatar');
@@ -1153,14 +1113,17 @@
         const initial = (user.full_name || user.email || '?')[0].toUpperCase();
         document.getElementById('avatarInitial').textContent = initial;
         document.getElementById('avatarName').textContent = user.full_name || user.email.split('@')[0];
-        updateCreditsDisplay(user.credits ?? 5);
+        updateCreditsDisplay(user.credits !== undefined ? user.credits : 5);
     }
 
     function updateCreditsDisplay(credits) {
         document.getElementById('creditsCount').textContent = credits;
         document.getElementById('creditsInModal').textContent = credits;
         document.getElementById('dropdownCredits').textContent = credits;
-        if (currentUser) currentUser.credits = credits;
+        if (currentUser) {
+            currentUser.credits = credits;
+            localStorage.setItem('refinr-user', JSON.stringify(currentUser));
+        }
     }
 
     function toggleDropdown() {
@@ -1233,7 +1196,6 @@
         const name = document.getElementById('signupName').value.trim();
         const email = document.getElementById('signupEmail').value.trim();
         const password = document.getElementById('signupPassword').value;
-        const referral = document.getElementById('signupReferral').value.trim();
         const errorEl = document.getElementById('authError');
         const successEl = document.getElementById('authSuccess');
 
@@ -1300,54 +1262,54 @@
         }
     }
 
-  async function refreshSession() {
-    const saved = localStorage.getItem('refinr-session');
-    if (!saved) return false;
-    
-    const session = JSON.parse(saved);
-    if (!session.refresh_token) return false;
-    try {
-        const response = await fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                action: 'refresh', 
-                refresh_token: session.refresh_token 
-            })
-        });
-        const data = await response.json();
-        if (data.session) {
-            currentSession = data.session;
-            localStorage.setItem('refinr-session', JSON.stringify(data.session));
-            return true;
-        }
-        return false;
-    } catch {
-        return false;
-    }
-}
+    async function refreshSession() {
+        const saved = localStorage.getItem('refinr-session');
+        if (!saved) { return false; }
 
-async function signOut() {
-    localStorage.removeItem('refinr-session');
-    localStorage.removeItem('refinr-user');
-    currentUser = null;
-    currentSession = null;
-    document.getElementById('authButtons').style.display = 'flex';
-    document.getElementById('userAvatar').classList.remove('visible');
-    document.getElementById('userDropdown').classList.remove('visible');
-    updateCreditsDisplay(5);
-}
+        const session = JSON.parse(saved);
+        if (!session.refresh_token) { return false; }
+
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'refresh',
+                    refresh_token: session.refresh_token
+                })
+            });
+            const data = await response.json();
+            if (data.session) {
+                currentSession = data.session;
+                localStorage.setItem('refinr-session', JSON.stringify(data.session));
+                return true;
+            }
+            return false;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async function signOut() {
+        localStorage.removeItem('refinr-session');
+        localStorage.removeItem('refinr-user');
+        currentUser = null;
+        currentSession = null;
+        document.getElementById('authButtons').style.display = 'flex';
+        document.getElementById('userAvatar').classList.remove('visible');
+        document.getElementById('userDropdown').classList.remove('visible');
+        updateCreditsDisplay(5);
+    }
 
     function copyReferralCode() {
-        if (currentUser?.referral_code) {
-            navigator.clipboard.writeText(currentUser.referral_code).then(() => {
-                alert(`Referral code copied: ${currentUser.referral_code}\n\nShare this with colleagues and students!`);
+        if (currentUser && currentUser.referral_code) {
+            navigator.clipboard.writeText(currentUser.referral_code).then(function() {
+                alert('Referral code copied: ' + currentUser.referral_code + '\n\nShare this with colleagues and students!');
             });
         }
         document.getElementById('userDropdown').classList.remove('visible');
     }
 
-    // Particle splash
     function createSplash(e) {
         const colours = ['#1B3A6B','#2D9B6F','#7C3AED','#D97706','#00FFFF','#F59E0B','#EF4444','#EC4899'];
         for (let i = 0; i < 16; i++) {
@@ -1356,20 +1318,19 @@ async function signOut() {
             const angle = (i / 16) * 360 + Math.random() * 20;
             const distance = 30 + Math.random() * 70;
             const size = 5 + Math.random() * 8;
-            particle.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;width:${size}px;height:${size}px;background:${colour};border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.55s ease-out;transform:translate(-50%,-50%);opacity:1;`;
+            particle.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:' + size + 'px;height:' + size + 'px;background:' + colour + ';border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.55s ease-out;transform:translate(-50%,-50%);opacity:1;';
             document.body.appendChild(particle);
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
                     const rad = (angle * Math.PI) / 180;
-                    particle.style.transform = `translate(calc(-50% + ${Math.cos(rad) * distance}px), calc(-50% + ${Math.sin(rad) * distance}px))`;
+                    particle.style.transform = 'translate(calc(-50% + ' + (Math.cos(rad) * distance) + 'px), calc(-50% + ' + (Math.sin(rad) * distance) + 'px))';
                     particle.style.opacity = '0';
                 });
             });
-            setTimeout(() => particle.remove(), 600);
+            setTimeout(function() { particle.remove(); }, 600);
         }
     }
 
-    // Progress helpers
     function showProgress(label, percent) {
         const pc = document.getElementById('progressContainer');
         const pl = document.getElementById('progressLabel');
@@ -1381,25 +1342,21 @@ async function signOut() {
     }
 
     function hideProgress() {
-        setTimeout(() => {
+        setTimeout(function() {
             document.getElementById('progressContainer').classList.remove('visible');
             document.getElementById('progressBar').style.width = '0%';
         }, 3000);
     }
 
     function loadExample() {
-        document.getElementById('referencesInput').value = `smith j 2020 academic writing oxford press
-jones mary 2019 research methods cambridge university press london
-brown t 2021 scientific writing wiley
-Smith J 2020 Academic Writing Oxford Press
-Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.`;
+        document.getElementById('referencesInput').value = 'smith j 2020 academic writing oxford press\njones mary 2019 research methods cambridge university press london\nbrown t 2021 scientific writing wiley\nSmith J 2020 Academic Writing Oxford Press\nSherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.';
     }
 
     function switchTab(tab, e) {
-        document.querySelectorAll('.lookup-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.lookup-panel').forEach(p => p.style.display = 'none');
-        document.getElementById(`tab-${tab}`).style.display = 'block';
-        if (e && e.currentTarget) e.currentTarget.classList.add('active');
+        document.querySelectorAll('.lookup-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.lookup-panel').forEach(function(p) { p.style.display = 'none'; });
+        document.getElementById('tab-' + tab).style.display = 'block';
+        if (e && e.currentTarget) { e.currentTarget.classList.add('active'); }
     }
 
     function openCleanModal() {
@@ -1408,17 +1365,15 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('cleanModal').classList.add('visible');
     }
 
-   function openVerifyModal() {
-    const input = document.getElementById('referencesInput').value.trim();
-    if (!input) { alert('Please paste your references first.'); return; }
-    if (!currentUser) { openAuthModal('signin'); return; }
-
+    function openVerifyModal() {
+        const input = document.getElementById('referencesInput').value.trim();
+        if (!input) { alert('Please paste your references first.'); return; }
+        if (!currentUser) { openAuthModal('signin'); return; }
         const credits = parseInt(document.getElementById('creditsCount').textContent);
         if (credits <= 0) {
-            alert('You have no credits remaining. Please sign up for free to get 5 credits, or purchase more.');
+            alert('You have no credits remaining. Please purchase more credits.');
             return;
         }
-
         document.getElementById('creditsInModal').textContent = credits;
         document.getElementById('verifyModal').classList.add('visible');
     }
@@ -1437,32 +1392,32 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         document.getElementById('outputCard').classList.add('visible');
         const shareBtn = document.getElementById('shareBtn');
         const noShare = ['Cleaning...', 'Generating...', 'Looking up...', 'Starting...', 'Searching...', 'Extracting...', 'Fetching...'];
-        shareBtn.style.display = noShare.some(t => title.includes(t)) ? 'none' : 'flex';
+        shareBtn.style.display = noShare.some(function(t) { return title.includes(t); }) ? 'none' : 'flex';
         document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyResults(e) {
         const content = document.getElementById('outputContent').textContent;
-        navigator.clipboard.writeText(content).then(() => {
+        navigator.clipboard.writeText(content).then(function() {
             createSplash(e);
             const btn = e.currentTarget;
             const tooltip = btn.querySelector('.tooltip');
             const svg = btn.querySelector('svg');
             tooltip.textContent = 'Copied!';
-            if (svg) svg.style.stroke = '#2D9B6F';
-            setTimeout(() => {
+            if (svg) { svg.style.stroke = '#2D9B6F'; }
+            setTimeout(function() {
                 tooltip.textContent = 'Copy';
-                if (svg) svg.style.stroke = 'currentColor';
+                if (svg) { svg.style.stroke = 'currentColor'; }
             }, 2000);
         });
     }
 
-   async function shareReport(e) {
-    if (!currentUser) { openAuthModal('signin'); return; }
-    const content = document.getElementById('outputContent').textContent;
-    const title = document.getElementById('outputTitle').textContent;
-    document.getElementById('shareUrlBox').textContent = 'Generating link...';
-    document.getElementById('shareModal').classList.add('visible');
+    async function shareReport(e) {
+        if (!currentUser) { openAuthModal('signin'); return; }
+        const content = document.getElementById('outputContent').textContent;
+        const title = document.getElementById('outputTitle').textContent;
+        document.getElementById('shareUrlBox').textContent = 'Generating link...';
+        document.getElementById('shareModal').classList.add('visible');
         try {
             const response = await fetch('/api/report', {
                 method: 'POST',
@@ -1471,22 +1426,22 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             });
             const data = await response.json();
             if (data.binId) {
-                currentShareUrl = `${window.location.origin}?report=${data.binId}`;
+                currentShareUrl = window.location.origin + '?report=' + data.binId;
                 document.getElementById('shareUrlBox').textContent = currentShareUrl;
             } else {
                 document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
             }
-        } catch {
+        } catch (err) {
             document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
         }
     }
 
     function copyShareLink() {
         if (currentShareUrl) {
-            navigator.clipboard.writeText(currentShareUrl).then(() => {
+            navigator.clipboard.writeText(currentShareUrl).then(function() {
                 const btn = event.currentTarget;
                 btn.textContent = '✅ Copied!';
-                setTimeout(() => btn.textContent = 'Copy link', 2000);
+                setTimeout(function() { btn.textContent = 'Copy link'; }, 2000);
             });
         }
     }
@@ -1504,9 +1459,9 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
             });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
-            showOutput(`Cleaned References — ${format}`, data.result);
+            showOutput('Cleaned References — ' + format, data.result);
             hideProgress();
-        } catch {
+        } catch (err) {
             showOutput('Error', 'Something went wrong. Please try again.');
             hideProgress();
         }
@@ -1515,69 +1470,79 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
     async function verifyReferences() {
         closeModal('verifyModal');
 
-        // Deduct credit from database if logged in
         if (currentUser && currentSession) {
-    try {
-        const creditResponse = await fetch('/api/credits', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentSession.access_token}`
-            },
-            body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
-        });
-        const creditData = await creditResponse.json();
+            try {
+                const creditResponse = await fetch('/api/credits', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + currentSession.access_token
+                    },
+                    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+                });
+                const creditData = await creditResponse.json();
 
-        if (creditResponse.status === 401) {
-            // Token expired — sign out and ask to sign in again
-            await signOut();
-            alert('Your session has expired. Please sign in again to continue.');
-            openAuthModal('signin');
-            return;
-        }
-
-        if (creditData.error) {
-            if (creditData.credits === 0 || creditData.error.includes('Insufficient')) {
-                showOutput('No credits remaining', 
-                    `You have used all your verification credits.\n\n` +
-                    `To continue verifying references:\n` +
-                    `• Purchase more credits (coming soon)\n` +
-                    `• Share Refinr with a colleague using your referral code: ${currentUser.referral_code || 'check your profile'}\n\n` +
-                    `Your referral code gives your colleagues a discount and earns you free credits when payments launch.`
-                );
-            } else {
-                alert(creditData.error);
+                if (creditResponse.status === 401) {
+                    const refreshed = await refreshSession();
+                    if (!refreshed) {
+                        await signOut();
+                        alert('Your session has expired. Please sign in again.');
+                        openAuthModal('signin');
+                        return;
+                    }
+                    // Retry with new token
+                    const retryResponse = await fetch('/api/credits', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + currentSession.access_token
+                        },
+                        body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+                    });
+                    const retryData = await retryResponse.json();
+                    if (retryData.error) {
+                        alert(retryData.error);
+                        return;
+                    }
+                    updateCreditsDisplay(retryData.credits);
+                } else if (creditData.error) {
+                    if (creditData.credits === 0 || (creditData.error && creditData.error.includes('Insufficient'))) {
+                        showOutput('No credits remaining',
+                            'You have used all your verification credits.\n\n' +
+                            'To continue verifying references:\n' +
+                            '• Purchase more credits (coming soon)\n' +
+                            '• Share Refinr with a colleague using your referral code: ' + (currentUser.referral_code || 'check your profile') + '\n\n' +
+                            'Your referral code gives your colleagues a discount and earns you free credits when payments launch.'
+                        );
+                    } else {
+                        alert(creditData.error);
+                    }
+                    return;
+                } else {
+                    updateCreditsDisplay(creditData.credits);
+                }
+            } catch (err) {
+                console.log('Credit error:', err);
             }
-            return;
-        }
-        updateCreditsDisplay(creditData.credits);
-    } catch (err) {
-        console.log('Credit error:', err);
-    }
-}
-        } else {
-            // Guest user — use local counter
-            const current = parseInt(document.getElementById('creditsCount').textContent);
-            updateCreditsDisplay(current - 1);
         }
 
         const referencesText = document.getElementById('referencesInput').value.trim();
-        const referenceList = referencesText.split('\n').filter(r => r.trim().length > 0);
+        const referenceList = referencesText.split('\n').filter(function(r) { return r.trim().length > 0; });
 
-        showProgress(`Verifying reference 0 of ${referenceList.length}...`, 0);
+        showProgress('Verifying reference 0 of ' + referenceList.length + '...', 0);
 
         document.getElementById('outputTitle').textContent = 'Verification Report';
         document.getElementById('outputContent').textContent = 'Starting verification...';
         document.getElementById('outputCard').classList.add('visible');
         document.getElementById('shareBtn').style.display = 'none';
 
-        let results = [];
+        const results = [];
 
         for (let i = 0; i < referenceList.length; i++) {
             const ref = referenceList[i].trim();
-            if (!ref) continue;
+            if (!ref) { continue; }
             const percent = Math.round(((i + 1) / referenceList.length) * 100);
-            document.getElementById('progressLabel').textContent = `Verifying reference ${i + 1} of ${referenceList.length}...`;
+            document.getElementById('progressLabel').textContent = 'Verifying reference ' + (i + 1) + ' of ' + referenceList.length + '...';
             document.getElementById('progressBar').style.width = percent + '%';
             try {
                 const response = await fetch('/api/verify', {
@@ -1587,31 +1552,21 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
                 });
                 const data = await response.json();
                 results.push(data.result);
-            } catch {
-                results.push(`⚠️ ERROR checking — ${ref}`);
+            } catch (err) {
+                results.push('⚠️ ERROR checking — ' + ref);
             }
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
 
         const total = results.length;
-        const confirmed = results.filter(r => r.includes('✅ CONFIRMED')).length;
-        const mismatches = results.filter(r => r.includes('⚠️ MISMATCH')).length;
-        const notFound = results.filter(r => r.includes('❌ NOT FOUND')).length;
+        const confirmed = results.filter(function(r) { return r.includes('✅ CONFIRMED'); }).length;
+        const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
+        const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
         const score = total > 0 ? Math.round((confirmed / total) * 100) : 0;
 
-        const scoreText = `📊 ACCURACY REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Overall Score: ${score}%
-✅ Confirmed: ${confirmed} of ${total}
-⚠️ Mismatches found: ${mismatches}
-❌ Not found in database: ${notFound}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '%\n✅ Confirmed: ' + confirmed + ' of ' + total + '\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
 
-DETAILED RESULTS:
-
-${results.join('\n\n')}`;
-
-        document.getElementById('progressLabel').textContent = `✅ Verification complete — ${referenceList.length} references checked`;
+        document.getElementById('progressLabel').textContent = '✅ Verification complete — ' + referenceList.length + ' references checked';
         document.getElementById('progressBar').style.width = '100%';
         showOutput('Verification Report', scoreText);
         hideProgress();
@@ -1631,7 +1586,7 @@ ${results.join('\n\n')}`;
             document.getElementById('progressBar').style.width = '100%';
             showOutput('In-text Citations', data.result);
             hideProgress();
-        } catch {
+        } catch (err) {
             showOutput('Error', 'Something went wrong. Please try again.');
             hideProgress();
         }
@@ -1643,8 +1598,8 @@ ${results.join('\n\n')}`;
         const format = document.getElementById('lookupFormatSelect').value;
         if (!identifiers) { alert('Please paste your DOIs or ISBNs first.'); return; }
 
-        const lines = identifiers.split('\n').filter(l => l.trim().length > 0);
-        showProgress(`Looking up ${lines.length} identifiers...`, 20);
+        const lines = identifiers.split('\n').filter(function(l) { return l.trim().length > 0; });
+        showProgress('Looking up ' + lines.length + ' identifiers...', 20);
 
         try {
             const response = await fetch('/api/lookup', {
@@ -1654,19 +1609,19 @@ ${results.join('\n\n')}`;
             });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = `✅ Lookup complete — ${lines.length} identifiers processed`;
+            document.getElementById('progressLabel').textContent = '✅ Lookup complete — ' + lines.length + ' identifiers processed';
 
             const lookupResults = data.results.join('\n');
-            showOutput(`DOI/ISBN Lookup — ${format}`, lookupResults);
+            showOutput('DOI/ISBN Lookup — ' + format, lookupResults);
 
             document.getElementById('referencesInput').value = data.results
-                .map(r => r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/,'').trim())
-                .filter(r => r.length > 0)
+                .map(function(r) { return r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim(); })
+                .filter(function(r) { return r.length > 0; })
                 .join('\n');
 
             document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.';
             hideProgress();
-        } catch {
+        } catch (err) {
             showOutput('Error', 'Something went wrong. Please try again.');
             hideProgress();
         }
@@ -1678,8 +1633,8 @@ ${results.join('\n\n')}`;
         const format = document.getElementById('urlFormatSelect').value;
         if (!urls) { alert('Please paste at least one URL.'); return; }
 
-        const urlList = urls.split('\n').filter(u => u.trim().length > 0);
-        showProgress(`Extracting ${urlList.length} URL(s)...`, 20);
+        const urlList = urls.split('\n').filter(function(u) { return u.trim().length > 0; });
+        showProgress('Extracting ' + urlList.length + ' URL(s)...', 20);
 
         try {
             const response = await fetch('/api/urllookup', {
@@ -1689,18 +1644,18 @@ ${results.join('\n\n')}`;
             });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = `✅ Extracted ${urlList.length} reference(s)`;
+            document.getElementById('progressLabel').textContent = '✅ Extracted ' + urlList.length + ' reference(s)';
 
             const results = data.results || ['Could not extract reference'];
-            showOutput(`URL Lookup — ${format}`, results.join('\n\n'));
+            showOutput('URL Lookup — ' + format, results.join('\n\n'));
 
             document.getElementById('referencesInput').value = results
-                .map(r => r.replace(/^✅\s*/, '').trim())
-                .filter(r => r.length > 0)
+                .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
+                .filter(function(r) { return r.length > 0; })
                 .join('\n');
 
             hideProgress();
-        } catch {
+        } catch (err) {
             showOutput('Error', 'Could not extract reference from URL.');
             hideProgress();
         }
@@ -1712,8 +1667,8 @@ ${results.join('\n\n')}`;
         const format = document.getElementById('titleFormatSelect').value;
         if (!titles) { alert('Please enter a title or author name.'); return; }
 
-        const titleList = titles.split('\n').filter(t => t.trim().length > 0);
-        showProgress(`Searching for ${titleList.length} reference(s)...`, 20);
+        const titleList = titles.split('\n').filter(function(t) { return t.trim().length > 0; });
+        showProgress('Searching for ' + titleList.length + ' reference(s)...', 20);
 
         try {
             const response = await fetch('/api/titlelookup', {
@@ -1723,18 +1678,18 @@ ${results.join('\n\n')}`;
             });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = `✅ Found ${titleList.length} reference(s)`;
+            document.getElementById('progressLabel').textContent = '✅ Found ' + titleList.length + ' reference(s)';
 
             const results = data.results || ['Could not find reference'];
-            showOutput(`Title Lookup — ${format}`, results.join('\n\n'));
+            showOutput('Title Lookup — ' + format, results.join('\n\n'));
 
             document.getElementById('referencesInput').value = results
-                .map(r => r.replace(/^✅\s*/, '').trim())
-                .filter(r => r.length > 0)
+                .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
+                .filter(function(r) { return r.length > 0; })
                 .join('\n');
 
             hideProgress();
-        } catch {
+        } catch (err) {
             showOutput('Error', 'Could not find reference.');
             hideProgress();
         }
@@ -1745,13 +1700,13 @@ ${results.join('\n\n')}`;
         const reportId = params.get('report');
         if (reportId) {
             try {
-                const response = await fetch(`/api/report?id=${reportId}`);
+                const response = await fetch('/api/report?id=' + reportId);
                 const data = await response.json();
                 if (data.reportData) {
-                    showOutput(`${data.reportData.title} — ${data.reportData.date}`, data.reportData.content);
+                    showOutput(data.reportData.title + ' — ' + data.reportData.date, data.reportData.content);
                     document.getElementById('shareBtn').style.display = 'none';
                 }
-            } catch {
+            } catch (err) {
                 console.log('Could not load shared report');
             }
         }
