@@ -57,23 +57,32 @@ module.exports = async function handler(req, res) {
             }
 
             // Deduct credits
-            const updateResponse = await fetch(
-                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify({ credits: profile.credits - creditAmount })
-                }
-            )
+           // Deduct credits
+const updateResponse = await fetch(
+    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
+    {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({ credits: profile.credits - creditAmount })
+    }
+)
 
-            if (!updateResponse.ok) {
-                return res.status(500).json({ error: 'Could not update credits' })
-            }
+const updateData = await updateResponse.json()
+console.log('Update response status:', updateResponse.status)
+console.log('Update response data:', JSON.stringify(updateData))
+
+if (!updateResponse.ok || !updateData || updateData.length === 0) {
+    return res.status(500).json({ 
+        error: 'Could not update credits',
+        details: JSON.stringify(updateData),
+        status: updateResponse.status
+    })
+}
 
             // Log transaction
             await fetch(`${SUPABASE_URL}/rest/v1/credit_transactions`, {
