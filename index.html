@@ -1300,16 +1300,43 @@
         }
     }
 
-    async function signOut() {
-        localStorage.removeItem('refinr-session');
-        localStorage.removeItem('refinr-user');
-        currentUser = null;
-        currentSession = null;
-        document.getElementById('authButtons').style.display = 'flex';
-        document.getElementById('userAvatar').classList.remove('visible');
-        document.getElementById('userDropdown').classList.remove('visible');
-        updateCreditsDisplay(5);
+  async function refreshSession() {
+    const saved = localStorage.getItem('refinr-session');
+    if (!saved) return false;
+    
+    const session = JSON.parse(saved);
+    if (!session.refresh_token) return false;
+    try {
+        const response = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'refresh', 
+                refresh_token: session.refresh_token 
+            })
+        });
+        const data = await response.json();
+        if (data.session) {
+            currentSession = data.session;
+            localStorage.setItem('refinr-session', JSON.stringify(data.session));
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
     }
+}
+
+async function signOut() {
+    localStorage.removeItem('refinr-session');
+    localStorage.removeItem('refinr-user');
+    currentUser = null;
+    currentSession = null;
+    document.getElementById('authButtons').style.display = 'flex';
+    document.getElementById('userAvatar').classList.remove('visible');
+    document.getElementById('userDropdown').classList.remove('visible');
+    updateCreditsDisplay(5);
+}
 
     function copyReferralCode() {
         if (currentUser?.referral_code) {
@@ -1490,25 +1517,44 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
 
         // Deduct credit from database if logged in
         if (currentUser && currentSession) {
-            try {
-                console.log('Session:', currentSession);
-console.log('Token:', currentSession?.access_token);
+    try {
+        const creditResponse = await fetch('/api/credits', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentSession.access_token}`
+            },
+            body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+        });
+        const creditData = await creditResponse.json();
 
-const creditResponse = await fetch('/api/credits', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentSession.access_token}`
-    },
-    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
-});
-                const creditData = await creditResponse.json();
-                if (creditData.error) {
-                    alert(creditData.error);
-                    return;
-                }
-                updateCreditsDisplay(creditData.credits);
-            } catch {}
+        if (creditResponse.status === 401) {
+            // Token expired — sign out and ask to sign in again
+            await signOut();
+            alert('Your session has expired. Please sign in again to continue.');
+            openAuthModal('signin');
+            return;
+        }
+
+        if (creditData.error) {
+            if (creditData.credits === 0 || creditData.error.includes('Insufficient')) {
+                showOutput('No credits remaining', 
+                    `You have used all your verification credits.\n\n` +
+                    `To continue verifying references:\n` +
+                    `• Purchase more credits (coming soon)\n` +
+                    `• Share Refinr with a colleague using your referral code: ${currentUser.referral_code || 'check your profile'}\n\n` +
+                    `Your referral code gives your colleagues a discount and earns you free credits when payments launch.`
+                );
+            } else {
+                alert(creditData.error);
+            }
+            return;
+        }
+        updateCreditsDisplay(creditData.credits);
+    } catch (err) {
+        console.log('Credit error:', err);
+    }
+}
         } else {
             // Guest user — use local counter
             const current = parseInt(document.getElementById('creditsCount').textContent);
