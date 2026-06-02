@@ -1491,14 +1491,17 @@ Sherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I.
         // Deduct credit from database if logged in
         if (currentUser && currentSession) {
             try {
-                const creditResponse = await fetch('/api/credits', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentSession.access_token}`
-                    },
-                    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
-                });
+                console.log('Session:', currentSession);
+console.log('Token:', currentSession?.access_token);
+
+const creditResponse = await fetch('/api/credits', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentSession.access_token}`
+    },
+    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+});
                 const creditData = await creditResponse.json();
                 if (creditData.error) {
                     alert(creditData.error);
