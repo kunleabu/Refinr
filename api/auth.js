@@ -86,6 +86,31 @@ export default async function handler(req, res) {
             })
         }
 
+       if (action === 'refresh') {
+    const { refresh_token } = req.body
+    if (!refresh_token) return res.status(400).json({ error: 'Missing refresh token' })
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ refresh_token })
+    })
+
+    const data = await response.json()
+    if (data.error || !data.access_token) {
+        return res.status(401).json({ error: 'Session expired. Please sign in again.' })
+    }
+
+    return res.status(200).json({
+        session: {
+            access_token: data.access_token,
+            refresh_token: data.refresh_token
+        }
+    })
+}
         if (action === 'signout') {
             const token = req.headers.authorization?.replace('Bearer ', '')
             if (token) {
