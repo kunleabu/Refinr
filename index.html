@@ -743,6 +743,39 @@
             z-index: 1;
         }
 
+        /* ── Credit package cards ── */
+        .credit-package {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .credit-package:hover { border-color: #1B3A6B; background: var(--output-bg); }
+        .credit-package.selected { border-color: #1B3A6B; background: rgba(27,58,107,0.06); }
+        [data-theme="dark"] .credit-package.selected { background: rgba(96,165,250,0.08); border-color: #60A5FA; }
+        .pkg-left { display: flex; flex-direction: column; gap: 2px; }
+        .pkg-credits { font-weight: 700; font-size: 0.95rem; color: var(--text); display: flex; align-items: center; gap: 6px; }
+        .pkg-desc { font-size: 0.78rem; color: var(--muted); }
+        .pkg-price { font-weight: 700; color: #1B3A6B; font-size: 1rem; white-space: nowrap; }
+        [data-theme="dark"] .pkg-price { color: #60A5FA; }
+        .pkg-badge { background: #2D9B6F; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .credit-cost-preview {
+            background: var(--output-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 16px;
+            display: none;
+        }
+        .credit-cost-preview.visible { display: block; }
+        .credit-cost-preview strong { color: var(--text); }
+
         @media (max-width: 600px) {
             header h1 { font-size: 1.5rem; }
             header p { font-size: 0.75rem; }
@@ -800,7 +833,7 @@
 
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
-        <button class="btn-get-credits" onclick="alert('Payment system coming soon!')">Get more credits</button>
+        <button class="btn-get-credits" onclick="openCreditsModal()">Get more credits</button>
     </div>
 
     <div class="card">
@@ -977,7 +1010,11 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.<br><br>This will use <strong>1 credit</strong>. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.</p>
+        <p>Credits used depends on how many references you verify. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
+        <div class="credit-cost-preview" id="creditCostPreview">
+            Your <strong id="refCountDisplay">0</strong> references will cost <strong id="creditCostDisplay">1</strong> credit(s).
+        </div>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
@@ -1052,10 +1089,83 @@
     </div>
 </div>
 
+<!-- Credits Purchase Modal -->
+<div class="modal-overlay" id="creditsModal">
+    <div class="modal">
+        <h3>🎯 Get more verification credits</h3>
+        <p>Credits are used for verification only. Formatting, lookup, and in-text citations are always free.</p>
+
+        <div style="background:var(--output-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:0.78rem;color:var(--muted);line-height:1.8;">
+            <strong style="color:var(--text);display:block;margin-bottom:4px;">How credits work</strong>
+            1–20 references = 1 credit &nbsp;·&nbsp;
+            21–50 = 2 credits &nbsp;·&nbsp;
+            51–100 = 3 credits &nbsp;·&nbsp;
+            100+ = 4 credits &nbsp;·&nbsp;
+            Journal analysis = 10 credits
+        </div>
+
+        <div id="creditsPackages" style="display:grid;gap:10px;margin-bottom:20px;">
+            <div class="credit-package" data-package="pack_20" onclick="selectPackage(this)">
+                <div class="pkg-left">
+                    <span class="pkg-credits">20 credits</span>
+                    <span class="pkg-desc">Great for a single project</span>
+                </div>
+                <span class="pkg-price" data-ngn="₦2,000" data-usd="$2">₦2,000</span>
+            </div>
+            <div class="credit-package selected" data-package="pack_50" onclick="selectPackage(this)">
+                <div class="pkg-left">
+                    <span class="pkg-credits">50 credits <span class="pkg-badge">Popular</span></span>
+                    <span class="pkg-desc">Perfect for regular researchers</span>
+                </div>
+                <span class="pkg-price" data-ngn="₦4,000" data-usd="$4">₦4,000</span>
+            </div>
+            <div class="credit-package" data-package="pack_100" onclick="selectPackage(this)">
+                <div class="pkg-left">
+                    <span class="pkg-credits">100 credits</span>
+                    <span class="pkg-desc">Best value for heavy use</span>
+                </div>
+                <span class="pkg-price" data-ngn="₦7,000" data-usd="$7">₦7,000</span>
+            </div>
+            <div class="credit-package" data-package="pack_300" onclick="selectPackage(this)">
+                <div class="pkg-left">
+                    <span class="pkg-credits">300 credits <span class="pkg-badge" style="background:#D97706;">Best value</span></span>
+                    <span class="pkg-desc">For institutions and power users</span>
+                </div>
+                <span class="pkg-price" data-ngn="₦15,000" data-usd="$15">₦15,000</span>
+            </div>
+        </div>
+
+        <div id="creditsError" class="auth-error"></div>
+        <div id="creditsSuccess" class="auth-success"></div>
+
+        <div class="modal-buttons" id="creditsBuyButtons">
+            <button class="btn btn-confirm" onclick="initializePayment()">Pay with Paystack</button>
+            <button class="btn btn-cancel" onclick="closeModal('creditsModal')">Cancel</button>
+        </div>
+
+        <div style="margin-top:14px;text-align:center;">
+            <button onclick="showVerifyForm()" style="background:none;border:none;color:var(--muted);font-family:'Poppins',sans-serif;font-size:0.78rem;cursor:pointer;text-decoration:underline;">
+                I paid but didn't receive credits
+            </button>
+        </div>
+
+        <div id="verifyPayForm" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+            <p style="font-size:0.82rem;margin-bottom:10px;">Paste your Paystack payment reference and we'll check and credit your account.</p>
+            <input type="text" class="auth-input" id="verifyReference" placeholder="e.g. T123456789012345">
+            <div class="modal-buttons">
+                <button class="btn btn-confirm-green" onclick="manualVerify()">Verify & credit me</button>
+                <button class="btn btn-cancel" onclick="hideVerifyForm()">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentUser = null;
     let currentSession = null;
     let currentShareUrl = '';
+    let userCurrency = 'NGN';
+    let selectedPackage = 'pack_50';
 
     // Restore saved theme
     const savedTheme = localStorage.getItem('refinr-theme');
@@ -1064,8 +1174,8 @@
         document.getElementById('themeBtn').textContent = '☀️ Dark';
     }
 
-    // Check for saved session on load
-    window.addEventListener('load', function() {
+    // Check for saved session on load + auto-verify pending payment
+    window.addEventListener('load', async function() {
         const savedSession = localStorage.getItem('refinr-session');
         const savedUser = localStorage.getItem('refinr-user');
         if (savedSession && savedUser) {
@@ -1074,6 +1184,25 @@
             updateUIForLoggedInUser(currentUser);
         }
         loadSharedReport();
+        detectUserCurrency();
+
+        // Auto-verify if returning from Paystack payment
+        const pendingRef = localStorage.getItem('refinr-pending-ref');
+        if (pendingRef && currentUser) {
+            try {
+                const res = await fetch('/api/paystack', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'verify', reference: pendingRef, user_id: currentUser.id })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    localStorage.removeItem('refinr-pending-ref');
+                    updateCreditsDisplay(data.new_balance);
+                    showCreditToast(data.credits_added, data.new_balance);
+                }
+            } catch (e) { /* silent — user can manually verify */ }
+        }
     });
 
     // Cursor glow
@@ -1231,7 +1360,6 @@
                 return;
             }
 
-            // Auto sign in after signup
             const signinResponse = await fetch('/api/auth', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1265,18 +1393,13 @@
     async function refreshSession() {
         const saved = localStorage.getItem('refinr-session');
         if (!saved) { return false; }
-
         const session = JSON.parse(saved);
         if (!session.refresh_token) { return false; }
-
         try {
             const response = await fetch('/api/auth', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'refresh',
-                    refresh_token: session.refresh_token
-                })
+                body: JSON.stringify({ action: 'refresh', refresh_token: session.refresh_token })
             });
             const data = await response.json();
             if (data.session) {
@@ -1285,9 +1408,7 @@
                 return true;
             }
             return false;
-        } catch (e) {
-            return false;
-        }
+        } catch (e) { return false; }
     }
 
     async function signOut() {
@@ -1365,16 +1486,41 @@
         document.getElementById('cleanModal').classList.add('visible');
     }
 
+    // ── TIERED CREDIT CALCULATION ──────────────────────────
+    function calculateCreditsNeeded(referenceText) {
+        if (!referenceText || !referenceText.trim()) return 0;
+        const lines = referenceText.trim().split('\n').filter(function(l) { return l.trim().length > 5; });
+        const count = lines.length;
+        if (count <= 20) return 1;
+        if (count <= 50) return 2;
+        if (count <= 100) return 3;
+        return 4;
+    }
+
+    function updateVerifyCostPreview() {
+        const text = document.getElementById('referencesInput').value || '';
+        const lines = text.trim().split('\n').filter(function(l) { return l.trim().length > 5; });
+        const count = lines.length;
+        const credits = calculateCreditsNeeded(text);
+        const preview = document.getElementById('creditCostPreview');
+        if (preview && count > 0) {
+            document.getElementById('refCountDisplay').textContent = count;
+            document.getElementById('creditCostDisplay').textContent = credits;
+            preview.classList.add('visible');
+        }
+    }
+
     function openVerifyModal() {
         const input = document.getElementById('referencesInput').value.trim();
         if (!input) { alert('Please paste your references first.'); return; }
         if (!currentUser) { openAuthModal('signin'); return; }
         const credits = parseInt(document.getElementById('creditsCount').textContent);
         if (credits <= 0) {
-            alert('You have no credits remaining. Please purchase more credits.');
+            openCreditsModal();
             return;
         }
         document.getElementById('creditsInModal').textContent = credits;
+        updateVerifyCostPreview();
         document.getElementById('verifyModal').classList.add('visible');
     }
 
@@ -1470,6 +1616,10 @@
     async function verifyReferences() {
         closeModal('verifyModal');
 
+        const referencesText = document.getElementById('referencesInput').value.trim();
+        const referenceList = referencesText.split('\n').filter(function(r) { return r.trim().length > 0; });
+        const creditsNeeded = calculateCreditsNeeded(referencesText);
+
         if (currentUser && currentSession) {
             try {
                 const creditResponse = await fetch('/api/credits', {
@@ -1478,7 +1628,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + currentSession.access_token
                     },
-                    body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+                    body: JSON.stringify({ action: 'deduct', amount: creditsNeeded, description: 'Reference verification (' + referenceList.length + ' references)' })
                 });
                 const creditData = await creditResponse.json();
 
@@ -1490,30 +1640,20 @@
                         openAuthModal('signin');
                         return;
                     }
-                    // Retry with new token
                     const retryResponse = await fetch('/api/credits', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + currentSession.access_token
                         },
-                        body: JSON.stringify({ action: 'deduct', amount: 1, description: 'Reference verification' })
+                        body: JSON.stringify({ action: 'deduct', amount: creditsNeeded, description: 'Reference verification (' + referenceList.length + ' references)' })
                     });
                     const retryData = await retryResponse.json();
-                    if (retryData.error) {
-                        alert(retryData.error);
-                        return;
-                    }
+                    if (retryData.error) { alert(retryData.error); return; }
                     updateCreditsDisplay(retryData.credits);
                 } else if (creditData.error) {
                     if (creditData.credits === 0 || (creditData.error && creditData.error.includes('Insufficient'))) {
-                        showOutput('No credits remaining',
-                            'You have used all your verification credits.\n\n' +
-                            'To continue verifying references:\n' +
-                            '• Purchase more credits (coming soon)\n' +
-                            '• Share Refinr with a colleague using your referral code: ' + (currentUser.referral_code || 'check your profile') + '\n\n' +
-                            'Your referral code gives your colleagues a discount and earns you free credits when payments launch.'
-                        );
+                        openCreditsModal();
                     } else {
                         alert(creditData.error);
                     }
@@ -1526,11 +1666,7 @@
             }
         }
 
-        const referencesText = document.getElementById('referencesInput').value.trim();
-        const referenceList = referencesText.split('\n').filter(function(r) { return r.trim().length > 0; });
-
         showProgress('Verifying reference 0 of ' + referenceList.length + '...', 0);
-
         document.getElementById('outputTitle').textContent = 'Verification Report';
         document.getElementById('outputContent').textContent = 'Starting verification...';
         document.getElementById('outputCard').classList.add('visible');
@@ -1597,10 +1733,8 @@
         const identifiers = document.getElementById('doiInput').value.trim();
         const format = document.getElementById('lookupFormatSelect').value;
         if (!identifiers) { alert('Please paste your DOIs or ISBNs first.'); return; }
-
         const lines = identifiers.split('\n').filter(function(l) { return l.trim().length > 0; });
         showProgress('Looking up ' + lines.length + ' identifiers...', 20);
-
         try {
             const response = await fetch('/api/lookup', {
                 method: 'POST',
@@ -1610,15 +1744,12 @@
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Lookup complete — ' + lines.length + ' identifiers processed';
-
             const lookupResults = data.results.join('\n');
             showOutput('DOI/ISBN Lookup — ' + format, lookupResults);
-
             document.getElementById('referencesInput').value = data.results
                 .map(function(r) { return r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim(); })
                 .filter(function(r) { return r.length > 0; })
                 .join('\n');
-
             document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.';
             hideProgress();
         } catch (err) {
@@ -1632,10 +1763,8 @@
         const urls = document.getElementById('urlInput').value.trim();
         const format = document.getElementById('urlFormatSelect').value;
         if (!urls) { alert('Please paste at least one URL.'); return; }
-
         const urlList = urls.split('\n').filter(function(u) { return u.trim().length > 0; });
         showProgress('Extracting ' + urlList.length + ' URL(s)...', 20);
-
         try {
             const response = await fetch('/api/urllookup', {
                 method: 'POST',
@@ -1645,15 +1774,12 @@
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Extracted ' + urlList.length + ' reference(s)';
-
             const results = data.results || ['Could not extract reference'];
             showOutput('URL Lookup — ' + format, results.join('\n\n'));
-
             document.getElementById('referencesInput').value = results
                 .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
                 .filter(function(r) { return r.length > 0; })
                 .join('\n');
-
             hideProgress();
         } catch (err) {
             showOutput('Error', 'Could not extract reference from URL.');
@@ -1666,10 +1792,8 @@
         const titles = document.getElementById('titleInput').value.trim();
         const format = document.getElementById('titleFormatSelect').value;
         if (!titles) { alert('Please enter a title or author name.'); return; }
-
         const titleList = titles.split('\n').filter(function(t) { return t.trim().length > 0; });
         showProgress('Searching for ' + titleList.length + ' reference(s)...', 20);
-
         try {
             const response = await fetch('/api/titlelookup', {
                 method: 'POST',
@@ -1679,15 +1803,12 @@
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Found ' + titleList.length + ' reference(s)';
-
             const results = data.results || ['Could not find reference'];
             showOutput('Title Lookup — ' + format, results.join('\n\n'));
-
             document.getElementById('referencesInput').value = results
                 .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
                 .filter(function(r) { return r.length > 0; })
                 .join('\n');
-
             hideProgress();
         } catch (err) {
             showOutput('Error', 'Could not find reference.');
@@ -1710,6 +1831,130 @@
                 console.log('Could not load shared report');
             }
         }
+    }
+
+    // ── CURRENCY DETECTION ─────────────────────────────────
+    async function detectUserCurrency() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            userCurrency = (data.country_code === 'NG') ? 'NGN' : 'USD';
+            updatePackagePrices();
+        } catch (e) {
+            userCurrency = 'NGN';
+        }
+    }
+
+    function updatePackagePrices() {
+        document.querySelectorAll('.pkg-price').forEach(function(el) {
+            el.textContent = userCurrency === 'USD' ? el.dataset.usd : el.dataset.ngn;
+        });
+    }
+
+    // ── PAYSTACK PAYMENTS ──────────────────────────────────
+    function openCreditsModal() {
+        if (!currentUser) { openAuthModal('signin'); return; }
+        document.getElementById('creditsError').classList.remove('visible');
+        document.getElementById('creditsSuccess').classList.remove('visible');
+        hideVerifyForm();
+        updatePackagePrices();
+        document.getElementById('creditsModal').classList.add('visible');
+    }
+
+    function selectPackage(el) {
+        document.querySelectorAll('.credit-package').forEach(function(p) { p.classList.remove('selected'); });
+        el.classList.add('selected');
+        selectedPackage = el.dataset.package;
+    }
+
+    async function initializePayment() {
+        if (!currentUser) { openAuthModal('signin'); return; }
+        const errorEl = document.getElementById('creditsError');
+        const btn = document.querySelector('#creditsBuyButtons .btn-confirm');
+        errorEl.classList.remove('visible');
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+        try {
+            const res = await fetch('/api/paystack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'initialize',
+                    package_id: selectedPackage,
+                    email: currentUser.email,
+                    user_id: currentUser.id,
+                    currency: userCurrency
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.authorization_url) throw new Error(data.error || 'Could not initialize payment');
+            localStorage.setItem('refinr-pending-ref', data.reference);
+            window.location.href = data.authorization_url;
+        } catch (err) {
+            errorEl.textContent = err.message;
+            errorEl.classList.add('visible');
+            btn.textContent = 'Pay with Paystack';
+            btn.disabled = false;
+        }
+    }
+
+    function showVerifyForm() {
+        document.getElementById('verifyPayForm').style.display = 'block';
+        document.getElementById('creditsBuyButtons').style.display = 'none';
+        document.getElementById('creditsPackages').style.display = 'none';
+    }
+
+    function hideVerifyForm() {
+        document.getElementById('verifyPayForm').style.display = 'none';
+        document.getElementById('creditsBuyButtons').style.display = 'flex';
+        document.getElementById('creditsPackages').style.display = 'grid';
+        const ref = document.getElementById('verifyReference');
+        if (ref) ref.value = '';
+    }
+
+    async function manualVerify() {
+        if (!currentUser) { openAuthModal('signin'); return; }
+        const reference = document.getElementById('verifyReference').value.trim();
+        const errorEl = document.getElementById('creditsError');
+        const successEl = document.getElementById('creditsSuccess');
+        const btn = document.querySelector('#verifyPayForm .btn-confirm-green');
+        errorEl.classList.remove('visible');
+        successEl.classList.remove('visible');
+        if (!reference) {
+            errorEl.textContent = 'Please enter your payment reference.';
+            errorEl.classList.add('visible');
+            return;
+        }
+        btn.textContent = 'Checking...';
+        btn.disabled = true;
+        try {
+            const res = await fetch('/api/paystack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', reference, user_id: currentUser.id })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Verification failed');
+            successEl.textContent = '✅ ' + data.credits_added + ' credits added! Your new balance is ' + data.new_balance + ' credits.';
+            successEl.classList.add('visible');
+            localStorage.removeItem('refinr-pending-ref');
+            updateCreditsDisplay(data.new_balance);
+            hideVerifyForm();
+        } catch (err) {
+            errorEl.textContent = err.message;
+            errorEl.classList.add('visible');
+        } finally {
+            btn.textContent = 'Verify & credit me';
+            btn.disabled = false;
+        }
+    }
+
+    function showCreditToast(added, balance) {
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2D9B6F;color:white;padding:12px 24px;border-radius:10px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.2);';
+        toast.textContent = '✅ ' + added + ' credits added! Balance: ' + balance + ' credits';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 5000);
     }
 </script>
 
