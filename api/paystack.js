@@ -145,14 +145,14 @@ export default async function handler(req, res) {
 
 // ── SHARED: Add credits to Supabase (idempotent) ───────────────────────────
 async function creditUser(user_id, credits, reference, package_id) {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
-  const headers = {
-    'Content-Type': 'application/json',
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-    'Prefer': 'return=representation',
-  };
+ const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const headers = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_SERVICE_KEY,
+  'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+  'Prefer': 'return=representation',
+};
 
   try {
     // Duplicate check — never credit the same reference twice
