@@ -175,12 +175,16 @@ async function creditUser(user_id, credits, reference, package_id) {
       `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=credits`,
       { headers }
     );
-    const profileData = await profileRes.json();
-    if (!profileData || profileData.length === 0) {
-      return { success: false, error: 'User not found' };
-    }
+   const profileData = await profileRes.json();
 
-    const newBalance = (profileData[0].credits || 0) + parseInt(credits);
+// Debug log so we can see what's coming back
+console.log('Profile query result:', JSON.stringify(profileData));
+
+if (!profileData || !Array.isArray(profileData) || profileData.length === 0) {
+  return { success: false, error: 'User profile not found — user_id: ' + user_id };
+}
+
+const newBalance = (profileData[0].credits || 0) + parseInt(credits);
 
     // Update balance
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}`, {
