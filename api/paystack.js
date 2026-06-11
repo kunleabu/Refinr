@@ -177,9 +177,6 @@ const headers = {
     );
    const profileData = await profileRes.json();
 
-// Debug log so we can see what's coming back
-console.log('Profile query result:', JSON.stringify(profileData));
-
 if (!profileData || !Array.isArray(profileData) || profileData.length === 0) {
   return { success: false, error: 'User profile not found — user_id: ' + user_id };
 }
