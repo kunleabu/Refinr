@@ -627,6 +627,36 @@
         .auth-input:focus { outline: none; border-color: #1B3A6B; }
         .auth-input::placeholder { color: var(--muted); }
 
+        /* Password field wrapper */
+        .password-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .password-wrapper .auth-input {
+            margin-bottom: 0;
+            padding-right: 44px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover { color: #1B3A6B; }
+        [data-theme="dark"] .password-toggle:hover { color: #60A5FA; }
+
         .auth-error {
             background: #FEF2F2;
             border: 1px solid #FCA5A5;
@@ -652,6 +682,45 @@
         }
 
         .auth-success.visible { display: block; }
+
+        /* Google button */
+        .btn-google {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--input-bg);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .btn-google:hover { border-color: #1B3A6B; background: var(--output-bg); }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
 
         .modal select {
             width: 100%;
@@ -964,10 +1033,32 @@
         </div>
         <div id="authError" class="auth-error"></div>
         <div id="authSuccess" class="auth-success"></div>
+
+        <!-- Google button — shown on both tabs -->
+        <button class="btn-google" onclick="handleGoogleAuth()">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+        </button>
+
+        <div class="auth-divider">or</div>
+
         <div id="signinForm">
             <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
-            <div class="modal-buttons">
+            <div class="password-wrapper">
+                <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
+                <button type="button" class="password-toggle" onclick="togglePassword('signinPassword', this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-buttons" style="margin-top:12px;">
                 <button class="btn btn-confirm" onclick="handleSignIn()">Sign in</button>
                 <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
             </div>
@@ -975,8 +1066,16 @@
         <div id="signupForm" style="display:none;">
             <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
             <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
-            <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
+            <div class="password-wrapper">
+                <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
+                <button type="button" class="password-toggle" onclick="togglePassword('signupPassword', this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)" style="margin-top:12px;">
             <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You will get 5 free verification credits on signup</p>
             <div class="modal-buttons">
                 <button class="btn btn-confirm" onclick="handleSignUp()">Create free account</button>
@@ -1167,6 +1266,9 @@
     let userCurrency = 'NGN';
     let selectedPackage = 'pack_50';
 
+    const SUPABASE_URL = 'https://fyvjsdpknqkgnkvuxzfn.supabase.co';
+    const SUPABASE_ANON_KEY_PUB = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5dmpzZHBrbnFrZ25rdXh6Zm4iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0NjA0NjA3MCwiZXhwIjoyMDYxNjIyMDcwfQ.khqPCDcByNnameK_m2GZCrMixFkFB9CjvbMfGcijFak';
+
     // Restore saved theme
     const savedTheme = localStorage.getItem('refinr-theme');
     if (savedTheme === 'dark') {
@@ -1174,7 +1276,6 @@
         document.getElementById('themeBtn').textContent = '☀️ Dark';
     }
 
-    // Check for saved session on load + auto-verify pending payment
     window.addEventListener('load', async function() {
         const savedSession = localStorage.getItem('refinr-session');
         const savedUser = localStorage.getItem('refinr-user');
@@ -1186,7 +1287,16 @@
         loadSharedReport();
         detectUserCurrency();
 
-        // Auto-verify if returning from Paystack payment
+        // Handle Google OAuth callback
+        const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken) {
+            await handleGoogleCallback(accessToken, refreshToken);
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+
+        // Auto-verify pending Paystack payment
         const pendingRef = localStorage.getItem('refinr-pending-ref');
         if (pendingRef && currentUser) {
             try {
@@ -1201,7 +1311,7 @@
                     updateCreditsDisplay(data.new_balance);
                     showCreditToast(data.credits_added, data.new_balance);
                 }
-            } catch (e) { /* silent — user can manually verify */ }
+            } catch (e) {}
         }
     });
 
@@ -1212,7 +1322,6 @@
         glow.style.top = e.clientY + 'px';
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
         const avatar = document.getElementById('userAvatar');
         const dropdown = document.getElementById('userDropdown');
@@ -1259,6 +1368,68 @@
         document.getElementById('userDropdown').classList.toggle('visible');
     }
 
+    // ── SHOW/HIDE PASSWORD ─────────────────────────────────
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btn.innerHTML = isPassword
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+
+    // ── GOOGLE AUTH ────────────────────────────────────────
+    function handleGoogleAuth() {
+        const redirectTo = window.location.origin + window.location.pathname;
+        const authUrl = SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo);
+        window.location.href = authUrl;
+    }
+
+    async function handleGoogleCallback(accessToken, refreshToken) {
+        try {
+            // Get user from Supabase using the token
+            const userRes = await fetch(SUPABASE_URL + '/auth/v1/user', {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'apikey': SUPABASE_ANON_KEY_PUB
+                }
+            });
+            const userData = await userRes.json();
+            if (!userData.id) return;
+
+            // Store session
+            currentSession = { access_token: accessToken, refresh_token: refreshToken };
+            localStorage.setItem('refinr-session', JSON.stringify(currentSession));
+
+            // Check if profile exists, create if not
+            const profileRes = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'signin',
+                    email: userData.email,
+                    provider: 'google',
+                    access_token: accessToken
+                })
+            });
+            const profileData = await profileRes.json();
+
+            currentUser = profileData.user || {
+                id: userData.id,
+                email: userData.email,
+                full_name: userData.user_metadata?.full_name || userData.email.split('@')[0],
+                credits: 5
+            };
+
+            localStorage.setItem('refinr-user', JSON.stringify(currentUser));
+            updateUIForLoggedInUser(currentUser);
+            closeModal('authModal');
+
+        } catch (e) {
+            console.log('Google callback error:', e);
+        }
+    }
+
     function openAuthModal(tab) {
         document.getElementById('authModal').classList.add('visible');
         switchAuthTab(tab);
@@ -1279,17 +1450,14 @@
         const email = document.getElementById('signinEmail').value.trim();
         const password = document.getElementById('signinPassword').value;
         const errorEl = document.getElementById('authError');
-
         if (!email || !password) {
             errorEl.textContent = 'Please enter your email and password.';
             errorEl.classList.add('visible');
             return;
         }
-
         const btn = event.currentTarget;
         btn.textContent = 'Signing in...';
         btn.disabled = true;
-
         try {
             const response = await fetch('/api/auth', {
                 method: 'POST',
@@ -1297,7 +1465,6 @@
                 body: JSON.stringify({ action: 'signin', email, password })
             });
             const data = await response.json();
-
             if (data.error) {
                 errorEl.textContent = data.error;
                 errorEl.classList.add('visible');
@@ -1305,14 +1472,12 @@
                 btn.disabled = false;
                 return;
             }
-
             currentUser = data.user;
             currentSession = data.session;
             localStorage.setItem('refinr-session', JSON.stringify(data.session));
             localStorage.setItem('refinr-user', JSON.stringify(data.user));
             updateUIForLoggedInUser(data.user);
             closeModal('authModal');
-
         } catch (error) {
             errorEl.textContent = 'Something went wrong. Please try again.';
             errorEl.classList.add('visible');
@@ -1327,23 +1492,19 @@
         const password = document.getElementById('signupPassword').value;
         const errorEl = document.getElementById('authError');
         const successEl = document.getElementById('authSuccess');
-
         if (!email || !password) {
             errorEl.textContent = 'Please enter your email and password.';
             errorEl.classList.add('visible');
             return;
         }
-
         if (password.length < 6) {
             errorEl.textContent = 'Password must be at least 6 characters.';
             errorEl.classList.add('visible');
             return;
         }
-
         const btn = event.currentTarget;
         btn.textContent = 'Creating account...';
         btn.disabled = true;
-
         try {
             const response = await fetch('/api/auth', {
                 method: 'POST',
@@ -1351,7 +1512,6 @@
                 body: JSON.stringify({ action: 'signup', email, password, full_name: name })
             });
             const data = await response.json();
-
             if (data.error) {
                 errorEl.textContent = data.error;
                 errorEl.classList.add('visible');
@@ -1359,14 +1519,12 @@
                 btn.disabled = false;
                 return;
             }
-
             const signinResponse = await fetch('/api/auth', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'signin', email, password })
             });
             const signinData = await signinResponse.json();
-
             if (signinData.user) {
                 currentUser = signinData.user;
                 currentSession = signinData.session;
@@ -1381,7 +1539,6 @@
                 btn.textContent = 'Create free account';
                 btn.disabled = false;
             }
-
         } catch (error) {
             errorEl.textContent = 'Something went wrong. Please try again.';
             errorEl.classList.add('visible');
@@ -1392,9 +1549,9 @@
 
     async function refreshSession() {
         const saved = localStorage.getItem('refinr-session');
-        if (!saved) { return false; }
+        if (!saved) return false;
         const session = JSON.parse(saved);
-        if (!session.refresh_token) { return false; }
+        if (!session.refresh_token) return false;
         try {
             const response = await fetch('/api/auth', {
                 method: 'POST',
@@ -1486,7 +1643,6 @@
         document.getElementById('cleanModal').classList.add('visible');
     }
 
-    // ── TIERED CREDIT CALCULATION ──────────────────────────
     function calculateCreditsNeeded(referenceText) {
         if (!referenceText || !referenceText.trim()) return 0;
         const lines = referenceText.trim().split('\n').filter(function(l) { return l.trim().length > 5; });
@@ -1515,10 +1671,7 @@
         if (!input) { alert('Please paste your references first.'); return; }
         if (!currentUser) { openAuthModal('signin'); return; }
         const credits = parseInt(document.getElementById('creditsCount').textContent);
-        if (credits <= 0) {
-            openCreditsModal();
-            return;
-        }
+        if (credits <= 0) { openCreditsModal(); return; }
         document.getElementById('creditsInModal').textContent = credits;
         updateVerifyCostPreview();
         document.getElementById('verifyModal').classList.add('visible');
@@ -1615,7 +1768,6 @@
 
     async function verifyReferences() {
         closeModal('verifyModal');
-
         const referencesText = document.getElementById('referencesInput').value.trim();
         const referenceList = referencesText.split('\n').filter(function(r) { return r.trim().length > 0; });
         const creditsNeeded = calculateCreditsNeeded(referencesText);
@@ -1624,46 +1776,29 @@
             try {
                 const creditResponse = await fetch('/api/credits', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + currentSession.access_token
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentSession.access_token },
                     body: JSON.stringify({ action: 'deduct', amount: creditsNeeded, description: 'Reference verification (' + referenceList.length + ' references)' })
                 });
                 const creditData = await creditResponse.json();
-
                 if (creditResponse.status === 401) {
                     const refreshed = await refreshSession();
-                    if (!refreshed) {
-                        await signOut();
-                        alert('Your session has expired. Please sign in again.');
-                        openAuthModal('signin');
-                        return;
-                    }
+                    if (!refreshed) { await signOut(); alert('Your session has expired. Please sign in again.'); openAuthModal('signin'); return; }
                     const retryResponse = await fetch('/api/credits', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + currentSession.access_token
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentSession.access_token },
                         body: JSON.stringify({ action: 'deduct', amount: creditsNeeded, description: 'Reference verification (' + referenceList.length + ' references)' })
                     });
                     const retryData = await retryResponse.json();
                     if (retryData.error) { alert(retryData.error); return; }
                     updateCreditsDisplay(retryData.credits);
                 } else if (creditData.error) {
-                    if (creditData.credits === 0 || (creditData.error && creditData.error.includes('Insufficient'))) {
-                        openCreditsModal();
-                    } else {
-                        alert(creditData.error);
-                    }
+                    if (creditData.credits === 0 || (creditData.error && creditData.error.includes('Insufficient'))) { openCreditsModal(); }
+                    else { alert(creditData.error); }
                     return;
                 } else {
                     updateCreditsDisplay(creditData.credits);
                 }
-            } catch (err) {
-                console.log('Credit error:', err);
-            }
+            } catch (err) { console.log('Credit error:', err); }
         }
 
         showProgress('Verifying reference 0 of ' + referenceList.length + '...', 0);
@@ -1673,10 +1808,9 @@
         document.getElementById('shareBtn').style.display = 'none';
 
         const results = [];
-
         for (let i = 0; i < referenceList.length; i++) {
             const ref = referenceList[i].trim();
-            if (!ref) { continue; }
+            if (!ref) continue;
             const percent = Math.round(((i + 1) / referenceList.length) * 100);
             document.getElementById('progressLabel').textContent = 'Verifying reference ' + (i + 1) + ' of ' + referenceList.length + '...';
             document.getElementById('progressBar').style.width = percent + '%';
@@ -1699,9 +1833,7 @@
         const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
         const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
         const score = total > 0 ? Math.round((confirmed / total) * 100) : 0;
-
         const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '%\n✅ Confirmed: ' + confirmed + ' of ' + total + '\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
-
         document.getElementById('progressLabel').textContent = '✅ Verification complete — ' + referenceList.length + ' references checked';
         document.getElementById('progressBar').style.width = '100%';
         showOutput('Verification Report', scoreText);
@@ -1746,10 +1878,7 @@
             document.getElementById('progressLabel').textContent = '✅ Lookup complete — ' + lines.length + ' identifiers processed';
             const lookupResults = data.results.join('\n');
             showOutput('DOI/ISBN Lookup — ' + format, lookupResults);
-            document.getElementById('referencesInput').value = data.results
-                .map(function(r) { return r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim(); })
-                .filter(function(r) { return r.length > 0; })
-                .join('\n');
+            document.getElementById('referencesInput').value = data.results.map(function(r) { return r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
             document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.';
             hideProgress();
         } catch (err) {
@@ -1776,10 +1905,7 @@
             document.getElementById('progressLabel').textContent = '✅ Extracted ' + urlList.length + ' reference(s)';
             const results = data.results || ['Could not extract reference'];
             showOutput('URL Lookup — ' + format, results.join('\n\n'));
-            document.getElementById('referencesInput').value = results
-                .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
-                .filter(function(r) { return r.length > 0; })
-                .join('\n');
+            document.getElementById('referencesInput').value = results.map(function(r) { return r.replace(/^✅\s*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
             hideProgress();
         } catch (err) {
             showOutput('Error', 'Could not extract reference from URL.');
@@ -1805,10 +1931,7 @@
             document.getElementById('progressLabel').textContent = '✅ Found ' + titleList.length + ' reference(s)';
             const results = data.results || ['Could not find reference'];
             showOutput('Title Lookup — ' + format, results.join('\n\n'));
-            document.getElementById('referencesInput').value = results
-                .map(function(r) { return r.replace(/^✅\s*/, '').trim(); })
-                .filter(function(r) { return r.length > 0; })
-                .join('\n');
+            document.getElementById('referencesInput').value = results.map(function(r) { return r.replace(/^✅\s*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
             hideProgress();
         } catch (err) {
             showOutput('Error', 'Could not find reference.');
@@ -1827,9 +1950,7 @@
                     showOutput(data.reportData.title + ' — ' + data.reportData.date, data.reportData.content);
                     document.getElementById('shareBtn').style.display = 'none';
                 }
-            } catch (err) {
-                console.log('Could not load shared report');
-            }
+            } catch (err) { console.log('Could not load shared report'); }
         }
     }
 
@@ -1840,9 +1961,7 @@
             const data = await res.json();
             userCurrency = (data.country_code === 'NG') ? 'NGN' : 'USD';
             updatePackagePrices();
-        } catch (e) {
-            userCurrency = 'NGN';
-        }
+        } catch (e) { userCurrency = 'NGN'; }
     }
 
     function updatePackagePrices() {
@@ -1878,13 +1997,7 @@
             const res = await fetch('/api/paystack', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'initialize',
-                    package_id: selectedPackage,
-                    email: currentUser.email,
-                    user_id: currentUser.id,
-                    currency: userCurrency
-                })
+                body: JSON.stringify({ action: 'initialize', package_id: selectedPackage, email: currentUser.email, user_id: currentUser.id, currency: userCurrency })
             });
             const data = await res.json();
             if (!res.ok || !data.authorization_url) throw new Error(data.error || 'Could not initialize payment');
