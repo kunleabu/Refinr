@@ -669,6 +669,18 @@
         }
         loadSharedReport();
         detectUserCurrency();
+        
+        // Handle Google OAuth callback
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+        const hashParams = new URLSearchParams(hash.replace('#', ''));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken && accessToken.length > 20) {
+            await handleGoogleCallback(accessToken, refreshToken);
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+    }
 
         // Auto-verify pending Paystack payment
         const pendingRef = localStorage.getItem('refinr-pending-ref');
@@ -737,10 +749,12 @@
     }
 
     async function handleGoogleCallback(accessToken, refreshToken) {
-        try {
-            const userRes = await fetch(SUPABASE_URL + '/auth/v1/user', { headers: { 'Authorization': 'Bearer ' + accessToken, 'apikey': SUPABASE_ANON_KEY_PUB } });
-            const userData = await userRes.json();
-            if (!userData.id) return;
+    if (!accessToken || accessToken.length < 20) return;
+    try {
+        const userRes = await fetch(SUPABASE_URL + '/auth/v1/user', {
+            if (!userRes.ok) return;
+        const userData = await userRes.json();
+        if (!userData.id) return;
             currentSession = { access_token: accessToken, refresh_token: refreshToken };
             localStorage.setItem('refinr-session', JSON.stringify(currentSession));
             const profileRes = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'signin', email: userData.email, provider: 'google', access_token: accessToken }) });
