@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     // Rate limiting
     const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
-    const limit = rateLimit(ip, 'verify', 10);
+    const limit = rateLimit(ip, 'verify', 50);
     if (!limit.allowed) {
         return res.status(429).json({ 
             error: `Too many requests. Please wait ${limit.resetIn} minutes before trying again.` 
