@@ -670,18 +670,6 @@
         loadSharedReport();
         detectUserCurrency();
 
-      // Handle Google OAuth callback — only if hash contains actual tokens
-const hash = window.location.hash;
-if (hash && hash.includes('access_token')) {
-    const hashParams = new URLSearchParams(hash.replace('#', ''));
-    const accessToken = hashParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token');
-    if (accessToken && accessToken.length > 20) {
-        await handleGoogleCallback(accessToken, refreshToken);
-        window.history.replaceState(null, '', window.location.pathname);
-    }
-}
-
         // Auto-verify pending Paystack payment
         const pendingRef = localStorage.getItem('refinr-pending-ref');
         if (pendingRef && currentUser) {
