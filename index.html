@@ -670,17 +670,17 @@
         loadSharedReport();
         detectUserCurrency();
 
-        // Handle Google OAuth callback
-        const hash = window.location.hash;
-        if (hash && hash.includes('access_token')) {
-            const hashParams = new URLSearchParams(hash.replace('#', ''));
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
-            if (accessToken && accessToken.length > 20) {
-                await handleGoogleCallback(accessToken, refreshToken);
-                window.history.replaceState(null, '', window.location.pathname);
-            }
-        }
+       // Handle Google OAuth callback
+const hash = window.location.hash || window.location.href.split('#')[1] || '';
+if (hash && hash.includes('access_token')) {
+    const hashParams = new URLSearchParams(hash.replace('#', ''));
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    if (accessToken && accessToken.length > 20) {
+        await handleGoogleCallback(accessToken, refreshToken);
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+}
 
         // Auto-verify pending Paystack payment
         const pendingRef = localStorage.getItem('refinr-pending-ref');
@@ -743,10 +743,10 @@
             : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     }
 
-    function handleGoogleAuth() {
-        const redirectTo = window.location.origin + window.location.pathname;
-        window.location.href = SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo);
-    }
+  function handleGoogleAuth() {
+    const redirectTo = window.location.origin + window.location.pathname;
+    window.location.replace(SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo) + '&flow_type=implicit');
+}
 
     async function handleGoogleCallback(accessToken, refreshToken) {
         if (!accessToken || accessToken.length < 20) return;
