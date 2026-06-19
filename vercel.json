@@ -1,5 +1,13 @@
 {
   "functions": {
+    "api/pdfextract.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/deepdive.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
     "api/*.js": {
       "memory": 512,
       "maxDuration": 30
