@@ -226,6 +226,23 @@
         .credit-cost-preview.visible { display: block; }
         .credit-cost-preview strong { color: var(--text); }
         footer { text-align: center; padding: 10px 20px 30px; color: var(--muted); font-size: 0.8rem; position: relative; z-index: 1; }
+        /* PDF Upload */
+        .upload-dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+        .upload-dropzone:hover { border-color: #6366F1; background: var(--output-bg); }
+        .upload-dropzone.dragging { border-color: #6366F1; background: rgba(99,102,241,0.05); }
+        .upload-dropzone .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+        .upload-dropzone p { color: var(--muted); font-size: 0.85rem; margin: 0; }
+        .upload-dropzone strong { color: var(--text); display: block; font-size: 0.95rem; margin-bottom: 4px; }
+        /* PDF option cards */
+        .pdf-option { border: 2px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .pdf-option:hover { border-color: #6366F1; background: var(--output-bg); }
+        .pdf-option-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .pdf-option-title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+        .pdf-option-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+        .badge-free { background: #D1FAE5; color: #065F46; }
+        .badge-credits { background: #FEF3C7; color: #92400E; }
+        .badge-premium { background: #EDE9FE; color: #5B21B6; }
+        .pdf-option-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
         @media (max-width: 600px) {
             header h1 { font-size: 1.5rem; }
             header p { font-size: 0.75rem; }
@@ -294,9 +311,11 @@
             <button class="btn btn-intext" onclick="openIntextModal()">📝 In-text citations</button>
             <button class="btn btn-lookup" onclick="openLookupModal()">🔎 Lookup tools</button>
         </div>
-        <div class="buttons-row" style="margin-top:10px;">
-            <button class="btn btn-idea" onclick="openIdeaModal()" style="grid-column: span 4;">💡 Search by idea <span class="badge">2 credits</span></button>
+        <div class="buttons-row" style="margin-top:10px;grid-template-columns:repeat(2,1fr);">
+            <button class="btn btn-idea" onclick="openIdeaModal()">💡 Search by idea <span class="badge">2 credits</span></button>
+            <button class="btn" style="background:#6366F1;color:white;" onclick="openUploadModal()">📄 Upload PDF / Doc</button>
         </div>
+        <input type="file" id="pdfFileInput" accept=".pdf,.doc,.docx" style="display:none;" onchange="handleFileUpload(event)">
         <div class="progress-container" id="progressContainer">
             <div class="progress-label">
                 <span id="progressLabel">Processing...</span>
@@ -1083,9 +1102,9 @@
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
         const total = results.length;
-        const confirmed = results.filter(r => r && r.includes('✅ CONFIRMED')).length;
-const mismatches = results.filter(r => r && r.includes('⚠️ MISMATCH')).length;
-const notFound = results.filter(r => r && r.includes('❌ NOT FOUND')).length;
+        const confirmed = results.filter(function(r) { return r.includes('✅ CONFIRMED'); }).length;
+        const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
+        const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
         const score = total > 0 ? Math.round((confirmed / total) * 100) : 0;
         const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '%\n✅ Confirmed: ' + confirmed + ' of ' + total + '\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
         document.getElementById('progressLabel').textContent = '✅ Verification complete — ' + referenceList.length + ' references checked';
@@ -1327,6 +1346,309 @@ const notFound = results.filter(r => r && r.includes('❌ NOT FOUND')).length;
         document.body.appendChild(toast);
         setTimeout(function() { toast.remove(); }, 5000);
     }
+</script>
+
+<!-- PDF Upload Modal -->
+<div class="modal-overlay" id="uploadModal">
+    <div class="modal modal-wide">
+        <h3>📄 Upload PDF or Word document</h3>
+        <div id="uploadPanel">
+            <div class="upload-dropzone" id="uploadDropzone" onclick="document.getElementById('pdfFileInput').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+                <div class="upload-icon">📄</div>
+                <strong>Click to upload or drag and drop</strong>
+                <p>PDF or Word document — max 10MB</p>
+            </div>
+            <div id="uploadError" class="auth-error"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="closeModal('uploadModal')">Cancel</button>
+            </div>
+        </div>
+        <div id="uploadReadingPanel" style="display:none;text-align:center;padding:20px 0;">
+            <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
+            <p style="color:var(--text);font-weight:600;margin-bottom:8px;">Reading your document...</p>
+            <p style="color:var(--muted);font-size:0.82rem;">Claude is analysing what's inside</p>
+        </div>
+        <div id="uploadOptionsPanel" style="display:none;">
+            <div id="uploadDocInfo" style="background:var(--output-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);"></div>
+            <div id="uploadOptions"></div>
+            <div id="uploadError2" class="auth-error"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Deep Dive Processing Modal -->
+<div class="modal-overlay" id="deepdiveModal">
+    <div class="modal">
+        <h3>🔬 Deep dive analysis running...</h3>
+        <p>Claude is performing a thorough analysis of your references. This may take up to 60 seconds.</p>
+        <div style="margin:20px 0;">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="deepdiveBar" style="width:0%;transition:width 1s ease;"></div>
+            </div>
+            <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;text-align:center;" id="deepdiveLabel">Initialising analysis...</p>
+        </div>
+        <p style="font-size:0.78rem;color:var(--muted);text-align:center;">Please don't close this window</p>
+    </div>
+</div>
+
+<script>
+// ── PDF UPLOAD ──────────────────────────────────────────────
+let uploadedReferences = [];
+let uploadedDocType = '';
+let uploadedTitle = '';
+
+function openUploadModal() {
+    if (!currentUser) { openAuthModal('signin'); return; }
+    resetUploadModal();
+    document.getElementById('uploadModal').classList.add('visible');
+}
+
+function resetUploadModal() {
+    document.getElementById('uploadPanel').style.display = 'block';
+    document.getElementById('uploadReadingPanel').style.display = 'none';
+    document.getElementById('uploadOptionsPanel').style.display = 'none';
+    document.getElementById('uploadError').classList.remove('visible');
+    document.getElementById('pdfFileInput').value = '';
+    uploadedReferences = []; uploadedDocType = ''; uploadedTitle = '';
+}
+
+function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadDropzone').classList.add('dragging'); }
+function handleDragLeave(e) { document.getElementById('uploadDropzone').classList.remove('dragging'); }
+function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadDropzone').classList.remove('dragging');
+    const file = e.dataTransfer.files[0];
+    if (file) processUploadedFile(file);
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) processUploadedFile(file);
+}
+
+async function processUploadedFile(file) {
+    const errorEl = document.getElementById('uploadError');
+    errorEl.classList.remove('visible');
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx)$/i)) {
+        errorEl.textContent = 'Please upload a PDF or Word document (.pdf, .doc, .docx)';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        errorEl.textContent = 'File is too large. Maximum size is 10MB.';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    // Only PDF supported for now (Word coming soon)
+    if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
+        errorEl.textContent = 'Word document support coming soon. Please upload a PDF for now.';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    // Show reading panel
+    document.getElementById('uploadPanel').style.display = 'none';
+    document.getElementById('uploadReadingPanel').style.display = 'block';
+
+    try {
+        // Convert to base64
+        const base64 = await new Promise(function(resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function() { resolve(reader.result.split(',')[1]); };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        const res = await fetch('/api/pdfextract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileData: base64, fileName: file.name })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Could not read document');
+        if (!data.references || data.references.length === 0) throw new Error('No references found in this document');
+
+        uploadedReferences = data.references;
+        uploadedDocType = data.documentType;
+        uploadedTitle = data.title || file.name;
+
+        showUploadOptions(data);
+
+    } catch (err) {
+        document.getElementById('uploadReadingPanel').style.display = 'none';
+        document.getElementById('uploadPanel').style.display = 'block';
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+    }
+}
+
+function showUploadOptions(data) {
+    document.getElementById('uploadReadingPanel').style.display = 'none';
+    document.getElementById('uploadOptionsPanel').style.display = 'block';
+
+    const isFullPaper = data.documentType === 'full_paper';
+    const credits = parseInt(document.getElementById('creditsCount').textContent);
+    const verifyCredits = calculateCreditsNeeded(data.references.join('\n'));
+
+    document.getElementById('uploadDocInfo').innerHTML =
+        '<strong style="color:var(--text);display:block;margin-bottom:4px;">' +
+        (isFullPaper ? '📄 Full academic paper detected' : '📋 Reference list detected') +
+        '</strong>' +
+        (data.title ? 'Title: ' + data.title + '<br>' : '') +
+        data.references.length + ' references found — ' + data.summary;
+
+    const optionsEl = document.getElementById('uploadOptions');
+
+    if (isFullPaper) {
+        optionsEl.innerHTML = `
+            <div class="pdf-option" onclick="runDeepDive()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">🔬 Deep dive analysis</span>
+                    <span class="pdf-option-badge badge-premium">10 credits</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Claude performs a thorough audit of all ${data.references.length} references. Checks credibility, flags weak or suspicious citations, checks if references support the claims they're cited for, identifies over-reliance patterns, and produces a supervisor-ready report with an overall credibility score.
+                </div>
+            </div>
+            <div class="pdf-option" onclick="runExtractAndVerify()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">🔍 Extract & verify references</span>
+                    <span class="pdf-option-badge badge-credits">${verifyCredits} credit${verifyCredits > 1 ? 's' : ''}</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Extracts all ${data.references.length} references from the paper and checks each one against CrossRef and OpenAlex (370M+ records). Returns an accuracy score and flags any mismatches or errors.
+                </div>
+            </div>
+            <div class="pdf-option" onclick="runExtractAndFormat()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">✨ Extract & format references</span>
+                    <span class="pdf-option-badge badge-free">Free</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Extracts all ${data.references.length} references from the paper and loads them into Refinr so you can clean, format, or reformat them in any citation style.
+                </div>
+            </div>`;
+    } else {
+        optionsEl.innerHTML = `
+            <div class="pdf-option" onclick="runDeepDive()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">🔬 Deep dive analysis</span>
+                    <span class="pdf-option-badge badge-premium">10 credits</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Claude performs a thorough quality audit of all ${data.references.length} references. Checks credibility, flags weak or non-academic sources, identifies formatting issues and over-reliance patterns, and produces a supervisor-ready report with an overall credibility score.
+                </div>
+            </div>
+            <div class="pdf-option" onclick="runExtractAndVerify()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">🔍 Verify references</span>
+                    <span class="pdf-option-badge badge-credits">${verifyCredits} credit${verifyCredits > 1 ? 's' : ''}</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Checks each of the ${data.references.length} references against CrossRef and OpenAlex (370M+ academic records). Returns an accuracy score and flags mismatches.
+                </div>
+            </div>
+            <div class="pdf-option" onclick="runExtractAndFormat()">
+                <div class="pdf-option-header">
+                    <span class="pdf-option-title">✨ Format my references</span>
+                    <span class="pdf-option-badge badge-free">Free</span>
+                </div>
+                <div class="pdf-option-desc">
+                    Loads all ${data.references.length} references into Refinr so you can clean and format them in Harvard, APA, MLA, Chicago, Vancouver, or IEEE.
+                </div>
+            </div>`;
+    }
+}
+
+// Option handlers
+function runExtractAndFormat() {
+    closeModal('uploadModal');
+    document.getElementById('referencesInput').value = uploadedReferences.join('\n');
+    document.getElementById('referencesInput').scrollIntoView({ behavior: 'smooth' });
+    showOutput('References extracted from PDF', uploadedReferences.join('\n\n') + '\n\n─────────────────────────────\n💡 ' + uploadedReferences.length + ' references loaded. Click "Clean references" to format them.');
+}
+
+async function runExtractAndVerify() {
+    closeModal('uploadModal');
+    document.getElementById('referencesInput').value = uploadedReferences.join('\n');
+    // Trigger verify flow
+    const credits = parseInt(document.getElementById('creditsCount').textContent);
+    if (!currentUser) { openAuthModal('signin'); return; }
+    if (credits <= 0) { openCreditsModal(); return; }
+    document.getElementById('creditsInModal').textContent = credits;
+    updateVerifyCostPreview();
+    document.getElementById('verifyModal').classList.add('visible');
+}
+
+async function runDeepDive() {
+    const credits = parseInt(document.getElementById('creditsCount').textContent);
+    if (credits < 10) {
+        document.getElementById('uploadError2').textContent = 'You need 10 credits for deep dive analysis. You have ' + credits + '.';
+        document.getElementById('uploadError2').classList.add('visible');
+        setTimeout(function() { closeModal('uploadModal'); openCreditsModal(); }, 1500);
+        return;
+    }
+
+    closeModal('uploadModal');
+
+    // Show deep dive processing modal
+    document.getElementById('deepdiveModal').classList.add('visible');
+    animateDeepDiveBar();
+
+    // Deduct credits
+    const ok = await deductCredits(10, 'Deep dive analysis — ' + (uploadedTitle || 'document'));
+    if (!ok) { closeModal('deepdiveModal'); return; }
+
+    try {
+        const res = await fetch('/api/deepdive', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                references: uploadedReferences,
+                documentType: uploadedDocType,
+                title: uploadedTitle
+            })
+        });
+
+        const data = await res.json();
+        closeModal('deepdiveModal');
+
+        if (!res.ok) throw new Error(data.error || 'Analysis failed');
+
+        showOutput('🔬 Deep Dive Analysis Report', data.result);
+
+    } catch (err) {
+        closeModal('deepdiveModal');
+        showOutput('Error', 'Deep dive analysis failed. Please try again. Your credits have not been deducted.');
+    }
+}
+
+function animateDeepDiveBar() {
+    const bar = document.getElementById('deepdiveBar');
+    const label = document.getElementById('deepdiveLabel');
+    const stages = [
+        { pct: 10, text: 'Reading references...' },
+        { pct: 25, text: 'Checking academic credibility...' },
+        { pct: 45, text: 'Analysing citation patterns...' },
+        { pct: 65, text: 'Identifying weak sources...' },
+        { pct: 80, text: 'Generating recommendations...' },
+        { pct: 90, text: 'Writing supervisor report...' }
+    ];
+    let i = 0;
+    const interval = setInterval(function() {
+        if (i >= stages.length) { clearInterval(interval); return; }
+        bar.style.width = stages[i].pct + '%';
+        label.textContent = stages[i].text;
+        i++;
+    }, 8000);
+}
 </script>
 
 </body>
