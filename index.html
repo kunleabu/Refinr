@@ -1202,7 +1202,7 @@
         const lines = identifiers.split('\n').filter(function(l) { return l.trim().length > 0; });
         showProgress('Looking up ' + lines.length + ' identifiers...', 20);
         try {
-            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifiers, format }) });
+            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'identifiers', identifiers, format }) });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Lookup complete — ' + lines.length + ' identifiers processed';
@@ -1222,7 +1222,7 @@
         const urlList = urls.split('\n').filter(function(u) { return u.trim().length > 0; });
         showProgress('Extracting ' + urlList.length + ' URL(s)...', 20);
         try {
-            const response = await fetch('/api/urllookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls, format }) });
+            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'url', urls, format }) });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Extracted ' + urlList.length + ' reference(s)';
@@ -1241,7 +1241,7 @@
         const titleList = titles.split('\n').filter(function(t) { return t.trim().length > 0; });
         showProgress('Searching for ' + titleList.length + ' reference(s)...', 20);
         try {
-            const response = await fetch('/api/titlelookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ titles, format }) });
+            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'title', titles, format }) });
             const data = await response.json();
             document.getElementById('progressBar').style.width = '100%';
             document.getElementById('progressLabel').textContent = '✅ Found ' + titleList.length + ' reference(s)';
@@ -1464,10 +1464,10 @@ async function processUploadedFile(file) {
             reader.readAsDataURL(file);
         });
 
-        const res = await fetch('/api/pdfextract', {
+        const res = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileData: base64, fileName: file.name })
+            body: JSON.stringify({ action: 'extract', fileData: base64, fileName: file.name })
         });
 
         const data = await res.json();
@@ -1607,10 +1607,11 @@ async function runDeepDive() {
     if (!ok) { closeModal('deepdiveModal'); return; }
 
     try {
-        const res = await fetch('/api/deepdive', {
+        const res = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                action: 'deepdive',
                 references: uploadedReferences,
                 documentType: uploadedDocType,
                 title: uploadedTitle
