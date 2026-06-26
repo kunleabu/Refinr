@@ -1128,37 +1128,77 @@
     }
 
     // ── SEARCH BY IDEA ──────────────────────────────────────
-    async function searchByIdea() {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const idea = document.getElementById('ideaInput').value.trim();
-        const format = document.getElementById('ideaFormatSelect').value;
-        const errorEl = document.getElementById('ideaError');
-        errorEl.classList.remove('visible');
-        if (!idea) { errorEl.textContent = 'Please enter a research idea or topic.'; errorEl.classList.add('visible'); return; }
-        const btn = document.getElementById('ideaSearchBtn');
-        btn.textContent = 'Searching...'; btn.disabled = true;
-        const ok = await deductCredits(2, 'Search by idea: ' + idea.substring(0, 50));
-        if (!ok) { btn.textContent = 'Search — 2 credits'; btn.disabled = false; return; }
-        try {
-            const res = await fetch('/api/searchbyidea', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idea, format }) });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Search failed');
-            if (!data.papers || data.papers.length === 0) {
-                errorEl.textContent = 'No papers found. Try different keywords.';
-                errorEl.classList.add('visible');
-                btn.textContent = 'Search — 2 credits'; btn.disabled = false;
-                return;
-            }
-            ideaPapers = data.papers;
-            ideaFormatted = data.formatted;
-            renderIdeaResults(data.papers, data.total, format);
-        } catch (err) {
-            errorEl.textContent = err.message;
-            errorEl.classList.add('visible');
-        } finally {
-            btn.textContent = 'Search — 2 credits'; btn.disabled = false;
-        }
+   async function searchByIdea() {
+    if (!currentUser) { 
+        openAuthModal('signin'); 
+        return; 
     }
+
+    const idea = document.getElementById('ideaInput').value.trim();
+    const format = document.getElementById('ideaFormatSelect').value;
+    const errorEl = document.getElementById('ideaError');
+
+    errorEl.classList.remove('visible');
+
+    if (!idea) {
+        errorEl.textContent = 'Please enter a research idea or topic.';
+        errorEl.classList.add('visible');
+        return;
+    }
+
+    const btn = document.getElementById('ideaSearchBtn');
+    btn.textContent = 'Searching...';
+    btn.disabled = true;
+
+    const ok = await deductCredits(2, 'Search by idea: ' + idea.substring(0, 50));
+
+    if (!ok) {
+        btn.textContent = 'Search — 2 credits';
+        btn.disabled = false;
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/searchbyidea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idea,
+                format,
+                yearFrom: document.getElementById('yearFrom').value || null,
+                yearTo: document.getElementById('yearTo').value || null
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || 'Search failed');
+        }
+
+        if (!data.papers || data.papers.length === 0) {
+            errorEl.textContent = 'No papers found. Try different keywords.';
+            errorEl.classList.add('visible');
+            btn.textContent = 'Search — 2 credits';
+            btn.disabled = false;
+            return;
+        }
+
+        ideaPapers = data.papers;
+        ideaFormatted = data.formatted;
+
+        renderIdeaResults(data.papers, data.total, format);
+
+    } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+    } finally {
+        btn.textContent = 'Search — 2 credits';
+        btn.disabled = false;
+    }
+}
 
     function renderIdeaResults(papers, total, format) {
         document.getElementById('ideaSearchPanel').style.display = 'none';
@@ -1172,7 +1212,9 @@
             card.dataset.index = i;
             card.onclick = function() { card.classList.toggle('selected'); };
             const authors = paper.authors.slice(0, 3).join(', ') + (paper.authors.length > 3 ? ' et al.' : '');
-            card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '</div><div class="idea-result-meta">' + escapeHtml(authors) + ' · ' + (paper.year || 'n.d.') + (paper.journal ? ' · ' + escapeHtml(paper.journal) : '') + (paper.doi ? ' · DOI: ' + escapeHtml(paper.doi) : '') + '</div>';
+            const doiLink = paper.doiUrl ? ' · <a href="' + escapeHtml(paper.doiUrl) + '" target="_blank" onclick="event.stopPropagation()" style="color:#0891B2;text-decoration:none;">View paper ↗</a>' : '';
+const abstractHtml = paper.abstract ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5;">' + escapeHtml(paper.abstract.substring(0, 200)) + (paper.abstract.length > 200 ? '...' : '') + '</div>' : '';
+card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '</div><div class="idea-result-meta">' + escapeHtml(authors) + ' · ' + (paper.year || 'n.d.') + (paper.journal ? ' · ' + escapeHtml(paper.journal) : '') + (paper.doi ? ' · DOI: ' + escapeHtml(paper.doi) : '') + doiLink + '</div>' + abstractHtml;
             list.appendChild(card);
         });
     }
@@ -1366,7 +1408,7 @@
         <div id="uploadReadingPanel" style="display:none;text-align:center;padding:20px 0;">
             <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
             <p style="color:var(--text);font-weight:600;margin-bottom:8px;">Reading your document...</p>
-            <p style="color:var(--muted);font-size:0.82rem;">Claude is analysing what's inside</p>
+            <p style="color:var(--muted);font-size:0.82rem;">Extracting and analysing references...</p>
         </div>
         <div id="uploadOptionsPanel" style="display:none;">
             <div id="uploadDocInfo" style="background:var(--output-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);"></div>
