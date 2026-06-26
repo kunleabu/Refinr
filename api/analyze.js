@@ -1,64 +1,71 @@
+// ── analyze.js ─────────────────────────────────────────────
+// action: 'extract' → uses Groq only (free, no Claude tokens)
+// action: 'deepdive' → uses Claude API (10 credits)
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { action } = req.body;
   if (!action) return res.status(400).json({ error: 'Missing action' });
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-
-  // ── EXTRACT: Read PDF and detect document type ─────────────
+  // ── EXTRACT: Read PDF using pdf-parse + Groq (FREE, no Claude tokens) ──
   if (action === 'extract') {
     const { fileData, fileName } = req.body;
     if (!fileData) return res.status(400).json({ error: 'No file data provided' });
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default;
+      const buffer = Buffer.from(fileData, 'base64');
+      const pdfData = await pdfParse(buffer);
+      const rawText = pdfData.text;
+
+      if (!rawText || rawText.trim().length < 50) {
+        return res.status(400).json({ error: 'Could not extract text from this PDF. Please try a different file.' });
+      }
+
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01'
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
+          model: 'llama-3.3-70b-versatile',
           max_tokens: 4000,
           messages: [{
+            role: 'system',
+            content: `You are an academic document analyser. Respond with ONLY a valid JSON object — no markdown, no explanation, no extra text.`
+          }, {
             role: 'user',
-            content: [
-              {
-                type: 'document',
-                source: { type: 'base64', media_type: 'application/pdf', data: fileData }
-              },
-              {
-                type: 'text',
-                text: `Analyse this document carefully and respond with ONLY a JSON object in this exact format:
+            content: `Analyse this document text and return ONLY a JSON object in this exact format:
 {
   "documentType": "full_paper" or "reference_list",
   "title": "document title if found, or null",
-  "referenceCount": number of references found,
-  "references": ["reference 1", "reference 2", ...],
+  "referenceCount": number,
+  "references": ["complete reference 1", "complete reference 2", ...],
   "summary": "one sentence describing what you found"
 }
 
 Rules:
-- If the document contains a full academic paper (with abstract, introduction, body text, methodology, conclusion etc.) set documentType to "full_paper"
-- If the document contains only or mostly a list of references/bibliography, set documentType to "reference_list"
-- Extract ALL references you can find in the document
-- Each reference should be a complete citation string
-- Do not include any text outside the JSON object`
-              }
-            ]
+- "full_paper" = has abstract, introduction, body text, methodology, conclusion etc.
+- "reference_list" = only or mostly a list of references/bibliography
+- Extract ALL complete references you can find
+- Each reference must be a complete citation string
+- Return ONLY the JSON object, nothing else
+
+DOCUMENT TEXT:
+${rawText.substring(0, 12000)}`
           }]
         })
       });
 
-      const data = await response.json();
-      if (data.error) {
-        console.error('Claude API error:', data.error);
-        return res.status(500).json({ error: 'Failed to read PDF. Please try again.' });
+      const groqData = await groqRes.json();
+
+      if (!groqData.choices?.[0]?.message?.content) {
+        return res.status(500).json({ error: 'Could not analyse document. Please try again.' });
       }
 
-      const text = data.content[0].text.trim();
+      const text = groqData.choices[0].message.content.trim();
       let parsed;
       try {
         const clean = text.replace(/```json\n?|\n?```/g, '').trim();
@@ -67,11 +74,15 @@ Rules:
         return res.status(500).json({ error: 'Could not read document structure. Please try again.' });
       }
 
+      if (!parsed.references || parsed.references.length === 0) {
+        return res.status(400).json({ error: 'No references found in this document. Please check the file contains references.' });
+      }
+
       return res.status(200).json({
         documentType: parsed.documentType,
         title: parsed.title,
-        referenceCount: parsed.referenceCount,
-        references: parsed.references || [],
+        referenceCount: parsed.referenceCount || parsed.references.length,
+        references: parsed.references,
         summary: parsed.summary
       });
 
@@ -81,10 +92,12 @@ Rules:
     }
   }
 
-  // ── DEEPDIVE: Full analysis with Claude ────────────────────
+  // ── DEEPDIVE: Full analysis with Claude API (10 credits) ──
   if (action === 'deepdive') {
     const { references, documentType, title } = req.body;
     if (!references || !references.length) return res.status(400).json({ error: 'No references provided' });
+
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
     const systemPrompt = `You are an expert academic reference analyst. Your job is to perform a deep, thorough analysis of academic references and produce a professional report that supervisors and journal editors can rely on. Be specific, honest, and constructive. Your analysis should feel like it comes from a senior academic librarian or research quality officer.`;
 
