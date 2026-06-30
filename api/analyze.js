@@ -162,7 +162,8 @@ Rules:
         const clean = text.replace(/```json\n?|\n?```/g, '').trim();
         parsed = JSON.parse(clean);
       } catch (e) {
-        return res.status(500).json({ error: 'Could not read document structure. Please try again.' });
+        console.error('JSON parse failed. Raw Groq text:', text);
+        return res.status(500).json({ error: 'Could not read document structure. Please try again.', debug: text.substring(0, 1500) });
       }
 
       if (!parsed.references || parsed.references.length === 0) {
