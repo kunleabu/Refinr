@@ -152,8 +152,8 @@ Rules:
       const groqData = await groqRes.json();
 
       if (!groqData.choices?.[0]?.message?.content) {
-        console.error('Groq did not return expected content. Status:', groqRes.status, 'Response:', JSON.stringify(groqData));
-        return res.status(500).json({ error: 'Could not analyse document. Please try again.', debug: groqData.error?.message || 'No error detail from Groq' });
+        console.error('Groq did not return expected content:', JSON.stringify(groqData));
+        return res.status(500).json({ error: 'Could not analyse document. Please try again in a few minutes.' });
       }
 
       const text = groqData.choices[0].message.content.trim();
@@ -163,7 +163,7 @@ Rules:
         parsed = JSON.parse(clean);
       } catch (e) {
         console.error('JSON parse failed. Raw Groq text:', text);
-        return res.status(500).json({ error: 'Could not read document structure. Please try again.', debug: text.substring(0, 1500) });
+        return res.status(500).json({ error: 'Could not read document structure. Please try again.' });
       }
 
       if (!parsed.references || parsed.references.length === 0) {
