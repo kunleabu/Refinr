@@ -112,6 +112,39 @@ function extractReferenceCandidate(fullText) {
 }
 
 // ── AI: structure already-validated reference text into a clean array ──────
+// ── Robust JSON extraction from an AI response that may contain extra text ──
+function extractJsonFromResponse(raw) {
+    // Strategy 1 — strip code fences if present, try direct parse
+    let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+    try {
+        return JSON.parse(cleaned);
+    } catch (e1) {
+        // continue to next strategy
+    }
+
+    // Strategy 2 — find the first '{' and the matching last '}' and try that slice
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        const sliced = cleaned.substring(firstBrace, lastBrace + 1);
+        try {
+            return JSON.parse(sliced);
+        } catch (e2) {
+            // Strategy 3 — attempt to fix common issues: trailing commas, unescaped newlines inside strings
+            const repaired = sliced
+                .replace(/,\s*([}\]])/g, '$1')           // remove trailing commas
+                .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); // strip control chars
+            try {
+                return JSON.parse(repaired);
+            } catch (e3) {
+                throw new Error(`AI response was not valid JSON even after repair attempts. First 200 chars: ${cleaned.substring(0, 200)}`);
+            }
+        }
+    }
+
+    throw new Error(`No JSON object found in AI response. First 200 chars: ${cleaned.substring(0, 200)}`);
+}
+
 async function structureReferencesWithGroq(referenceText, beginningText) {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -122,10 +155,11 @@ async function structureReferencesWithGroq(referenceText, beginningText) {
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             temperature: 0,
+            response_format: { type: 'json_object' },
             messages: [
                 {
                     role: 'system',
-                    content: "You are a document structuring assistant. You will be given two pieces of text: (1) the BEGINNING of an academic document (for title and document-type detection), and (2) a block of text that has ALREADY BEEN IDENTIFIED as the reference list / bibliography section. Your only job is to: (a) extract the document title if present, (b) determine if the BEGINNING text shows signs of a full academic paper (abstract, introduction, methodology, results sections) versus just being a bare reference list with no other content, and (c) split the REFERENCE SECTION text into individual, complete reference entries as an array of strings, exactly as they appear, without reformatting or correcting them. Do NOT include in-text citations like (Smith, 2020) — only complete bibliographic entries with author, year, title and source details. If the reference section block contains non-reference content at the start or end (like page headers, footnotes unrelated to references, or document metadata), exclude that content from the entries. Return ONLY valid JSON in this exact shape: {\"title\": \"...\", \"documentType\": \"full_paper\" or \"reference_list\", \"references\": [\"...\", \"...\"], \"summary\": \"one short sentence\"}. No markdown, no explanation, no code fences — JSON only."
+                    content: "You are a document structuring assistant. You will be given two pieces of text: (1) the BEGINNING of an academic document (for title and document-type detection), and (2) a block of text that has ALREADY BEEN IDENTIFIED as the reference list / bibliography section. Your only job is to: (a) extract the document title if present, (b) determine if the BEGINNING text shows signs of a full academic paper (abstract, introduction, methodology, results sections) versus just being a bare reference list with no other content, and (c) split the REFERENCE SECTION text into individual, complete reference entries as an array of strings, exactly as they appear, without reformatting or correcting them. Do NOT include in-text citations like (Smith, 2020) — only complete bibliographic entries with author, year, title and source details. If the reference section block contains non-reference content at the start or end (like page headers, footnotes unrelated to references, or document metadata), exclude that content from the entries.\n\nCRITICAL OUTPUT RULES: Respond with ONLY a single valid JSON object. No markdown code fences. No explanation before or after. No preamble like \"Here is the JSON:\". Your entire response must start with { and end with }. Inside string values, properly escape any double quotes (\\\") and backslashes (\\\\) that appear in reference text, and replace any literal newlines within a single reference entry with a space so each array element is a single-line string. The exact shape required: {\"title\": \"...\", \"documentType\": \"full_paper\" or \"reference_list\", \"references\": [\"...\", \"...\"], \"summary\": \"one short sentence\"}"
                 },
                 {
                     role: 'user',
@@ -142,12 +176,11 @@ async function structureReferencesWithGroq(referenceText, beginningText) {
 
     const data = await response.json();
     const raw = data.choices[0].message.content.trim();
-    const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
 
     try {
-        return JSON.parse(cleaned);
-    } catch (e) {
-        throw new Error('Could not parse structured reference data from AI response');
+        return extractJsonFromResponse(raw);
+    } catch (parseErr) {
+        throw new Error(`Could not parse structured reference data from AI response. ${parseErr.message}`);
     }
 }
 
