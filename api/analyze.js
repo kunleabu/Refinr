@@ -8,10 +8,17 @@
 // touches text we have already validated is worth analysing.
 // ============================================================
 
-import pdfParse from 'pdf-parse';
-
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+
+// pdf-parse is loaded dynamically inside the handler (not at module top-level).
+// Some versions of pdf-parse run file-system side effects on import that can
+// crash a serverless function before any of our code executes. Dynamic import
+// inside a try/catch lets us surface a clean error instead of a bare 500.
+async function loadPdfParser() {
+    const mod = await import('pdf-parse/lib/pdf-parse.js').catch(() => import('pdf-parse'));
+    return mod.default || mod;
+}
 
 // ── Rule Engine: heading detection ──────────────────────────
 const REFERENCE_HEADINGS = [
@@ -182,6 +189,20 @@ async function runDeepDiveAnalysis(references, documentType, title) {
 
 // ── Main handler ─────────────────────────────────────────────────────────
 export default async function handler(req, res) {
+    try {
+        return await routeRequest(req, res);
+    } catch (fatalErr) {
+        // Last-resort catch — ensures the client always gets a readable error
+        // instead of a bare 500 with no information.
+        console.error('Fatal error in /api/analyze:', fatalErr);
+        return res.status(500).json({
+            error: `Unexpected server error: ${fatalErr.message}`,
+            stage: 'fatal'
+        });
+    }
+}
+
+async function routeRequest(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -198,7 +219,18 @@ export default async function handler(req, res) {
 
         try {
             const buffer = Buffer.from(fileData, 'base64');
-            const pdfData = await pdfParse(buffer);
+
+            let pdfData;
+            try {
+                const pdfParse = await loadPdfParser();
+                pdfData = await pdfParse(buffer);
+            } catch (parseErr) {
+                return res.status(500).json({
+                    error: `PDF parsing library failed to load or process this file: ${parseErr.message}`,
+                    stage: 'pdf_parse'
+                });
+            }
+
             const fullText = pdfData.text;
 
             if (!fullText || fullText.trim().length < 100) {
