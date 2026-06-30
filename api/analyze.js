@@ -145,7 +145,7 @@ function extractJsonFromResponse(raw) {
     throw new Error(`No JSON object found in AI response. First 200 chars: ${cleaned.substring(0, 200)}`);
 }
 
-async function structureReferencesWithGroq(referenceText, beginningText) {
+async function callGroqForStructuring(referenceText, beginningText, maxTokens) {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -155,11 +155,12 @@ async function structureReferencesWithGroq(referenceText, beginningText) {
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             temperature: 0,
+            max_tokens: maxTokens,
             response_format: { type: 'json_object' },
             messages: [
                 {
                     role: 'system',
-                    content: "You are a document structuring assistant. You will be given two pieces of text: (1) the BEGINNING of an academic document (for title and document-type detection), and (2) a block of text that has ALREADY BEEN IDENTIFIED as the reference list / bibliography section. Your only job is to: (a) extract the document title if present, (b) determine if the BEGINNING text shows signs of a full academic paper (abstract, introduction, methodology, results sections) versus just being a bare reference list with no other content, and (c) split the REFERENCE SECTION text into individual, complete reference entries as an array of strings, exactly as they appear, without reformatting or correcting them. Do NOT include in-text citations like (Smith, 2020) — only complete bibliographic entries with author, year, title and source details. If the reference section block contains non-reference content at the start or end (like page headers, footnotes unrelated to references, or document metadata), exclude that content from the entries.\n\nCRITICAL OUTPUT RULES: Respond with ONLY a single valid JSON object. No markdown code fences. No explanation before or after. No preamble like \"Here is the JSON:\". Your entire response must start with { and end with }. Inside string values, properly escape any double quotes (\\\") and backslashes (\\\\) that appear in reference text, and replace any literal newlines within a single reference entry with a space so each array element is a single-line string. The exact shape required: {\"title\": \"...\", \"documentType\": \"full_paper\" or \"reference_list\", \"references\": [\"...\", \"...\"], \"summary\": \"one short sentence\"}"
+                    content: "You are a document structuring assistant. You will be given two pieces of text: (1) the BEGINNING of an academic document (for title and document-type detection), and (2) a block of text that has ALREADY BEEN IDENTIFIED as the reference list / bibliography section. Your only job is to: (a) extract the document title if present, (b) determine if the BEGINNING text shows signs of a full academic paper (abstract, introduction, methodology, results sections) versus just being a bare reference list with no other content, and (c) split the REFERENCE SECTION text into individual, complete reference entries as an array of strings, exactly as they appear, without reformatting or correcting them. Do NOT include in-text citations like (Smith, 2020) — only complete bibliographic entries with author, year, title and source details. If the reference section block contains non-reference content at the start or end (like page headers, footnotes unrelated to references, or document metadata), exclude that content from the entries. Keep each reference entry concise — do not add commentary or extra description beyond the reference itself.\n\nCRITICAL OUTPUT RULES: Respond with ONLY a single valid JSON object. No markdown code fences. No explanation before or after. No preamble like \"Here is the JSON:\". Your entire response must start with { and end with }. Inside string values, properly escape any double quotes (\\\") and backslashes (\\\\) that appear in reference text, and replace any literal newlines within a single reference entry with a space so each array element is a single-line string. The exact shape required: {\"title\": \"...\", \"documentType\": \"full_paper\" or \"reference_list\", \"references\": [\"...\", \"...\"], \"summary\": \"one short sentence\"}"
                 },
                 {
                     role: 'user',
@@ -169,18 +170,51 @@ async function structureReferencesWithGroq(referenceText, beginningText) {
         })
     });
 
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Groq structuring failed: ${errText}`);
+    const bodyText = await response.text();
+    let bodyJson;
+    try {
+        bodyJson = JSON.parse(bodyText);
+    } catch {
+        bodyJson = null;
     }
 
-    const data = await response.json();
-    const raw = data.choices[0].message.content.trim();
+    if (!response.ok) {
+        const isTruncation = bodyJson?.error?.code === 'json_validate_failed'
+            && /max.?tokens|completion tokens/i.test(bodyJson?.error?.failed_generation || bodyJson?.error?.message || '');
+        const err = new Error(`Groq structuring failed: ${bodyText}`);
+        err.isTruncation = isTruncation;
+        throw err;
+    }
+
+    return bodyJson.choices[0].message.content.trim();
+}
+
+async function structureReferencesWithGroq(referenceText, beginningText) {
+    // First attempt — generous token budget, full reference text.
+    try {
+        const raw = await callGroqForStructuring(referenceText, beginningText, 8000);
+        return extractJsonFromResponse(raw);
+    } catch (firstErr) {
+        const wasTruncated = firstErr.isTruncation === true;
+        if (!wasTruncated) {
+            throw new Error(`Could not parse structured reference data from AI response. ${firstErr.message}`);
+        }
+    }
+
+    // Second attempt — the reference text itself was likely too long to fit in
+    // the response alongside the input. Trim to a smaller, still-validated slice
+    // (most recent/earliest references) and retry once.
+    const trimmedReferenceText = referenceText.length > 6000
+        ? referenceText.substring(0, 6000)
+        : referenceText;
 
     try {
-        return extractJsonFromResponse(raw);
-    } catch (parseErr) {
-        throw new Error(`Could not parse structured reference data from AI response. ${parseErr.message}`);
+        const raw = await callGroqForStructuring(trimmedReferenceText, beginningText, 8000);
+        const result = extractJsonFromResponse(raw);
+        result.summary = (result.summary || '') + ' (Note: document had more references than could be processed in one pass — list may be incomplete. Consider splitting very long reference lists.)';
+        return result;
+    } catch (secondErr) {
+        throw new Error(`This document's reference list is too long to process in one pass, even after trimming. ${secondErr.message}`);
     }
 }
 
