@@ -152,7 +152,8 @@ Rules:
       const groqData = await groqRes.json();
 
       if (!groqData.choices?.[0]?.message?.content) {
-        return res.status(500).json({ error: 'Could not analyse document. Please try again.' });
+        console.error('Groq did not return expected content. Status:', groqRes.status, 'Response:', JSON.stringify(groqData));
+        return res.status(500).json({ error: 'Could not analyse document. Please try again.', debug: groqData.error?.message || 'No error detail from Groq' });
       }
 
       const text = groqData.choices[0].message.content.trim();
