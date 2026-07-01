@@ -1,357 +1,283 @@
-// ============================================================
-// REFINR — Document Intelligence Engine
-// Handles: PDF text extraction, reference-section isolation,
-// structural validation, and routing to the Credibility Engine
-// (deep dive) only when genuinely needed.
+// ── analyze.js ─────────────────────────────────────────────
+// Document Intelligence Engine: rule-based reference isolation
+// before any AI is involved. AI only touches validated text.
 //
-// Design principle: rules find the reference list; AI only
-// touches text we have already validated is worth analysing.
-// ============================================================
+// action: 'extract'  → pdf-parse (rules) + heading search (rules) +
+//                       validation scoring (rules) + Groq (AI, only
+//                       on the isolated, validated reference block)
+// action: 'deepdive' → Claude API (AI) on validated reference list
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-
-// pdf-parse is loaded dynamically inside the handler (not at module top-level).
-// Some versions of pdf-parse run file-system side effects on import that can
-// crash a serverless function before any of our code executes. Dynamic import
-// inside a try/catch lets us surface a clean error instead of a bare 500.
-async function loadPdfParser() {
-    const mod = await import('pdf-parse/lib/pdf-parse.js').catch(() => import('pdf-parse'));
-    return mod.default || mod;
-}
-
-// ── Rule Engine: heading detection ──────────────────────────
+// ── RULE LAYER: heading detection ───────────────────────────
 const REFERENCE_HEADINGS = [
-    'references', 'reference list', 'bibliography', 'works cited',
-    'literature cited', 'sources', 'cited works', 'list of references'
+  'references', 'bibliography', 'works cited', 'literature cited',
+  'sources', 'reference list', 'cited works'
 ];
 
 function findReferenceSectionStart(text) {
-    const lowerText = text.toLowerCase();
-    let bestIndex = -1;
-    let bestHeading = null;
-
-    for (const heading of REFERENCE_HEADINGS) {
-        // Look for the heading as its own line/segment, not buried mid-sentence.
-        // Match: start-of-line OR preceded by newline/whitespace, heading word,
-        // then end-of-line or punctuation — to avoid matching "references to X" in body text.
-        const pattern = new RegExp('(?:^|\\n)\\s*' + heading.replace(/\s+/g, '\\s+') + '\\s*\\n', 'gi');
-        let match;
-        while ((match = pattern.exec(lowerText)) !== null) {
-            // Prefer the LAST occurrence — reference sections are near the end,
-            // and "references" can appear earlier in a table of contents.
-            if (match.index > bestIndex) {
-                bestIndex = match.index + match[0].length;
-                bestHeading = heading;
-            }
-        }
+  // Search the text line by line, from the BOTTOM up, for a line
+  // that is just a heading (short, matches a known heading word).
+  const lines = text.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim().toLowerCase().replace(/[^a-z\s]/g, '').trim();
+    if (line.length === 0 || line.length > 30) continue; // headings are short
+    if (REFERENCE_HEADINGS.includes(line)) {
+      // Return the character offset where this line starts in the original text
+      const offset = lines.slice(0, i + 1).join('\n').length;
+      return offset;
     }
-
-    return bestIndex === -1 ? null : { startIndex: bestIndex, heading: bestHeading };
+  }
+  return -1; // not found
 }
 
-// ── Rule Engine: validate a text block actually looks like a reference list ──
-function scoreReferenceLikelihood(text) {
-    if (!text || text.trim().length < 50) return 0;
+// ── RULE LAYER: validation scoring ──────────────────────────
+// Scores how "reference-list-like" a block of text is, without any AI.
+function scoreReferenceBlock(text) {
+  if (!text || text.length < 50) return 0;
 
-    const sampleLength = Math.min(text.length, 4000);
-    const sample = text.substring(0, sampleLength);
+  const yearMatches = (text.match(/\b(19|20)\d{2}\b/g) || []).length;
+  const doiMatches = (text.match(/10\.\d{4,9}\/\S+/g) || []).length;
+  const urlMatches = (text.match(/https?:\/\/\S+/g) || []).length;
+  // "Lastname, F." or "Lastname, F.M." author-pattern
+  const authorPatternMatches = (text.match(/\b[A-Z][a-z]+,\s?[A-Z]\.(\s?[A-Z]\.)?/g) || []).length;
 
-    const yearMatches = (sample.match(/\b(19|20)\d{2}\b/g) || []).length;
-    const doiMatches = (sample.match(/10\.\d{4,9}\/\S+/g) || []).length;
-    const urlMatches = (sample.match(/https?:\/\/\S+/g) || []).length;
-    // "Lastname, F." or "Lastname, F.M." style author patterns
-    const authorPatternMatches = (sample.match(/\b[A-Z][a-zA-Z'-]+,\s?[A-Z]\.(\s?[A-Z]\.)?/g) || []).length;
-    // Lines that look like hanging-indent / numbered reference entries
-    const lineStarts = sample.split('\n').filter(line => {
-        const trimmed = line.trim();
-        return /^(\[\d+\]|\d+[\.\)]|\([A-Z])/.test(trimmed) || /^[A-Z][a-zA-Z'-]+,/.test(trimmed);
-    }).length;
+  const lengthFactor = text.length / 500; // normalise per 500 chars
+  const rawScore = (yearMatches + doiMatches * 2 + urlMatches + authorPatternMatches) / Math.max(lengthFactor, 1);
 
-    // Normalise to a density score per 500 characters
-    const unit = sampleLength / 500;
-    const score =
-        (yearMatches / unit) * 2 +
-        (doiMatches / unit) * 3 +
-        (urlMatches / unit) * 1 +
-        (authorPatternMatches / unit) * 3 +
-        (lineStarts / unit) * 2;
-
-    return score;
+  return rawScore; // threshold of ~3 used below
 }
 
-const VALIDATION_THRESHOLD = 4; // tuned conservatively; raise if false positives appear
+const VALIDATION_THRESHOLD = 3;
 
-// ── Rule Engine: locate and validate the reference section ─────────────────
-function extractReferenceCandidate(fullText) {
-    // Attempt 1 — heading-based extraction
-    const heading = findReferenceSectionStart(fullText);
-    if (heading) {
-        const candidate = fullText.substring(heading.startIndex);
-        const trimmedCandidate = candidate.length > 16000 ? candidate.substring(0, 16000) : candidate;
-        const score = scoreReferenceLikelihood(trimmedCandidate);
-        if (score >= VALIDATION_THRESHOLD) {
-            return { text: trimmedCandidate, method: 'heading_match', heading: heading.heading, score };
-        }
+// ── RULE LAYER: isolate the reference block deterministically ──
+function isolateReferenceBlock(fullText) {
+  // Step 1: try heading-based extraction first
+  const headingOffset = findReferenceSectionStart(fullText);
+
+  if (headingOffset !== -1) {
+    const candidate = fullText.substring(headingOffset, headingOffset + 16000); // cap size sent onward
+    const score = scoreReferenceBlock(candidate);
+    if (score >= VALIDATION_THRESHOLD) {
+      return { block: candidate, method: 'heading_match', score };
     }
+  }
 
-    // Attempt 2 — progressive end-window fallback, validated at each size
-    const windowSizes = [8000, 12000, 16000];
-    for (const size of windowSizes) {
-        const candidate = fullText.substring(Math.max(0, fullText.length - size));
-        const score = scoreReferenceLikelihood(candidate);
-        if (score >= VALIDATION_THRESHOLD) {
-            return { text: candidate, method: 'end_window_fallback', windowSize: size, score };
-        }
+  // Step 2: fall back to progressive end-windows, validating each
+  const windowSizes = [8000, 12000, 16000];
+  for (const size of windowSizes) {
+    const candidate = fullText.substring(Math.max(0, fullText.length - size));
+    const score = scoreReferenceBlock(candidate);
+    if (score >= VALIDATION_THRESHOLD) {
+      return { block: candidate, method: 'fallback_window_' + size, score };
     }
+  }
 
-    // Attempt 3 — nothing validated; return the largest end window anyway,
-    // but flag it clearly so the caller can warn the user.
-    const fallback = fullText.substring(Math.max(0, fullText.length - 16000));
-    return { text: fallback, method: 'unvalidated_fallback', score: scoreReferenceLikelihood(fallback) };
+  // Step 3: nothing validated — return the best-scoring attempt anyway,
+  // but flag it as unvalidated so the caller can warn the user
+  const lastResort = fullText.substring(Math.max(0, fullText.length - 12000));
+  return { block: lastResort, method: 'unvalidated', score: scoreReferenceBlock(lastResort) };
 }
 
-// ── AI: structure already-validated reference text into a clean array ──────
-// ── Robust JSON extraction from an AI response that may contain extra text ──
-function extractJsonFromResponse(raw) {
-    // Strategy 1 — strip code fences if present, try direct parse
-    let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-    try {
-        return JSON.parse(cleaned);
-    } catch (e1) {
-        // continue to next strategy
-    }
-
-    // Strategy 2 — find the first '{' and the matching last '}' and try that slice
-    const firstBrace = cleaned.indexOf('{');
-    const lastBrace = cleaned.lastIndexOf('}');
-    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        const sliced = cleaned.substring(firstBrace, lastBrace + 1);
-        try {
-            return JSON.parse(sliced);
-        } catch (e2) {
-            // Strategy 3 — attempt to fix common issues: trailing commas, unescaped newlines inside strings
-            const repaired = sliced
-                .replace(/,\s*([}\]])/g, '$1')           // remove trailing commas
-                .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); // strip control chars
-            try {
-                return JSON.parse(repaired);
-            } catch (e3) {
-                throw new Error(`AI response was not valid JSON even after repair attempts. First 200 chars: ${cleaned.substring(0, 200)}`);
-            }
-        }
-    }
-
-    throw new Error(`No JSON object found in AI response. First 200 chars: ${cleaned.substring(0, 200)}`);
-}
-
-async function callGroqForStructuring(referenceText, beginningText, maxTokens) {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            temperature: 0,
-            max_tokens: maxTokens,
-            response_format: { type: 'json_object' },
-            messages: [
-                {
-                    role: 'system',
-                    content: "You are a document structuring assistant. You will be given two pieces of text: (1) the BEGINNING of an academic document (for title and document-type detection), and (2) a block of text that has ALREADY BEEN IDENTIFIED as the reference list / bibliography section. Your only job is to: (a) extract the document title if present, (b) determine if the BEGINNING text shows signs of a full academic paper (abstract, introduction, methodology, results sections) versus just being a bare reference list with no other content, and (c) split the REFERENCE SECTION text into individual, complete reference entries as an array of strings, exactly as they appear, without reformatting or correcting them. Do NOT include in-text citations like (Smith, 2020) — only complete bibliographic entries with author, year, title and source details. If the reference section block contains non-reference content at the start or end (like page headers, footnotes unrelated to references, or document metadata), exclude that content from the entries. Keep each reference entry concise — do not add commentary or extra description beyond the reference itself.\n\nCRITICAL OUTPUT RULES: Respond with ONLY a single valid JSON object. No markdown code fences. No explanation before or after. No preamble like \"Here is the JSON:\". Your entire response must start with { and end with }. Inside string values, properly escape any double quotes (\\\") and backslashes (\\\\) that appear in reference text, and replace any literal newlines within a single reference entry with a space so each array element is a single-line string. The exact shape required: {\"title\": \"...\", \"documentType\": \"full_paper\" or \"reference_list\", \"references\": [\"...\", \"...\"], \"summary\": \"one short sentence\"}"
-                },
-                {
-                    role: 'user',
-                    content: `BEGINNING OF DOCUMENT:\n${beginningText}\n\n---\n\nIDENTIFIED REFERENCE SECTION:\n${referenceText}`
-                }
-            ]
-        })
-    });
-
-    const bodyText = await response.text();
-    let bodyJson;
-    try {
-        bodyJson = JSON.parse(bodyText);
-    } catch {
-        bodyJson = null;
-    }
-
-    if (!response.ok) {
-        const isTruncation = bodyJson?.error?.code === 'json_validate_failed'
-            && /max.?tokens|completion tokens/i.test(bodyJson?.error?.failed_generation || bodyJson?.error?.message || '');
-        const err = new Error(`Groq structuring failed: ${bodyText}`);
-        err.isTruncation = isTruncation;
-        throw err;
-    }
-
-    return bodyJson.choices[0].message.content.trim();
-}
-
-async function structureReferencesWithGroq(referenceText, beginningText) {
-    // First attempt — generous token budget, full reference text.
-    try {
-        const raw = await callGroqForStructuring(referenceText, beginningText, 8000);
-        return extractJsonFromResponse(raw);
-    } catch (firstErr) {
-        const wasTruncated = firstErr.isTruncation === true;
-        if (!wasTruncated) {
-            throw new Error(`Could not parse structured reference data from AI response. ${firstErr.message}`);
-        }
-    }
-
-    // Second attempt — the reference text itself was likely too long to fit in
-    // the response alongside the input. Trim to a smaller, still-validated slice
-    // (most recent/earliest references) and retry once.
-    const trimmedReferenceText = referenceText.length > 6000
-        ? referenceText.substring(0, 6000)
-        : referenceText;
-
-    try {
-        const raw = await callGroqForStructuring(trimmedReferenceText, beginningText, 8000);
-        const result = extractJsonFromResponse(raw);
-        result.summary = (result.summary || '') + ' (Note: document had more references than could be processed in one pass — list may be incomplete. Consider splitting very long reference lists.)';
-        return result;
-    } catch (secondErr) {
-        throw new Error(`This document's reference list is too long to process in one pass, even after trimming. ${secondErr.message}`);
-    }
-}
-
-// ── Credibility Engine: deep dive analysis via Claude ───────────────────────
-async function runDeepDiveAnalysis(references, documentType, title) {
-    if (!ANTHROPIC_API_KEY) {
-        throw new Error('Deep dive analysis is not configured on the server yet.');
-    }
-
-    const refList = references.map((r, i) => `${i + 1}. ${r}`).join('\n');
-
-    const systemPrompt = "You are an academic credibility analyst working inside Refinr's Credibility Engine. You perform deep, evidence-based review of reference lists for researchers, supervisors and journal editors. You are thorough, specific and conservative — never invent details you cannot infer, and clearly distinguish between things you can verify from the text given versus things that would require external lookup. Your report must be genuinely useful to a supervisor deciding whether to approve a submission.";
-
-    const userPrompt = `Document title: ${title || 'Untitled document'}\nDocument type: ${documentType === 'full_paper' ? 'Full academic paper' : 'Reference list only'}\n\nHere are the ${references.length} references extracted from this document:\n\n${refList}\n\nProduce a structured credibility report covering:\n\n1. OVERALL CREDIBILITY SCORE (0-100) with one-line justification\n2. SOURCE QUALITY — flag any references that appear to be non-academic, predatory journals, unreliable websites, or missing critical bibliographic details\n3. RECENCY — note if the reference list is unusually outdated for the apparent field, or well-balanced between foundational and recent work\n4. DIVERSITY — flag over-reliance on a small number of authors, journals, or self-citation patterns if apparent from the list\n5. FORMATTING CONSISTENCY — note if the references appear to mix multiple citation styles inconsistently\n6. RECOMMENDATIONS — 3 to 5 concrete, actionable suggestions to strengthen this reference list\n\nFormat your response as clean readable text with clear section headers, suitable to show directly to a supervisor or student. Do not use markdown bold/asterisks — use plain text section headers in capitals.`;
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
-            max_tokens: 2000,
-            system: systemPrompt,
-            messages: [{ role: 'user', content: userPrompt }]
-        })
-    });
-
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Claude deep dive failed: ${errText}`);
-    }
-
-    const data = await response.json();
-    return data.content.map(block => block.text || '').join('\n').trim();
-}
-
-// ── Main handler ─────────────────────────────────────────────────────────
 export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { action } = req.body;
+  if (!action) return res.status(400).json({ error: 'Missing action' });
+
+  // ── EXTRACT: pdf-parse + rule-based isolation + Groq (only on validated block) ──
+  if (action === 'extract') {
+    const { fileData, fileName } = req.body;
+    if (!fileData) return res.status(400).json({ error: 'No file data provided' });
+
     try {
-        return await routeRequest(req, res);
-    } catch (fatalErr) {
-        // Last-resort catch — ensures the client always gets a readable error
-        // instead of a bare 500 with no information.
-        console.error('Fatal error in /api/analyze:', fatalErr);
-        return res.status(500).json({
-            error: `Unexpected server error: ${fatalErr.message}`,
-            stage: 'fatal'
+      const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default;
+      const buffer = Buffer.from(fileData, 'base64');
+      const pdfData = await pdfParse(buffer);
+      const rawText = pdfData.text;
+
+      if (!rawText || rawText.trim().length < 50) {
+        return res.status(400).json({ error: 'Could not extract text from this PDF. Please try a different file.' });
+      }
+
+      // ── RULES: isolate the reference block before any AI call ──
+      const beginning = rawText.substring(0, 1500); // for title + doc type only
+      const isolation = isolateReferenceBlock(rawText);
+
+      if (isolation.method === 'unvalidated') {
+        return res.status(400).json({
+          error: 'We could not confidently locate a reference list in this document. Please check the PDF contains a clearly labelled References or Bibliography section, or paste your references directly instead.'
         });
-    }
+      }
+
+      // ── AI: Groq only touches the small, validated, isolated block ──
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          max_tokens: 4000,
+          messages: [{
+            role: 'system',
+            content: `You are an academic document analyser. You will be given the beginning of a document (for title/type detection) and an isolated block of text that has already been confirmed to be a reference list or bibliography. Respond with ONLY a valid JSON object — no markdown, no explanation.`
+          }, {
+            role: 'user',
+            content: `DOCUMENT BEGINNING (for title and document type only):
+${beginning}
+
+ISOLATED REFERENCE LIST BLOCK (this has already been validated as the references/bibliography section — extract structured references from THIS block only):
+${isolation.block}
+
+Return ONLY a JSON object in this exact format:
+{
+  "documentType": "full_paper" or "reference_list",
+  "title": "document title if found in the beginning section, or null",
+  "referenceCount": number,
+  "references": ["complete reference 1", "complete reference 2", ...],
+  "summary": "one sentence describing what you found"
 }
 
-async function routeRequest(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+Rules:
+- "full_paper" = the beginning section has abstract, introduction, body text etc.
+- "reference_list" = the beginning section is itself mostly references (little to no body text)
+- Extract ALL complete, distinct references from the ISOLATED REFERENCE LIST BLOCK
+- Do NOT extract in-text citations like "(Smith, 2020)" found in body paragraphs — only full bibliography-style entries
+- Each reference must be a complete citation string
+- Return ONLY the JSON object, nothing else`
+          }]
+        })
+      });
+
+      const groqData = await groqRes.json();
+
+      if (!groqData.choices?.[0]?.message?.content) {
+        console.error('Groq did not return expected content:', JSON.stringify(groqData));
+        return res.status(500).json({ error: 'Could not analyse document. Please try again in a few minutes.' });
+      }
+
+      const text = groqData.choices[0].message.content.trim();
+      let parsed;
+      try {
+        const clean = text.replace(/```json\n?|\n?```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch (e) {
+        console.error('JSON parse failed. Raw Groq text:', text);
+        return res.status(500).json({ error: 'Could not read document structure. Please try again.' });
+      }
+
+      if (!parsed.references || parsed.references.length === 0) {
+        return res.status(400).json({ error: 'No references found in this document. Please check the file contains a reference list.' });
+      }
+
+      return res.status(200).json({
+        documentType: parsed.documentType,
+        title: parsed.title,
+        referenceCount: parsed.referenceCount || parsed.references.length,
+        references: parsed.references,
+        summary: parsed.summary,
+        extractionMethod: isolation.method // useful for debugging in Vercel logs
+      });
+
+    } catch (error) {
+      console.error('PDF extract error:', error);
+      return res.status(500).json({ error: 'Failed to process PDF. Please try again.' });
     }
+  }
 
-    const { action } = req.body;
+  // ── DEEPDIVE: Claude API analysis on the already-validated reference list ──
+  if (action === 'deepdive') {
+    const { references, documentType, title } = req.body;
+    if (!references || !references.length) return res.status(400).json({ error: 'No references provided' });
 
-    // ── ACTION: extract ──────────────────────────────────────────────────
-    if (action === 'extract') {
-        const { fileData, fileName } = req.body;
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-        if (!fileData) {
-            return res.status(400).json({ error: 'Missing file data' });
-        }
+    const systemPrompt = `You are an expert academic reference analyst. Your job is to perform a deep, thorough analysis of academic references and produce a professional report that supervisors and journal editors can rely on. Be specific, honest, and constructive. Your analysis should feel like it comes from a senior academic librarian or research quality officer.`;
 
-        try {
-            const buffer = Buffer.from(fileData, 'base64');
+    const userPrompt = `Perform a deep dive analysis of these ${references.length} academic references${title ? ` from the document "${title}"` : ''}.
 
-            let pdfData;
-            try {
-                const pdfParse = await loadPdfParser();
-                pdfData = await pdfParse(buffer);
-            } catch (parseErr) {
-                return res.status(500).json({
-                    error: `PDF parsing library failed to load or process this file: ${parseErr.message}`,
-                    stage: 'pdf_parse'
-                });
-            }
+REFERENCES:
+${references.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
-            const fullText = pdfData.text;
+Produce a comprehensive analysis report in this exact format:
 
-            if (!fullText || fullText.trim().length < 100) {
-                return res.status(400).json({
-                    error: 'Could not extract readable text from this PDF. It may be a scanned image without selectable text.'
-                });
-            }
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 DEEP DIVE ANALYSIS REPORT
+${title ? `Document: ${title}` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            const beginningText = fullText.substring(0, 2000);
-            const candidate = extractReferenceCandidate(fullText);
+OVERALL CREDIBILITY SCORE: [X/100]
 
-            if (candidate.method === 'unvalidated_fallback' && candidate.score < VALIDATION_THRESHOLD) {
-                return res.status(422).json({
-                    error: 'Could not confidently locate a reference list in this document. The file may not contain a standard reference section, or the PDF text extraction may have failed for that section. Try a different file or paste your references directly.'
-                });
-            }
+SUMMARY
+[2-3 sentences summarising the overall quality of this reference list]
 
-            const structured = await structureReferencesWithGroq(candidate.text, beginningText);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 REFERENCE QUALITY BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            if (!structured.references || structured.references.length === 0) {
-                return res.status(422).json({
-                    error: 'A reference-like section was found but no individual references could be identified within it.'
-                });
-            }
+Total references: ${references.length}
+Strong references (peer-reviewed, reputable): [number]
+Acceptable references (credible but minor issues): [number]
+Weak references (non-academic, outdated, or unverifiable): [number]
+Formatting issues found: [number]
 
-            return res.status(200).json({
-                title: structured.title || fileName,
-                documentType: structured.documentType || 'reference_list',
-                references: structured.references,
-                summary: structured.summary || `${structured.references.length} references found`,
-                extractionMethod: candidate.method,
-                extractionScore: Math.round(candidate.score * 10) / 10
-            });
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 DETAILED REFERENCE ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        } catch (err) {
-            return res.status(500).json({ error: `Could not process document: ${err.message}` });
-        }
+[For each reference provide:]
+[Number]. [Reference]
+Status: ✅ Strong / ⚠️ Acceptable / ❌ Weak
+Issue: [specific issue if any, or "None"]
+Suggestion: [specific improvement if needed, or "None"]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ KEY CONCERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[List the most important issues found. If none, say "No major concerns identified."]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[3-5 specific, actionable recommendations to improve the reference list quality]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 SUPERVISOR VERDICT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[A clear professional verdict: whether this reference list meets academic standards, what needs fixing before submission, and an overall assessment]`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 4000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        console.error('Claude deep dive error:', data.error);
+        return res.status(500).json({ error: 'Analysis failed. Please try again.' });
+      }
+
+      return res.status(200).json({ result: data.content[0].text });
+
+    } catch (error) {
+      console.error('Deep dive error:', error);
+      return res.status(500).json({ error: 'Analysis failed. Please try again.' });
     }
+  }
 
-    // ── ACTION: deepdive ─────────────────────────────────────────────────
-    if (action === 'deepdive') {
-        const { references, documentType, title } = req.body;
-
-        if (!references || references.length === 0) {
-            return res.status(400).json({ error: 'No references provided for analysis' });
-        }
-
-        try {
-            const result = await runDeepDiveAnalysis(references, documentType, title);
-            return res.status(200).json({ result });
-        } catch (err) {
-            return res.status(500).json({ error: err.message });
-        }
-    }
-
-    return res.status(400).json({ error: 'Invalid action' });
+  return res.status(400).json({ error: 'Unknown action' });
 }
