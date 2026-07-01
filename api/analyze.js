@@ -117,7 +117,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
-          max_tokens: 4000,
+          max_tokens: 8000,
           messages: [{
             role: 'system',
             content: `You are an academic document analyser. You will be given the beginning of a document (for title/type detection) and an isolated block of text that has already been confirmed to be a reference list or bibliography. Respond with ONLY a valid JSON object — no markdown, no explanation.`
@@ -159,10 +159,23 @@ Rules:
       const text = groqData.choices[0].message.content.trim();
       let parsed;
       try {
-        const clean = text.replace(/```json\n?|\n?```/g, '').trim();
+        let clean = text.replace(/```json\n?|\n?```/g, '').trim();
+
+        // If JSON was truncated mid-array, try to repair it
+        if (!clean.endsWith('}')) {
+          // Find the last complete reference entry and close the JSON
+          const lastComma = clean.lastIndexOf('",');
+          const lastQuote = clean.lastIndexOf('"');
+          if (lastComma > 0) {
+            clean = clean.substring(0, lastComma + 1) + '\n  ]\n}';
+          } else if (lastQuote > 0) {
+            clean = clean.substring(0, lastQuote + 1) + '\n  ]\n}';
+          }
+        }
+
         parsed = JSON.parse(clean);
       } catch (e) {
-        console.error('JSON parse failed. Raw Groq text:', text);
+        console.error('JSON parse failed. Raw Groq text:', text.substring(0, 500));
         return res.status(500).json({ error: 'Could not read document structure. Please try again.' });
       }
 
