@@ -1098,11 +1098,14 @@
             if (!ref) continue;
             document.getElementById('progressLabel').textContent = 'Verifying reference ' + (i + 1) + ' of ' + referenceList.length + '...';
             document.getElementById('progressBar').style.width = Math.round(((i + 1) / referenceList.length) * 100) + '%';
-            try {
-                const response = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reference: ref }) });
+            if (i > 0) await new Promise(r => setTimeout(r, 150));
+try {
+    const response = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reference: ref }) });
                 const data = await response.json();
                 results.push(data.result);
-            } catch (err) { results.push('⚠️ ERROR checking — ' + ref); }
+            } catch (err) {
+    results.push('⚠️ ERROR checking — ' + ref + ' (' + err.message + ')');
+}
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
         const total = results.length;
