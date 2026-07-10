@@ -1109,12 +1109,13 @@ try {
             document.getElementById('outputContent').textContent = results.join('\n\n');
         }
         const total = results.length;
-        const confirmed = results.filter(function(r) { return r.includes('✅ CONFIRMED'); }).length;
-        const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
-        const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
-        const score = total > 0 ? Math.round((confirmed / total) * 100) : 0;
-        const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '%\n✅ Confirmed: ' + confirmed + ' of ' + total + '\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
-        document.getElementById('progressLabel').textContent = '✅ Verification complete — ' + referenceList.length + ' references checked';
+const confirmed = results.filter(function(r) { return r.includes('✅ CONFIRMED'); }).length;
+const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
+const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
+const unverifiable = results.filter(function(r) { return r.includes('⚪ UNVERIFIABLE'); }).length;
+const verifiable = total - unverifiable;
+const score = verifiable > 0 ? Math.round((confirmed / verifiable) * 100) : 0;
+const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '% (of verifiable references)\n✅ Confirmed: ' + confirmed + ' of ' + verifiable + ' verifiable\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n⚪ Unverifiable (blogs, preprints, incomplete): ' + unverifiable + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
         document.getElementById('progressBar').style.width = '100%';
         showOutput('Verification Report', scoreText);
         hideProgress();
