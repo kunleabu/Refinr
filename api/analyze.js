@@ -71,7 +71,35 @@ function isolateReferenceBlock(fullText) {
   return { block: null, method: 'not_found', score: 0 };
 }
 
-// ── RULE LAYER 4: Pattern detection ───────────────────────────────
+// ── RULE LAYER 4: Deterministic deduplication ─────────────────────
+// Removes duplicates using normalised string similarity.
+// No AI — pure string comparison on a normalised fingerprint.
+function normaliseRef(ref) {
+  return ref
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '') // strip all punctuation and spaces
+    .substring(0, 80);          // compare on first 80 normalised chars
+}
+
+function deduplicateReferences(refs) {
+  const seen = new Map();
+  const duplicates = [];
+  const unique = [];
+
+  for (const ref of refs) {
+    const key = normaliseRef(ref);
+    if (seen.has(key)) {
+      duplicates.push(ref);
+    } else {
+      seen.set(key, true);
+      unique.push(ref);
+    }
+  }
+
+  return { unique, duplicatesRemoved: duplicates.length };
+}
+
+// ── RULE LAYER 5: Pattern detection ───────────────────────────────
 // Detect which reference format the list uses
 function detectReferencePattern(text) {
   const lines = text.split('\n').filter(l => l.trim().length > 10);
@@ -89,7 +117,7 @@ function detectReferencePattern(text) {
   return 'unknown';
 }
 
-// ── RULE LAYER 5: Deterministic reference splitters ───────────────
+// ── RULE LAYER 6: Deterministic reference splitters ───────────────
 function splitByNumbered(text) {
   // Split on lines starting with "1." "2." "1)" "2)" etc.
   const refs = text.split(/\n(?=\s*\d+[\.\)]\s+[A-Z])/);
@@ -152,7 +180,7 @@ function splitUnknownPattern(text) {
   return refs;
 }
 
-// ── RULE LAYER 6: Entry validation ────────────────────────────────
+// ── RULE LAYER 7: Entry validation ────────────────────────────────
 // Each extracted entry should look like a real reference
 function validateEntry(entry) {
   if (!entry || entry.length < 20) return false;
@@ -207,14 +235,18 @@ async function extractReferences(fileData, fileName) {
   const invalid = references.filter(r => !validateEntry(r));
   const validationRate = references.length > 0 ? valid.length / references.length : 0;
 
-  // Step 7: If >80% passed validation, return — no AI needed
+  // Step 7: If >80% passed validation, deduplicate and return — no AI needed
   if (validationRate >= 0.80 && valid.length >= 3) {
+    const { unique, duplicatesRemoved } = deduplicateReferences(valid);
+    const total = valid.length;
     return {
       documentType,
       title,
-      references: valid,
-      referenceCount: valid.length,
-      summary: `Found ${valid.length} references using deterministic ${pattern} pattern matching.`,
+      references: unique,
+      referenceCount: unique.length,
+      totalFound: total,
+      duplicatesRemoved,
+      summary: `${total} references extracted · ${duplicatesRemoved} duplicate${duplicatesRemoved !== 1 ? 's' : ''} removed · ${unique.length} unique references ready`,
       extractionMethod: `rules_${pattern}`,
       validationRate: Math.round(validationRate * 100)
     };
@@ -273,15 +305,16 @@ async function extractReferences(fileData, fileName) {
     groqRefs = [];
   }
 
-  // Merge: validated rule-based refs + Groq-cleaned refs
+  // Merge: validated rule-based refs + Groq-cleaned refs, then deduplicate
   const allRefs = [...valid, ...groqRefs.filter(r => typeof r === 'string' && r.length > 20)];
-  const unique = [...new Map(allRefs.map(r => [r.substring(0, 40), r])).values()];
+  const { unique, duplicatesRemoved } = deduplicateReferences(allRefs);
 
   return {
     documentType, title,
     references: unique,
     referenceCount: unique.length,
-    summary: `Found ${unique.length} references (${valid.length} by rules, ${groqRefs.length} by AI cleanup).`,
+    duplicatesRemoved,
+    summary: `Found ${unique.length} unique references${duplicatesRemoved > 0 ? ` (${duplicatesRemoved} duplicate${duplicatesRemoved > 1 ? 's' : ''} removed)` : ''} (${valid.length} by rules, ${groqRefs.length} by AI cleanup).`,
     extractionMethod: `hybrid_${pattern}`,
     validationRate: Math.round(validationRate * 100)
   };
