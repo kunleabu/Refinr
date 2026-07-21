@@ -1,0 +1,139 @@
+{
+  "version": "1.0",
+  "description": "Curated index of most-used academic citation styles for Refinr. Style files fetched on demand from the official CSL repository.",
+  "cslBaseUrl": "https://raw.githubusercontent.com/citation-style-language/styles/master/",
+  "groups": [
+    {
+      "group": "Most Popular",
+      "description": "The styles used by the majority of researchers worldwide",
+      "styles": [
+        { "id": "harvard-cite-them-right", "name": "Harvard (Cite Them Right)", "shortName": "Harvard", "disciplines": ["general"] },
+        { "id": "apa", "name": "APA 7th Edition", "shortName": "APA 7", "disciplines": ["psychology", "social-sciences", "education"] },
+        { "id": "modern-language-association", "name": "MLA 9th Edition", "shortName": "MLA", "disciplines": ["humanities", "literature"] },
+        { "id": "chicago-author-date", "name": "Chicago Author-Date 18th Edition", "shortName": "Chicago (Author-Date)", "disciplines": ["humanities", "social-sciences"] },
+        { "id": "chicago-note-bibliography", "name": "Chicago Notes & Bibliography 18th Edition", "shortName": "Chicago (Notes)", "disciplines": ["humanities", "history"] },
+        { "id": "vancouver", "name": "Vancouver", "shortName": "Vancouver", "disciplines": ["medicine", "health-sciences"] },
+        { "id": "ieee", "name": "IEEE", "shortName": "IEEE", "disciplines": ["engineering", "computer-science"] },
+        { "id": "ama10", "name": "AMA 11th Edition", "shortName": "AMA", "disciplines": ["medicine"] },
+        { "id": "american-chemical-society", "name": "American Chemical Society (ACS)", "shortName": "ACS", "disciplines": ["chemistry"] },
+        { "id": "council-of-science-editors", "name": "Council of Science Editors (CSE)", "shortName": "CSE", "disciplines": ["biology", "science"] }
+      ]
+    },
+    {
+      "group": "Medicine & Health Sciences",
+      "styles": [
+        { "id": "vancouver", "name": "Vancouver", "shortName": "Vancouver", "disciplines": ["medicine"] },
+        { "id": "ama10", "name": "AMA 11th Edition", "shortName": "AMA", "disciplines": ["medicine"] },
+        { "id": "british-medical-journal", "name": "BMJ (British Medical Journal)", "shortName": "BMJ", "disciplines": ["medicine"] },
+        { "id": "the-lancet", "name": "The Lancet", "shortName": "Lancet", "disciplines": ["medicine"] },
+        { "id": "new-england-journal-of-medicine", "name": "New England Journal of Medicine (NEJM)", "shortName": "NEJM", "disciplines": ["medicine"] },
+        { "id": "jama", "name": "JAMA (Journal of the American Medical Association)", "shortName": "JAMA", "disciplines": ["medicine"] },
+        { "id": "plos", "name": "PLOS ONE", "shortName": "PLOS", "disciplines": ["biology", "medicine"] },
+        { "id": "american-journal-of-public-health", "name": "American Journal of Public Health", "shortName": "AJPH", "disciplines": ["public-health"] },
+        { "id": "journal-of-clinical-oncology", "name": "Journal of Clinical Oncology", "shortName": "JCO", "disciplines": ["oncology"] },
+        { "id": "frontiers-in", "name": "Frontiers journals (general)", "shortName": "Frontiers", "disciplines": ["medicine", "science"] },
+        { "id": "biomed-central", "name": "BioMed Central (BMC) journals", "shortName": "BMC", "disciplines": ["medicine", "biology"] },
+        { "id": "journal-of-infectious-diseases", "name": "Journal of Infectious Diseases", "shortName": "JID", "disciplines": ["medicine"] },
+        { "id": "nursing-reference-center", "name": "Nursing Reference Center", "shortName": "Nursing", "disciplines": ["nursing"] }
+      ]
+    },
+    {
+      "group": "Natural Sciences",
+      "styles": [
+        { "id": "nature", "name": "Nature", "shortName": "Nature", "disciplines": ["science"] },
+        { "id": "science", "name": "Science", "shortName": "Science", "disciplines": ["science"] },
+        { "id": "cell", "name": "Cell", "shortName": "Cell", "disciplines": ["biology"] },
+        { "id": "american-chemical-society", "name": "American Chemical Society (ACS)", "shortName": "ACS", "disciplines": ["chemistry"] },
+        { "id": "council-of-science-editors", "name": "Council of Science Editors (CSE)", "shortName": "CSE", "disciplines": ["biology"] },
+        { "id": "biophysical-journal", "name": "Biophysical Journal", "shortName": "Biophys J", "disciplines": ["biology", "physics"] },
+        { "id": "journal-of-biological-chemistry", "name": "Journal of Biological Chemistry", "shortName": "JBC", "disciplines": ["biochemistry"] },
+        { "id": "molecular-cell", "name": "Molecular Cell", "shortName": "Mol Cell", "disciplines": ["biology"] },
+        { "id": "nucleic-acids-research", "name": "Nucleic Acids Research", "shortName": "NAR", "disciplines": ["biology"] },
+        { "id": "proceedings-of-the-national-academy-of-sciences", "name": "PNAS (Proceedings of the National Academy of Sciences)", "shortName": "PNAS", "disciplines": ["science"] },
+        { "id": "royal-society-of-chemistry", "name": "Royal Society of Chemistry", "shortName": "RSC", "disciplines": ["chemistry"] },
+        { "id": "wiley-blackwell-author-date", "name": "Wiley (Author-Date)", "shortName": "Wiley", "disciplines": ["science"] },
+        { "id": "elsevier-with-titles", "name": "Elsevier (with titles)", "shortName": "Elsevier", "disciplines": ["science"] },
+        { "id": "springer-basic-author-date", "name": "Springer (Author-Date)", "shortName": "Springer", "disciplines": ["science"] },
+        { "id": "american-meteorological-society", "name": "American Meteorological Society (AMS)", "shortName": "AMS", "disciplines": ["meteorology"] },
+        { "id": "journal-of-ecology", "name": "Journal of Ecology", "shortName": "J Ecology", "disciplines": ["ecology"] }
+      ]
+    },
+    {
+      "group": "Engineering & Technology",
+      "styles": [
+        { "id": "ieee", "name": "IEEE", "shortName": "IEEE", "disciplines": ["engineering", "computer-science"] },
+        { "id": "acm-sig-proceedings", "name": "ACM (Association for Computing Machinery)", "shortName": "ACM", "disciplines": ["computer-science"] },
+        { "id": "springer-lecture-notes-in-computer-science", "name": "Springer Lecture Notes in Computer Science", "shortName": "Springer LNCS", "disciplines": ["computer-science"] },
+        { "id": "american-institute-of-aeronautics-and-astronautics", "name": "AIAA (American Institute of Aeronautics and Astronautics)", "shortName": "AIAA", "disciplines": ["aerospace"] },
+        { "id": "american-society-of-civil-engineers", "name": "ASCE (American Society of Civil Engineers)", "shortName": "ASCE", "disciplines": ["civil-engineering"] },
+        { "id": "american-society-of-mechanical-engineers", "name": "ASME (American Society of Mechanical Engineers)", "shortName": "ASME", "disciplines": ["mechanical-engineering"] },
+        { "id": "institute-of-physics", "name": "Institute of Physics (IOP)", "shortName": "IOP", "disciplines": ["physics"] },
+        { "id": "american-physical-society", "name": "American Physical Society (APS)", "shortName": "APS", "disciplines": ["physics"] }
+      ]
+    },
+    {
+      "group": "Social Sciences",
+      "styles": [
+        { "id": "apa", "name": "APA 7th Edition", "shortName": "APA 7", "disciplines": ["psychology", "social-sciences"] },
+        { "id": "chicago-author-date", "name": "Chicago Author-Date", "shortName": "Chicago (Author-Date)", "disciplines": ["social-sciences"] },
+        { "id": "american-sociological-association", "name": "American Sociological Association (ASA)", "shortName": "ASA", "disciplines": ["sociology"] },
+        { "id": "american-political-science-association", "name": "American Political Science Association (APSA)", "shortName": "APSA", "disciplines": ["political-science"] },
+        { "id": "academy-of-management-review", "name": "Academy of Management (AOM)", "shortName": "AOM", "disciplines": ["management"] },
+        { "id": "american-anthropological-association", "name": "American Anthropological Association (AAA)", "shortName": "AAA", "disciplines": ["anthropology"] },
+        { "id": "american-economic-association", "name": "American Economic Association (AEA)", "shortName": "AEA", "disciplines": ["economics"] },
+        { "id": "journal-of-finance", "name": "Journal of Finance", "shortName": "JF", "disciplines": ["finance"] },
+        { "id": "harvard-business-school", "name": "Harvard Business School", "shortName": "HBS", "disciplines": ["business"] },
+        { "id": "frontiers-in", "name": "Frontiers in Psychology", "shortName": "Front Psychol", "disciplines": ["psychology"] }
+      ]
+    },
+    {
+      "group": "Humanities",
+      "styles": [
+        { "id": "modern-language-association", "name": "MLA 9th Edition", "shortName": "MLA", "disciplines": ["literature", "humanities"] },
+        { "id": "chicago-note-bibliography", "name": "Chicago Notes & Bibliography", "shortName": "Chicago (Notes)", "disciplines": ["history", "humanities"] },
+        { "id": "chicago-author-date", "name": "Chicago Author-Date", "shortName": "Chicago (Author-Date)", "disciplines": ["humanities"] },
+        { "id": "turabian-author-date", "name": "Turabian Author-Date (8th edition)", "shortName": "Turabian", "disciplines": ["humanities"] },
+        { "id": "oscola", "name": "OSCOLA (Oxford Standard for Citation of Legal Authorities)", "shortName": "OSCOLA", "disciplines": ["law"] },
+        { "id": "bluebook-law-review", "name": "Bluebook Law Review", "shortName": "Bluebook", "disciplines": ["law"] },
+        { "id": "annual-reviews", "name": "Annual Reviews", "shortName": "Annual Reviews", "disciplines": ["humanities", "science"] },
+        { "id": "journal-of-the-american-philosophical-association", "name": "American Philosophical Association", "shortName": "APA (Philosophy)", "disciplines": ["philosophy"] }
+      ]
+    },
+    {
+      "group": "Education & Psychology",
+      "styles": [
+        { "id": "apa", "name": "APA 7th Edition", "shortName": "APA 7", "disciplines": ["psychology", "education"] },
+        { "id": "apa-6th-edition", "name": "APA 6th Edition", "shortName": "APA 6", "disciplines": ["psychology"] },
+        { "id": "american-educational-research-association", "name": "American Educational Research Association (AERA)", "shortName": "AERA", "disciplines": ["education"] }
+      ]
+    },
+    {
+      "group": "Open Access & Multidisciplinary",
+      "styles": [
+        { "id": "plos", "name": "PLOS ONE", "shortName": "PLOS", "disciplines": ["general"] },
+        { "id": "frontiers-in", "name": "Frontiers (all journals)", "shortName": "Frontiers", "disciplines": ["general"] },
+        { "id": "mdpi", "name": "MDPI journals", "shortName": "MDPI", "disciplines": ["general"] },
+        { "id": "f1000research", "name": "F1000Research", "shortName": "F1000", "disciplines": ["general"] },
+        { "id": "pensoft-journals", "name": "Pensoft Journals", "shortName": "Pensoft", "disciplines": ["biology"] }
+      ]
+    },
+    {
+      "group": "African & Nigerian Academic Institutions",
+      "description": "Styles commonly used or accepted by African universities and journals",
+      "styles": [
+        { "id": "harvard-cite-them-right", "name": "Harvard (Cite Them Right) — widely accepted across Nigeria", "shortName": "Harvard", "disciplines": ["general"] },
+        { "id": "apa", "name": "APA 7th Edition — common in Nigerian education faculties", "shortName": "APA 7", "disciplines": ["education", "psychology"] },
+        { "id": "vancouver", "name": "Vancouver — Nigerian medical journals", "shortName": "Vancouver", "disciplines": ["medicine"] },
+        { "id": "african-journals-online", "name": "African Journals Online (AJOL)", "shortName": "AJOL", "disciplines": ["general"] }
+      ]
+    },
+    {
+      "group": "Simple Formatting",
+      "description": "Non-standard but commonly requested output formats",
+      "styles": [
+        { "id": "_clean_only", "name": "Clean and alphabetize only (no style change)", "shortName": "Clean only", "disciplines": ["general"], "special": true },
+        { "id": "_number_only", "name": "Number my references (sequential)", "shortName": "Numbered", "disciplines": ["general"], "special": true }
+      ]
+    }
+  ]
+}
