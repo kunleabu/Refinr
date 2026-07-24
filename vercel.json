@@ -1,12 +1,9 @@
 {
   "functions": {
-    "api/analyze.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
     "api/*.js": {
       "memory": 512,
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "lib/**"
     }
   },
   "rewrites": [
