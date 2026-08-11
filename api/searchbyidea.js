@@ -1,111 +1,110 @@
+// ═══════════════════════════════════════════════════════════════════
+// api/searchbyidea.js — Research Discovery Engine
+// Searches OpenAlex by research concept/idea.
+// Results formatted via CSL/citeproc-js — no Groq for formatting.
+// ═══════════════════════════════════════════════════════════════════
+
+import { formatSingle } from '../lib/formatter.js';
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const { idea, format, yearFrom, yearTo } = req.body;
-  if (!idea) return res.status(400).json({ error: 'Missing search idea' });
-
-  const citationFormat = format || 'Harvard';
-  const resultLimit = 20; // increased from 8
-
-  try {
-    // ── Step 1: Search OpenAlex — sort by relevance score not citation count ──
-    const searchQuery = encodeURIComponent(idea);
-
-    // Build year filter if provided
-    let yearFilter = '';
-    if (yearFrom && yearTo) yearFilter = `,publication_year:${yearFrom}-${yearTo}`;
-    else if (yearFrom) yearFilter = `,publication_year:>${yearFrom}`;
-    else if (yearTo) yearFilter = `,publication_year:<${yearTo}`;
-
-    const openAlexUrl = `https://api.openalex.org/works?search=${searchQuery}&per_page=${resultLimit}&select=id,title,authorships,publication_year,primary_location,doi,type,abstract_inverted_index&sort=relevance_score:desc${yearFilter ? `&filter=${yearFilter.slice(1)}` : ''}`;
-
-    const openAlexRes = await fetch(openAlexUrl, {
-      headers: { 'User-Agent': 'Refinr/1.0 (mailto:hello.refinr@gmail.com)' }
-    });
-
-    const openAlexData = await openAlexRes.json();
-
-    if (!openAlexData.results || openAlexData.results.length === 0) {
-      return res.status(200).json({ papers: [], formatted: '', total: 0, message: 'No papers found. Try different keywords.' });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // ── Step 2: Structure the raw data including DOI links ──
-    const papers = openAlexData.results.map(function(work) {
-      const authors = (work.authorships || [])
-        .slice(0, 6)
-        .map(function(a) { return a.author?.display_name || ''; })
-        .filter(Boolean);
+    const { idea, format = 'Harvard', yearFrom, yearTo } = req.body;
 
-      const journal = work.primary_location?.source?.display_name || '';
-      const doi = work.doi ? work.doi.replace('https://doi.org/', '') : '';
-      const doiUrl = work.doi || (doi ? `https://doi.org/${doi}` : '');
-      const openAlexId = work.id || '';
+    if (!idea || !idea.trim()) {
+        return res.status(400).json({ error: 'Missing research idea or topic' });
+    }
 
-      // Reconstruct abstract from inverted index if available
-      let abstract = '';
-      if (work.abstract_inverted_index) {
-        try {
-          const words = {};
-          for (const [word, positions] of Object.entries(work.abstract_inverted_index)) {
-            positions.forEach(pos => { words[pos] = word; });
-          }
-          abstract = Object.keys(words).sort((a, b) => a - b).map(k => words[k]).join(' ').substring(0, 300);
-        } catch {}
-      }
+    try {
+        // Build OpenAlex search URL with optional year filter
+        let url = `https://api.openalex.org/works?search=${encodeURIComponent(idea.trim())}&per-page=10&sort=cited_by_count:desc`;
+        
+        if (yearFrom || yearTo) {
+            const from = yearFrom || '1900';
+            const to = yearTo || new Date().getFullYear();
+            url += `&filter=publication_year:${from}-${to}`;
+        }
 
-      return {
-        title: work.title || 'Unknown title',
-        authors,
-        year: work.publication_year || '',
-        journal,
-        doi,
-        doiUrl,
-        openAlexUrl: openAlexId ? `https://openalex.org/${openAlexId.split('/').pop()}` : '',
-        abstract,
-        type: work.type || 'article'
-      };
-    });
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`OpenAlex returned ${r.status}`);
 
-    // ── Step 3: Format with Groq ──
-    const papersText = papers.map(function(p, i) {
-      return `${i + 1}. Title: ${p.title}
-Authors: ${p.authors.join(', ') || 'Unknown'}
-Year: ${p.year}
-Journal: ${p.journal || 'N/A'}
-DOI: ${p.doi || 'N/A'}`;
-    }).join('\n\n');
+        const d = await r.json();
+        const works = d.results || [];
 
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 4000,
-        messages: [{
-          role: 'system',
-          content: `You are an academic reference formatter. Format each paper as a proper ${citationFormat} reference. Return ONLY the formatted references, numbered, one per line. No explanations, no preamble. If a DOI is available, include it at the end. Use exact author names, titles, years and journals provided — do not invent or change any details.`
-        }, {
-          role: 'user',
-          content: `Format these papers as ${citationFormat} references:\n\n${papersText}`
-        }]
-      })
-    });
+        if (works.length === 0) {
+            return res.status(200).json({
+                papers: [],
+                formatted: '',
+                total: 0,
+                message: 'No papers found for this topic. Try different keywords.'
+            });
+        }
 
-    const groqData = await groqRes.json();
-    const formattedRefs = groqData.choices[0].message.content;
+        // Build CSL-JSON for each result and format
+        const papers = [];
+        const formattedLines = [];
 
-    return res.status(200).json({
-      papers,
-      formatted: formattedRefs,
-      total: openAlexData.meta?.count || papers.length,
-      format: citationFormat
-    });
+        for (const work of works) {
+            const doiClean = work.doi?.replace('https://doi.org/', '');
 
-  } catch (error) {
-    console.error('Search by idea error:', error);
-    return res.status(500).json({ error: 'Search failed. Please try again.' });
-  }
+            // Build author list
+            const authors = (work.authorships || []).map(a => {
+                const name = a.author?.display_name || '';
+                const parts = name.trim().split(' ');
+                return {
+                    family: parts.slice(-1)[0] || '',
+                    given: parts.slice(0, -1).join(' ') || ''
+                };
+            });
+
+            // Build CSL-JSON item
+            const cslItem = {
+                id: `idea_${work.id?.split('/').pop() || Math.random().toString(36).substring(2, 9)}`,
+                type: 'article-journal',
+                author: authors,
+                issued: { 'date-parts': [[work.publication_year || new Date().getFullYear()]] },
+                title: work.title || 'Untitled',
+                'container-title': work.primary_location?.source?.display_name || '',
+                DOI: doiClean || undefined,
+                URL: doiClean ? `https://doi.org/${doiClean}` : (work.primary_location?.landing_page_url || undefined)
+            };
+
+            // Format via CSL
+            let formatted = '';
+            try {
+                formatted = await formatSingle(cslItem, format);
+            } catch {
+                // Fallback plain text if formatting fails
+                const authorStr = authors.slice(0, 3).map(a => `${a.family}, ${a.given}`).join('; ');
+                formatted = `${authorStr} (${work.publication_year || 'n.d.'}) ${work.title || 'Untitled'}`;
+            }
+
+            formattedLines.push(formatted);
+
+            // Paper card data for the UI
+            papers.push({
+                title: work.title || 'Untitled',
+                authors: authors.map(a => `${a.family}, ${a.given}`),
+                year: work.publication_year,
+                journal: work.primary_location?.source?.display_name || '',
+                doi: doiClean || null,
+                doiUrl: doiClean ? `https://doi.org/${doiClean}` : null,
+                abstract: work.abstract || null,
+                citedBy: work.cited_by_count || 0,
+                formatted
+            });
+        }
+
+        return res.status(200).json({
+            papers,
+            formatted: formattedLines.join('\n'),
+            total: d.meta?.count || works.length
+        });
+
+    } catch (err) {
+        console.error('Search by idea error:', err.message);
+        return res.status(500).json({ error: `Search failed: ${err.message}` });
+    }
 }
