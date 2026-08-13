@@ -6,261 +6,239 @@
     <title>Refinr — Format. Verify. Submit with confidence.</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script async src="https://tally.so/widgets/embed.js"></script>
-    <script>
-      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
+    <script>window.va = window.va || function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
     <script defer src="/_vercel/insights/script.js"></script>
     <style>
-        :root {
-            --bg: #F5F7FA;
-            --card: #ffffff;
-            --text: #2D2D2D;
-            --muted: #6B7280;
-            --border: #e0e7ef;
-            --input-bg: #ffffff;
-            --header-bg: #1B3A6B;
-            --output-bg: #F8FAFF;
-        }
-        [data-theme="dark"] {
-            --bg: #0F172A;
-            --card: #1E293B;
-            --text: #E2E8F0;
-            --muted: #94A3B8;
-            --border: #334155;
-            --input-bg: #1E293B;
-            --header-bg: #0F172A;
-            --output-bg: #0F172A;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
-        .cursor-glow { position: fixed; width: 350px; height: 350px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,255,0.07) 0%, transparent 70%); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.1s ease, top 0.1s ease; z-index: 0; }
-        [data-theme="dark"] .cursor-glow { background: radial-gradient(circle, rgba(0,255,255,0.12) 0%, transparent 70%); }
-        header { background: var(--header-bg); padding: 16px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); position: relative; z-index: 10; }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; max-width: 800px; margin: 0 auto; }
-        .header-brand { text-align: center; flex: 1; }
-        header h1 { color: white; font-size: 2rem; font-weight: 700; letter-spacing: 2px; }
-        header p { color: #A8C4E0; font-size: 0.85rem; margin-top: 3px; }
-        header p.sub { color: #7DD3FC; font-size: 0.75rem; margin-top: 2px; }
-        .header-left { display: flex; align-items: center; gap: 8px; min-width: 80px; }
-        .header-right { display: flex; align-items: center; gap: 8px; min-width: 80px; justify-content: flex-end; }
-        .theme-toggle { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; padding: 5px 12px; color: white; font-family: 'Poppins', sans-serif; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .theme-toggle:hover { background: rgba(255,255,255,0.25); }
-        .btn-signin { background: white; border: none; border-radius: 50px; padding: 5px 14px; color: #1B3A6B; font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .btn-signin:hover { background: #e8f0fe; }
-        .user-avatar { display: none; align-items: center; gap: 8px; cursor: pointer; position: relative; }
-        .user-avatar.visible { display: flex; }
-        .avatar-circle { width: 32px; height: 32px; border-radius: 50%; background: white; color: #1B3A6B; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
-        .avatar-name { color: white; font-size: 0.8rem; font-weight: 600; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .user-dropdown { position: absolute; top: calc(100% + 10px); right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px; min-width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; z-index: 200; }
-        .user-dropdown.visible { display: block; }
-        .dropdown-item { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: var(--text); cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
-        .dropdown-item:hover { background: var(--bg); }
-        .dropdown-item.danger { color: #EF4444; }
-        .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
-        .dropdown-credits { padding: 10px 14px; font-size: 0.8rem; color: var(--muted); border-bottom: 1px solid var(--border); margin-bottom: 4px; }
-        .dropdown-credits strong { color: #1B3A6B; font-size: 1rem; display: block; }
-        [data-theme="dark"] .dropdown-credits strong { color: #60A5FA; }
-        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; position: relative; z-index: 1; }
-        .card { background: var(--card); border-radius: 12px; padding: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); margin-bottom: 24px; border: 1px solid var(--border); transition: background 0.3s, border 0.3s; }
-        .card label { display: block; font-weight: 600; color: #1B3A6B; margin-bottom: 10px; font-size: 0.95rem; }
-        [data-theme="dark"] .card label { color: #60A5FA; }
-        .input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-example { background: transparent; color: #1B3A6B; border: 1.5px solid #1B3A6B; border-radius: 6px; padding: 4px 12px; font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-example:hover { background: #1B3A6B; color: white; }
-        [data-theme="dark"] .btn-example { color: #60A5FA; border-color: #60A5FA; }
-        [data-theme="dark"] .btn-example:hover { background: #60A5FA; color: #0F172A; }
-        textarea { width: 100%; height: 200px; padding: 14px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; resize: vertical; transition: border-color 0.2s, background 0.3s, color 0.3s; color: var(--text); background: var(--input-bg); }
-        textarea:focus { outline: none; border-color: #1B3A6B; }
-        [data-theme="dark"] textarea:focus { border-color: #60A5FA; }
-        textarea::placeholder { color: var(--muted); }
-        .buttons-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
-        .btn { padding: 13px 8px; border: none; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; text-align: center; line-height: 1.3; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
-        .btn:active { transform: translateY(0); }
-        .btn-clean { background: #1B3A6B; color: white; }
-        .btn-verify { background: #2D9B6F; color: white; }
-        .btn-intext { background: #7C3AED; color: white; }
-        .btn-lookup { background: #D97706; color: white; }
-        .btn-idea { background: #0891B2; color: white; }
-        .btn .badge { background: rgba(255,255,255,0.25); border-radius: 4px; padding: 2px 5px; font-size: 0.65rem; }
-        .progress-container { display: none; margin-top: 20px; }
-        .progress-container.visible { display: block; }
-        .progress-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .progress-dots span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2D9B6F; animation: bounce 1.2s infinite; }
-        .progress-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .progress-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-6px); opacity: 1; } }
-        .progress-bar-bg { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
-        .progress-bar-fill { background: linear-gradient(90deg, #2D9B6F, #00FFFF); height: 100%; border-radius: 99px; transition: width 0.4s ease; width: 0%; box-shadow: 0 0 8px rgba(0,255,255,0.5); }
-        .output-card { display: none; }
-        .output-card.visible { display: block; }
-        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .output-header h3 { color: #1B3A6B; font-size: 1rem; font-weight: 600; }
-        [data-theme="dark"] .output-header h3 { color: #60A5FA; }
-        .icon-btns { display: flex; gap: 8px; align-items: center; }
-        .icon-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text); }
-        .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .icon-btn.copy-btn:hover { border-color: #1B3A6B; background: #1B3A6B; color: white; }
-        .icon-btn.share-btn:hover { border-color: #2D9B6F; background: #2D9B6F; color: white; }
-        .icon-btn.accept-btn:hover { border-color: #2D9B6F; background: #2D9B6F; color: white; }
-        .icon-btn svg { pointer-events: none; }
-        .icon-btn .tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #2D2D2D; color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Poppins', sans-serif; }
-        [data-theme="dark"] .icon-btn .tooltip { background: #E2E8F0; color: #0F172A; }
-        .icon-btn:hover .tooltip { opacity: 1; }
-        .output-content { background: var(--output-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 16px; font-size: 0.9rem; line-height: 1.8; white-space: pre-wrap; min-height: 120px; color: var(--text); transition: background 0.3s; }
-        .credits-bar { background: var(--card); border-radius: 8px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border: 1px solid var(--border); font-size: 0.85rem; transition: background 0.3s; }
-        .credits-bar span { color: var(--muted); }
-        .credits-count { color: #1B3A6B; font-weight: 700; }
-        [data-theme="dark"] .credits-count { color: #60A5FA; }
-        .btn-get-credits { background: #1B3A6B; color: white; border: none; border-radius: 6px; padding: 5px 12px; font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-get-credits:hover { background: #2D4F8A; }
-        .demo-section { background: var(--card); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid var(--border); transition: background 0.3s; }
-        .demo-section h2 { color: #1B3A6B; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; text-align: center; }
-        .demo-section .demo-subtitle { text-align: center; color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-        [data-theme="dark"] .demo-section h2 { color: #60A5FA; }
-        .demo-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
-        .demo-box { background: var(--output-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 14px; font-size: 0.8rem; line-height: 1.9; color: var(--text); }
-        .demo-box.before { border-color: #FCA5A5; }
-        .demo-box.after { border-color: #6EE7B7; }
-        .demo-label { font-size: 0.75rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .demo-box.before .demo-label { color: #EF4444; }
-        .demo-box.after .demo-label { color: #10B981; }
-        .demo-box.before .demo-content span, .demo-box.after .demo-content span { display: block; opacity: 0; animation: fadeInUp 0.4s ease forwards; }
-        .demo-box.before .demo-content span:nth-child(1) { animation-delay: 0.3s; }
-        .demo-box.before .demo-content span:nth-child(2) { animation-delay: 0.7s; }
-        .demo-box.before .demo-content span:nth-child(3) { animation-delay: 1.1s; }
-        .demo-box.before .demo-content span:nth-child(4) { animation-delay: 1.5s; }
-        .demo-box.after .demo-content span:nth-child(1) { animation-delay: 2.2s; }
-        .demo-box.after .demo-content span:nth-child(2) { animation-delay: 2.6s; }
-        .demo-box.after .demo-content span:nth-child(3) { animation-delay: 3.0s; }
-        .demo-box.after .demo-content span:nth-child(4) { animation-delay: 3.4s; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .demo-arrow { font-size: 1.5rem; color: #1B3A6B; text-align: center; animation: pulse 2s infinite; }
-        [data-theme="dark"] .demo-arrow { color: #60A5FA; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
-        .feedback-bar { background: var(--card); border-radius: 12px; padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border: 1px solid var(--border); transition: background 0.3s; }
-        .feedback-bar p { color: var(--muted); font-size: 0.85rem; }
-        .feedback-bar strong { color: var(--text); display: block; font-size: 0.95rem; margin-bottom: 3px; }
-        .btn-feedback { background: transparent; color: #1B3A6B; border: 1.5px solid #1B3A6B; border-radius: 8px; padding: 8px 20px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .btn-feedback:hover { background: #1B3A6B; color: white; }
-        [data-theme="dark"] .btn-feedback { color: #60A5FA; border-color: #60A5FA; }
-        [data-theme="dark"] .btn-feedback:hover { background: #60A5FA; color: #0F172A; }
-        .social-footer { text-align: center; padding: 20px; border-top: 1px solid var(--border); margin-top: 10px; }
-        .social-icons { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; }
-        .social-icon { position: relative; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; transition: all 0.2s; }
-        .social-icon:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .social-icon.x-icon:hover { border-color: #000; background: #000; color: white; }
-        .social-icon.linkedin-icon:hover { border-color: #0077B5; background: #0077B5; color: white; }
-        .social-icon.instagram-icon:hover { border-color: #E1306C; background: #E1306C; color: white; }
-        .social-icon svg { pointer-events: none; }
-        .social-icon .tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #2D2D2D; color: white; font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Poppins', sans-serif; }
-        .social-icon:hover .tooltip { opacity: 1; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-overlay.visible { display: flex; }
-        .modal { background: var(--card); border-radius: 16px; padding: 30px; width: 90%; max-width: 460px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 1px solid var(--border); animation: slideUp 0.2s ease; max-height: 90vh; overflow-y: auto; }
-        .modal.modal-wide { max-width: 560px; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal h3 { color: #1B3A6B; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
-        [data-theme="dark"] .modal h3 { color: #60A5FA; }
-        .modal p { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.6; }
-        .auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
-        .auth-tab { background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; padding: 8px 20px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-        .auth-tab.active { color: #1B3A6B; border-bottom-color: #1B3A6B; }
-        [data-theme="dark"] .auth-tab.active { color: #60A5FA; border-bottom-color: #60A5FA; }
-        .auth-input { width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; color: var(--text); background: var(--input-bg); margin-bottom: 12px; transition: border-color 0.2s; }
-        .auth-input:focus { outline: none; border-color: #1B3A6B; }
-        .auth-input::placeholder { color: var(--muted); }
-        .password-wrapper { position: relative; margin-bottom: 12px; }
-        .password-wrapper .auth-input { margin-bottom: 0; padding-right: 44px; }
-        .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
-        .password-toggle:hover { color: #1B3A6B; }
-        [data-theme="dark"] .password-toggle:hover { color: #60A5FA; }
-        .auth-error { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #EF4444; margin-bottom: 12px; display: none; }
-        .auth-error.visible { display: block; }
-        .auth-success { background: #F0FDF4; border: 1px solid #6EE7B7; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #10B981; margin-bottom: 12px; display: none; }
-        .auth-success.visible { display: block; }
-        .btn-google { width: 100%; padding: 11px 14px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text); background: var(--input-bg); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; }
-        .btn-google:hover { border-color: #1B3A6B; background: var(--output-bg); }
-        .auth-divider { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: var(--muted); font-size: 0.8rem; }
-        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .modal select { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; color: var(--text); background: var(--input-bg); margin-bottom: 16px; appearance: none; }
-        .modal select:focus { outline: none; border-color: #1B3A6B; }
-        .modal-buttons { display: flex; gap: 10px; }
-        .btn-confirm { background: #1B3A6B; color: white; flex: 1; }
-        .btn-confirm-green { background: #2D9B6F; color: white; flex: 1; }
-        .btn-confirm-orange { background: #D97706; color: white; flex: 1; }
-        .btn-confirm-teal { background: #0891B2; color: white; flex: 1; }
-        .btn-cancel { background: var(--border); color: var(--muted); flex: 1; }
-        .lookup-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
-        .lookup-tab { background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; padding: 8px 14px; font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
-        .lookup-tab.active { color: #D97706; border-bottom-color: #D97706; }
-        .lookup-tab:hover { color: #D97706; }
-        .lookup-textarea { height: 100px; width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; background: var(--input-bg); color: var(--text); resize: none; margin-bottom: 12px; transition: border-color 0.2s; }
-        .lookup-textarea:focus { outline: none; border-color: #D97706; }
-        .lookup-select { width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; color: var(--text); background: var(--input-bg); margin-bottom: 16px; appearance: none; }
-        .share-url-box { background: var(--output-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; font-size: 0.8rem; color: var(--muted); word-break: break-all; margin-bottom: 16px; font-family: 'Courier New', monospace; }
+        :root{--bg:#F5F7FA;--card:#ffffff;--text:#2D2D2D;--muted:#6B7280;--border:#e0e7ef;--input-bg:#ffffff;--header-bg:#1B3A6B;--output-bg:#F8FAFF;}
+        [data-theme="dark"]{--bg:#0F172A;--card:#1E293B;--text:#E2E8F0;--muted:#94A3B8;--border:#334155;--input-bg:#1E293B;--header-bg:#0F172A;--output-bg:#0F172A;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s,color 0.3s;overflow-x:hidden;}
+        .cursor-glow{position:fixed;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,255,0.07) 0%,transparent 70%);pointer-events:none;transform:translate(-50%,-50%);transition:left 0.1s ease,top 0.1s ease;z-index:0;}
+        [data-theme="dark"] .cursor-glow{background:radial-gradient(circle,rgba(0,255,255,0.12) 0%,transparent 70%);}
+        header{background:var(--header-bg);padding:16px 20px;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:10;}
+        .header-inner{display:flex;align-items:center;justify-content:space-between;max-width:800px;margin:0 auto;}
+        .header-brand{text-align:center;flex:1;}
+        header h1{color:white;font-size:2rem;font-weight:700;letter-spacing:2px;}
+        header p{color:#A8C4E0;font-size:0.85rem;margin-top:3px;}
+        header p.sub{color:#7DD3FC;font-size:0.75rem;margin-top:2px;}
+        .header-left{display:flex;align-items:center;gap:8px;min-width:80px;}
+        .header-right{display:flex;align-items:center;gap:8px;min-width:80px;justify-content:flex-end;}
+        .theme-toggle{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:5px 12px;color:white;font-family:'Poppins',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+        .theme-toggle:hover{background:rgba(255,255,255,0.25);}
+        .btn-signin{background:white;border:none;border-radius:50px;padding:5px 14px;color:#1B3A6B;font-family:'Poppins',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+        .btn-signin:hover{background:#e8f0fe;}
+        .user-avatar{display:none;align-items:center;gap:8px;cursor:pointer;position:relative;}
+        .user-avatar.visible{display:flex;}
+        .avatar-circle{width:32px;height:32px;border-radius:50%;background:white;color:#1B3A6B;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;}
+        .avatar-name{color:white;font-size:0.8rem;font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .user-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:200px;box-shadow:0 10px 30px rgba(0,0,0,0.15);display:none;z-index:200;}
+        .user-dropdown.visible{display:block;}
+        .dropdown-item{padding:10px 14px;border-radius:8px;font-size:0.85rem;color:var(--text);cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:8px;}
+        .dropdown-item:hover{background:var(--bg);}
+        .dropdown-item.danger{color:#EF4444;}
+        .dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+        .dropdown-credits{padding:10px 14px;font-size:0.8rem;color:var(--muted);border-bottom:1px solid var(--border);margin-bottom:4px;}
+        .dropdown-credits strong{color:#1B3A6B;font-size:1rem;display:block;}
+        [data-theme="dark"] .dropdown-credits strong{color:#60A5FA;}
+        .container{max-width:800px;margin:40px auto;padding:0 20px;position:relative;z-index:1;}
+        .card{background:var(--card);border-radius:12px;padding:30px;box-shadow:0 2px 15px rgba(0,0,0,0.08);margin-bottom:24px;border:1px solid var(--border);transition:background 0.3s,border 0.3s;}
+        .card label{display:block;font-weight:600;color:#1B3A6B;margin-bottom:10px;font-size:0.95rem;}
+        [data-theme="dark"] .card label{color:#60A5FA;}
+        .input-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+        .btn-example{background:transparent;color:#1B3A6B;border:1.5px solid #1B3A6B;border-radius:6px;padding:4px 12px;font-family:'Poppins',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+        .btn-example:hover{background:#1B3A6B;color:white;}
+        [data-theme="dark"] .btn-example{color:#60A5FA;border-color:#60A5FA;}
+        [data-theme="dark"] .btn-example:hover{background:#60A5FA;color:#0F172A;}
+        textarea{width:100%;height:200px;padding:14px;border:2px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.9rem;resize:vertical;transition:border-color 0.2s,background 0.3s,color 0.3s;color:var(--text);background:var(--input-bg);}
+        textarea:focus{outline:none;border-color:#1B3A6B;}
+        [data-theme="dark"] textarea:focus{border-color:#60A5FA;}
+        textarea::placeholder{color:var(--muted);}
+        .buttons-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px;}
+        .btn{padding:13px 8px;border:none;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;text-align:center;line-height:1.3;}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.15);}
+        .btn:active{transform:translateY(0);}
+        .btn-clean{background:#1B3A6B;color:white;}
+        .btn-verify{background:#2D9B6F;color:white;}
+        .btn-intext{background:#7C3AED;color:white;}
+        .btn-lookup{background:#D97706;color:white;}
+        .btn .badge{background:rgba(255,255,255,0.25);border-radius:4px;padding:2px 5px;font-size:0.65rem;}
+        .progress-container{display:none;margin-top:20px;}
+        .progress-container.visible{display:block;}
+        .progress-label{font-size:0.85rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+        .progress-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#2D9B6F;animation:bounce 1.2s infinite;}
+        .progress-dots span:nth-child(2){animation-delay:0.2s;}
+        .progress-dots span:nth-child(3){animation-delay:0.4s;}
+        @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4;}40%{transform:translateY(-6px);opacity:1;}}
+        .progress-bar-bg{background:var(--border);border-radius:99px;height:6px;overflow:hidden;}
+        .progress-bar-fill{background:linear-gradient(90deg,#2D9B6F,#00FFFF);height:100%;border-radius:99px;transition:width 0.4s ease;width:0%;box-shadow:0 0 8px rgba(0,255,255,0.5);}
+        .output-card{display:none;}
+        .output-card.visible{display:block;}
+        .output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
+        .output-header h3{color:#1B3A6B;font-size:1rem;font-weight:600;}
+        [data-theme="dark"] .output-header h3{color:#60A5FA;}
+        .icon-btns{display:flex;gap:8px;align-items:center;}
+        .icon-btn{position:relative;width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:var(--text);}
+        .icon-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+        .icon-btn.copy-btn:hover{border-color:#1B3A6B;background:#1B3A6B;color:white;}
+        .icon-btn.share-btn:hover{border-color:#2D9B6F;background:#2D9B6F;color:white;}
+        .icon-btn.accept-btn:hover{border-color:#2D9B6F;background:#2D9B6F;color:white;}
+        .icon-btn svg{pointer-events:none;}
+        .icon-btn .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#2D2D2D;color:white;font-size:0.7rem;padding:4px 8px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;font-family:'Poppins',sans-serif;}
+        [data-theme="dark"] .icon-btn .tooltip{background:#E2E8F0;color:#0F172A;}
+        .icon-btn:hover .tooltip{opacity:1;}
+        .output-content{background:var(--output-bg);border:1.5px solid var(--border);border-radius:8px;padding:16px;font-size:0.9rem;line-height:1.8;white-space:pre-wrap;min-height:120px;color:var(--text);transition:background 0.3s;overflow-wrap:break-word;}
+        .output-content a{color:#0891B2;text-decoration:none;border-bottom:1px solid #0891B2;}
+        .output-content a:hover{opacity:0.8;}
+        .credits-bar{background:var(--card);border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;border:1px solid var(--border);font-size:0.85rem;transition:background 0.3s;}
+        .credits-bar span{color:var(--muted);}
+        .credits-count{color:#1B3A6B;font-weight:700;}
+        [data-theme="dark"] .credits-count{color:#60A5FA;}
+        .btn-get-credits{background:#1B3A6B;color:white;border:none;border-radius:6px;padding:5px 12px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+        .btn-get-credits:hover{background:#2D4F8A;}
+        .demo-section{background:var(--card);border-radius:12px;padding:30px;margin-bottom:24px;border:1px solid var(--border);transition:background 0.3s;}
+        .demo-section h2{color:#1B3A6B;font-size:1.1rem;font-weight:700;margin-bottom:8px;text-align:center;}
+        .demo-section .demo-subtitle{text-align:center;color:var(--muted);font-size:0.85rem;margin-bottom:20px;}
+        [data-theme="dark"] .demo-section h2{color:#60A5FA;}
+        .demo-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;}
+        .demo-box{background:var(--output-bg);border:1.5px solid var(--border);border-radius:8px;padding:14px;font-size:0.8rem;line-height:1.9;color:var(--text);}
+        .demo-box.before{border-color:#FCA5A5;}
+        .demo-box.after{border-color:#6EE7B7;}
+        .demo-label{font-size:0.75rem;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+        .demo-box.before .demo-label{color:#EF4444;}
+        .demo-box.after .demo-label{color:#10B981;}
+        .demo-box.before .demo-content span,.demo-box.after .demo-content span{display:block;opacity:0;animation:fadeInUp 0.4s ease forwards;}
+        .demo-box.before .demo-content span:nth-child(1){animation-delay:0.3s;}
+        .demo-box.before .demo-content span:nth-child(2){animation-delay:0.7s;}
+        .demo-box.before .demo-content span:nth-child(3){animation-delay:1.1s;}
+        .demo-box.before .demo-content span:nth-child(4){animation-delay:1.5s;}
+        .demo-box.after .demo-content span:nth-child(1){animation-delay:2.2s;}
+        .demo-box.after .demo-content span:nth-child(2){animation-delay:2.6s;}
+        .demo-box.after .demo-content span:nth-child(3){animation-delay:3.0s;}
+        .demo-box.after .demo-content span:nth-child(4){animation-delay:3.4s;}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+        .demo-arrow{font-size:1.5rem;color:#1B3A6B;text-align:center;animation:pulse 2s infinite;}
+        [data-theme="dark"] .demo-arrow{color:#60A5FA;}
+        @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.2);opacity:0.7;}}
+        .feedback-bar{background:var(--card);border-radius:12px;padding:20px 30px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;border:1px solid var(--border);transition:background 0.3s;}
+        .feedback-bar p{color:var(--muted);font-size:0.85rem;}
+        .feedback-bar strong{color:var(--text);display:block;font-size:0.95rem;margin-bottom:3px;}
+        .btn-feedback{background:transparent;color:#1B3A6B;border:1.5px solid #1B3A6B;border-radius:8px;padding:8px 20px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+        .btn-feedback:hover{background:#1B3A6B;color:white;}
+        [data-theme="dark"] .btn-feedback{color:#60A5FA;border-color:#60A5FA;}
+        [data-theme="dark"] .btn-feedback:hover{background:#60A5FA;color:#0F172A;}
+        .social-footer{text-align:center;padding:20px;border-top:1px solid var(--border);margin-top:10px;}
+        .social-icons{display:flex;justify-content:center;gap:16px;margin-bottom:12px;}
+        .social-icon{position:relative;width:40px;height:40px;border-radius:10px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all 0.2s;}
+        .social-icon:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+        .social-icon.x-icon:hover{border-color:#000;background:#000;color:white;}
+        .social-icon.linkedin-icon:hover{border-color:#0077B5;background:#0077B5;color:white;}
+        .social-icon.instagram-icon:hover{border-color:#E1306C;background:#E1306C;color:white;}
+        .social-icon svg{pointer-events:none;}
+        .social-icon .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#2D2D2D;color:white;font-size:0.7rem;padding:4px 8px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;font-family:'Poppins',sans-serif;}
+        .social-icon:hover .tooltip{opacity:1;}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+        .modal-overlay.visible{display:flex;}
+        .modal{background:var(--card);border-radius:16px;padding:30px;width:90%;max-width:460px;box-shadow:0 25px 60px rgba(0,0,0,0.3);border:1px solid var(--border);animation:slideUp 0.2s ease;max-height:90vh;overflow-y:auto;}
+        .modal.modal-wide{max-width:560px;}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+        .modal h3{color:#1B3A6B;font-size:1.1rem;font-weight:700;margin-bottom:16px;}
+        [data-theme="dark"] .modal h3{color:#60A5FA;}
+        .modal p{color:var(--muted);font-size:0.85rem;margin-bottom:12px;line-height:1.6;}
+        .auth-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border);}
+        .auth-tab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 20px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+        .auth-tab.active{color:#1B3A6B;border-bottom-color:#1B3A6B;}
+        [data-theme="dark"] .auth-tab.active{color:#60A5FA;border-bottom-color:#60A5FA;}
+        .auth-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.9rem;color:var(--text);background:var(--input-bg);margin-bottom:12px;transition:border-color 0.2s;}
+        .auth-input:focus{outline:none;border-color:#1B3A6B;}
+        .auth-input::placeholder{color:var(--muted);}
+        .auth-error{background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 14px;font-size:0.85rem;color:#EF4444;margin-bottom:12px;display:none;}
+        .auth-error.visible{display:block;}
+        .auth-success{background:#F0FDF4;border:1px solid #6EE7B7;border-radius:8px;padding:10px 14px;font-size:0.85rem;color:#10B981;margin-bottom:12px;display:none;}
+        .auth-success.visible{display:block;}
+        .modal-buttons{display:flex;gap:10px;}
+        .btn-confirm{background:#1B3A6B;color:white;flex:1;}
+        .btn-confirm-green{background:#2D9B6F;color:white;flex:1;}
+        .btn-confirm-orange{background:#D97706;color:white;flex:1;}
+        .btn-confirm-teal{background:#0891B2;color:white;flex:1;}
+        .btn-cancel{background:var(--border);color:var(--muted);flex:1;}
+        .lookup-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);}
+        .lookup-tab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 14px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+        .lookup-tab.active{color:#D97706;border-bottom-color:#D97706;}
+        .lookup-tab:hover{color:#D97706;}
+        .lookup-textarea{height:100px;width:100%;padding:10px;border:2px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;background:var(--input-bg);color:var(--text);resize:none;margin-bottom:12px;transition:border-color 0.2s;}
+        .lookup-textarea:focus{outline:none;border-color:#D97706;}
+        .share-url-box{background:var(--output-bg);border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:0.8rem;color:var(--muted);word-break:break-all;margin-bottom:16px;font-family:'Courier New',monospace;}
         /* Citation style toggle */
-        .citation-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
-        .citation-toggle-btn { flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--muted); background: var(--input-bg); cursor: pointer; transition: all 0.2s; text-align: center; }
-        .citation-toggle-btn.active { border-color: #7C3AED; color: #7C3AED; background: rgba(124,58,237,0.05); }
-        [data-theme="dark"] .citation-toggle-btn.active { background: rgba(124,58,237,0.1); }
-        /* Search by idea results */
-        .idea-results { display: grid; gap: 10px; margin-bottom: 16px; max-height: 340px; overflow-y: auto; }
-        .idea-result-card { border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: all 0.2s; }
-        .idea-result-card:hover { border-color: #0891B2; background: var(--output-bg); }
-        .idea-result-card.selected { border-color: #0891B2; background: rgba(8,145,178,0.05); }
-        .idea-result-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
-        .idea-result-meta { font-size: 0.75rem; color: var(--muted); }
-        /* Credit package cards */
-        .credit-package { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
-        .credit-package:hover { border-color: #1B3A6B; background: var(--output-bg); }
-        .credit-package.selected { border-color: #1B3A6B; background: rgba(27,58,107,0.06); }
-        [data-theme="dark"] .credit-package.selected { background: rgba(96,165,250,0.08); border-color: #60A5FA; }
-        .pkg-left { display: flex; flex-direction: column; gap: 2px; }
-        .pkg-credits { font-weight: 700; font-size: 0.95rem; color: var(--text); display: flex; align-items: center; gap: 6px; }
-        .pkg-desc { font-size: 0.78rem; color: var(--muted); }
-        .pkg-price { font-weight: 700; color: #1B3A6B; font-size: 1rem; white-space: nowrap; }
-        [data-theme="dark"] .pkg-price { color: #60A5FA; }
-        .pkg-badge { background: #2D9B6F; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-        .credit-cost-preview { background: var(--output-bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--muted); margin-bottom: 16px; display: none; }
-        .credit-cost-preview.visible { display: block; }
-        .credit-cost-preview strong { color: var(--text); }
-        footer { text-align: center; padding: 10px 20px 30px; color: var(--muted); font-size: 0.8rem; position: relative; z-index: 1; }
-        /* PDF Upload */
-        .upload-dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
-        .upload-dropzone:hover { border-color: #6366F1; background: var(--output-bg); }
-        .upload-dropzone.dragging { border-color: #6366F1; background: rgba(99,102,241,0.05); }
-        .upload-dropzone .upload-icon { font-size: 2rem; margin-bottom: 8px; }
-        .upload-dropzone p { color: var(--muted); font-size: 0.85rem; margin: 0; }
-        .upload-dropzone strong { color: var(--text); display: block; font-size: 0.95rem; margin-bottom: 4px; }
-        /* PDF option cards */
-        .pdf-option { border: 2px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
-        .pdf-option:hover { border-color: #6366F1; background: var(--output-bg); }
-        .pdf-option-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-        .pdf-option-title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
-        .pdf-option-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
-        .badge-free { background: #D1FAE5; color: #065F46; }
-        .badge-credits { background: #FEF3C7; color: #92400E; }
-        .badge-premium { background: #EDE9FE; color: #5B21B6; }
-        .pdf-option-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.5rem; }
-            header p { font-size: 0.75rem; }
-            header p.sub { display: none; }
-            .avatar-name { display: none; }
-            .buttons-row { grid-template-columns: repeat(2, 1fr); }
-            .demo-grid { grid-template-columns: 1fr; }
-            .demo-arrow { transform: rotate(90deg); display: block; text-align: center; }
-            .feedback-bar { flex-direction: column; gap: 12px; text-align: center; }
-            .card { padding: 20px; }
-            .lookup-tab { padding: 6px 10px; font-size: 0.75rem; }
+        .citation-toggle{display:flex;gap:8px;margin-bottom:16px;}
+        .citation-toggle-btn{flex:1;padding:10px;border:2px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:600;color:var(--muted);background:var(--input-bg);cursor:pointer;transition:all 0.2s;text-align:center;}
+        .citation-toggle-btn.active{border-color:#7C3AED;color:#7C3AED;background:rgba(124,58,237,0.05);}
+        /* Searchable style picker */
+        .style-picker{position:relative;margin-bottom:16px;}
+        .style-picker-search{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.88rem;color:var(--text);background:var(--input-bg);outline:none;transition:border-color 0.2s;}
+        .style-picker-search:focus{border-color:#1B3A6B;}
+        [data-theme="dark"] .style-picker-search:focus{border-color:#60A5FA;}
+        .style-picker-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);z-index:300;max-height:260px;overflow-y:auto;}
+        .style-picker-dropdown.open{display:block;}
+        .style-group-label{padding:8px 12px 4px;font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-top:1px solid var(--border);}
+        .style-group-label:first-child{border-top:none;}
+        .style-option{padding:9px 14px;font-size:0.85rem;color:var(--text);cursor:pointer;transition:background 0.15s;display:flex;align-items:center;justify-content:space-between;}
+        .style-option:hover{background:var(--output-bg);}
+        .style-option.selected{color:#1B3A6B;font-weight:600;}
+        [data-theme="dark"] .style-option.selected{color:#60A5FA;}
+        .style-option-short{font-size:0.75rem;color:var(--muted);}
+        /* Style detection banner */
+        .style-detect-banner{background:rgba(8,145,178,0.08);border:1.5px solid #0891B2;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:none;}
+        .style-detect-banner.visible{display:block;}
+        .style-detect-banner p{color:var(--text);font-size:0.85rem;margin-bottom:10px;}
+        .style-detect-banner p strong{color:#0891B2;}
+        .style-detect-actions{display:flex;gap:8px;}
+        .btn-keep-style{background:#0891B2;color:white;border:none;border-radius:6px;padding:6px 14px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;}
+        .btn-convert-style{background:transparent;color:#0891B2;border:1.5px solid #0891B2;border-radius:6px;padding:6px 14px;font-family:'Poppins',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;}
+        /* Search by idea */
+        .idea-results{display:grid;gap:10px;margin-bottom:16px;max-height:340px;overflow-y:auto;}
+        .idea-result-card{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all 0.2s;}
+        .idea-result-card:hover{border-color:#0891B2;background:var(--output-bg);}
+        .idea-result-card.selected{border-color:#0891B2;background:rgba(8,145,178,0.05);}
+        .idea-result-title{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4;}
+        .idea-result-meta{font-size:0.75rem;color:var(--muted);}
+        /* Credit packages */
+        .credit-package{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
+        .credit-package:hover{border-color:#1B3A6B;background:var(--output-bg);}
+        .credit-package.selected{border-color:#1B3A6B;background:rgba(27,58,107,0.06);}
+        [data-theme="dark"] .credit-package.selected{background:rgba(96,165,250,0.08);border-color:#60A5FA;}
+        .pkg-left{display:flex;flex-direction:column;gap:2px;}
+        .pkg-credits{font-weight:700;font-size:0.95rem;color:var(--text);display:flex;align-items:center;gap:6px;}
+        .pkg-desc{font-size:0.78rem;color:var(--muted);}
+        .pkg-price{font-weight:700;color:#1B3A6B;font-size:1rem;white-space:nowrap;}
+        [data-theme="dark"] .pkg-price{color:#60A5FA;}
+        .pkg-badge{background:#2D9B6F;color:white;font-size:0.65rem;padding:2px 6px;border-radius:4px;font-weight:600;}
+        /* PDF upload */
+        .upload-dropzone{border:2px dashed var(--border);border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px;}
+        .upload-dropzone:hover,.upload-dropzone.dragging{border-color:#6366F1;background:var(--output-bg);}
+        .upload-dropzone .upload-icon{font-size:2rem;margin-bottom:8px;}
+        .upload-dropzone p{color:var(--muted);font-size:0.85rem;margin:0;}
+        .upload-dropzone strong{color:var(--text);display:block;font-size:0.95rem;margin-bottom:4px;}
+        .pdf-option{border:2px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
+        .pdf-option:hover{border-color:#6366F1;background:var(--output-bg);}
+        .pdf-option-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+        .pdf-option-title{font-weight:700;font-size:0.95rem;color:var(--text);}
+        .pdf-option-badge{font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:4px;}
+        .badge-free{background:#D1FAE5;color:#065F46;}
+        .badge-credits{background:#FEF3C7;color:#92400E;}
+        .badge-premium{background:#EDE9FE;color:#5B21B6;}
+        .pdf-option-desc{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+        footer{text-align:center;padding:10px 20px 30px;color:var(--muted);font-size:0.8rem;position:relative;z-index:1;}
+        @media(max-width:600px){
+            header h1{font-size:1.5rem;}header p{font-size:0.75rem;}header p.sub{display:none;}
+            .avatar-name{display:none;}.buttons-row{grid-template-columns:repeat(2,1fr);}
+            .demo-grid{grid-template-columns:1fr;}.demo-arrow{transform:rotate(90deg);display:block;text-align:center;}
+            .feedback-bar{flex-direction:column;gap:12px;text-align:center;}.card{padding:20px;}
+            .lookup-tab{padding:6px 10px;font-size:0.75rem;}
         }
     </style>
 </head>
 <body>
-
 <div class="cursor-glow" id="cursorGlow"></div>
-
 <header>
     <div class="header-inner">
         <div class="header-left">
@@ -279,10 +257,7 @@
                 <div class="avatar-circle" id="avatarInitial">?</div>
                 <span class="avatar-name" id="avatarName"></span>
                 <div class="user-dropdown" id="userDropdown">
-                    <div class="dropdown-credits">
-                        <strong id="dropdownCredits">5</strong>
-                        verification credits remaining
-                    </div>
+                    <div class="dropdown-credits"><strong id="dropdownCredits">5</strong>verification credits remaining</div>
                     <div class="dropdown-item" onclick="copyReferralCode()">🎁 Copy referral code</div>
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-item danger" onclick="signOut()">🚪 Sign out</div>
@@ -293,7 +268,6 @@
 </header>
 
 <div class="container">
-
     <div class="credits-bar">
         <span>Verification credits: <span class="credits-count" id="creditsCount">5</span> remaining</span>
         <button class="btn-get-credits" onclick="openCreditsModal()">Get more credits</button>
@@ -312,7 +286,7 @@
             <button class="btn btn-lookup" onclick="openLookupModal()">🔎 Lookup tools</button>
         </div>
         <div class="buttons-row" style="margin-top:10px;grid-template-columns:repeat(2,1fr);">
-            <button class="btn btn-idea" onclick="openIdeaModal()">💡 Search by idea <span class="badge">2 credits</span></button>
+            <button class="btn" style="background:#0891B2;color:white;" onclick="openIdeaModal()">💡 Search by idea <span class="badge">2 credits</span></button>
             <button class="btn" style="background:#6366F1;color:white;" onclick="openUploadModal()">📄 Upload PDF / Doc</button>
         </div>
         <input type="file" id="pdfFileInput" accept=".pdf,.doc,.docx" style="display:none;" onchange="handleFileUpload(event)">
@@ -321,9 +295,7 @@
                 <span id="progressLabel">Processing...</span>
                 <div class="progress-dots"><span></span><span></span><span></span></div>
             </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progressBar"></div>
-            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
         </div>
     </div>
 
@@ -397,9 +369,8 @@
                 <span class="tooltip">@getrefinrapp on Instagram</span>
             </a>
         </div>
-        <p style="font-size:0.75rem;">© 2026 Refinr. All rights reserved. | <a href="/privacy" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--muted);">Privacy Policy</a></p>
+        <p style="font-size:0.75rem;">© 2026 Refinr Ltd. All rights reserved. | <a href="/privacy" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--muted);">Privacy Policy</a></p>
     </div>
-
 </div>
 
 <!-- Auth Modal -->
@@ -411,16 +382,10 @@
         </div>
         <div id="authError" class="auth-error"></div>
         <div id="authSuccess" class="auth-success"></div>
-
         <div id="signinForm">
             <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
-            <div class="password-wrapper">
-                <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
-                <button type="button" class="password-toggle" onclick="togglePassword('signinPassword', this)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-            <div class="modal-buttons" style="margin-top:12px;">
+            <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
+            <div class="modal-buttons" style="margin-top:4px;">
                 <button class="btn btn-confirm" onclick="handleSignIn()">Sign in</button>
                 <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
             </div>
@@ -428,13 +393,8 @@
         <div id="signupForm" style="display:none;">
             <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
             <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
-            <div class="password-wrapper">
-                <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
-                <button type="button" class="password-toggle" onclick="togglePassword('signupPassword', this)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-            <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)" style="margin-top:12px;">
+            <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
+            <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
             <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You will get 5 free verification credits on signup</p>
             <div class="modal-buttons">
                 <button class="btn btn-confirm" onclick="handleSignUp()">Create free account</button>
@@ -448,17 +408,12 @@
 <div class="modal-overlay" id="cleanModal">
     <div class="modal">
         <h3>Select citation format</h3>
-        <p>Choose how you want your references formatted.</p>
-        <select id="formatSelect">
-            <option value="Clean and alphabetize only">Clean and alphabetize only</option>
-            <option value="Harvard">Harvard</option>
-            <option value="APA">APA</option>
-            <option value="MLA">MLA</option>
-            <option value="Chicago">Chicago</option>
-            <option value="Vancouver">Vancouver</option>
-            <option value="IEEE">IEEE</option>
-            <option value="Number my references">Number my references</option>
-        </select>
+        <p>Search or scroll to find your style. Works with Harvard, APA, Nature, IEEE and 150+ more.</p>
+        <div class="style-picker">
+            <input type="text" class="style-picker-search" id="cleanStyleSearch" placeholder="🔍 Search — Harvard, APA, Nature, Vancouver, IEEE..." oninput="filterStyles('clean')" onfocus="openStyleDropdown('clean')" onblur="closeStyleDropdown('clean',300)">
+            <div class="style-picker-dropdown" id="cleanStyleDropdown"></div>
+            <input type="hidden" id="formatSelect" value="Harvard">
+        </div>
         <div class="modal-buttons">
             <button class="btn btn-confirm" onclick="cleanReferences()">Clean my references</button>
             <button class="btn btn-cancel" onclick="closeModal('cleanModal')">Cancel</button>
@@ -470,11 +425,8 @@
 <div class="modal-overlay" id="verifyModal">
     <div class="modal">
         <h3>Verify your references</h3>
-        <p>Refinr checks each reference against CrossRef (130M records) and OpenAlex (240M records) and flags any mismatches.</p>
-        <p>Credits used depends on how many references you verify. You have <strong id="creditsInModal">5</strong> credits remaining.</p>
-        <div class="credit-cost-preview" id="creditCostPreview">
-            Your <strong id="refCountDisplay">0</strong> references will cost <strong id="creditCostDisplay">1</strong> credit(s).
-        </div>
+        <p>Checks against CrossRef (130M) and OpenAlex (240M records).</p>
+        <p>You have <strong id="creditsInModal">5</strong> credits remaining.</p>
         <div class="modal-buttons">
             <button class="btn btn-confirm-green" onclick="verifyReferences()">Verify now</button>
             <button class="btn btn-cancel" onclick="closeModal('verifyModal')">Cancel</button>
@@ -482,21 +434,17 @@
     </div>
 </div>
 
-<!-- In-text Citations Modal -->
+<!-- In-text Modal -->
 <div class="modal-overlay" id="intextModal">
     <div class="modal">
         <h3>📝 In-text citations</h3>
-        <p>Choose your citation style then generate.</p>
+        <p>Choose your citation style.</p>
         <div class="citation-toggle">
-            <button class="citation-toggle-btn active" id="toggleParenthetical" onclick="setCitationStyle('parenthetical')">
-                Parenthetical<br><span style="font-size:0.75rem;font-weight:400;">(Smith, 2020)</span>
-            </button>
-            <button class="citation-toggle-btn" id="toggleNarrative" onclick="setCitationStyle('narrative')">
-                Narrative<br><span style="font-size:0.75rem;font-weight:400;">Smith (2020)</span>
-            </button>
+            <button class="citation-toggle-btn active" id="toggleParenthetical" onclick="setCitationStyle('parenthetical')">Parenthetical<br><span style="font-size:0.75rem;font-weight:400;">(Smith, 2020)</span></button>
+            <button class="citation-toggle-btn" id="toggleNarrative" onclick="setCitationStyle('narrative')">Narrative<br><span style="font-size:0.75rem;font-weight:400;">Smith (2020)</span></button>
         </div>
         <div class="modal-buttons">
-            <button class="btn btn-confirm" style="background:#7C3AED;" onclick="generateIntext()">Generate citations</button>
+            <button class="btn" style="background:#7C3AED;color:white;flex:1;" onclick="generateIntext()">Generate citations</button>
             <button class="btn btn-cancel" onclick="closeModal('intextModal')">Cancel</button>
         </div>
     </div>
@@ -507,21 +455,18 @@
     <div class="modal">
         <h3>🔎 Reference Lookup Tools</h3>
         <div class="lookup-tabs">
-            <button class="lookup-tab active" id="tab-btn-doi" onclick="switchTab('doi', event)">DOI / ISBN</button>
-            <button class="lookup-tab" id="tab-btn-url" onclick="switchTab('url', event)">URL</button>
-            <button class="lookup-tab" id="tab-btn-title" onclick="switchTab('title', event)">Find by Title</button>
+            <button class="lookup-tab active" id="tab-btn-doi" onclick="switchTab('doi',event)">DOI / ISBN</button>
+            <button class="lookup-tab" id="tab-btn-url" onclick="switchTab('url',event)">URL</button>
+            <button class="lookup-tab" id="tab-btn-title" onclick="switchTab('title',event)">Find by Title</button>
         </div>
         <div class="lookup-panel" id="tab-doi">
             <p>Paste one DOI or ISBN per line.</p>
             <textarea class="lookup-textarea" id="doiInput" placeholder="10.1038/nature04244&#10;9780140449136"></textarea>
-            <select class="lookup-select" id="lookupFormatSelect">
-                <option value="Harvard">Harvard</option>
-                <option value="APA">APA</option>
-                <option value="MLA">MLA</option>
-                <option value="Chicago">Chicago</option>
-                <option value="Vancouver">Vancouver</option>
-                <option value="IEEE">IEEE</option>
-            </select>
+            <div class="style-picker">
+                <input type="text" class="style-picker-search" id="lookupStyleSearch" placeholder="🔍 Style — Harvard, APA..." oninput="filterStyles('lookup')" onfocus="openStyleDropdown('lookup')" onblur="closeStyleDropdown('lookup',300)">
+                <div class="style-picker-dropdown" id="lookupStyleDropdown"></div>
+                <input type="hidden" id="lookupFormatSelect" value="Harvard">
+            </div>
             <div class="modal-buttons">
                 <button class="btn btn-confirm-orange" onclick="lookupIdentifiers()">Look up references</button>
                 <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
@@ -530,14 +475,11 @@
         <div class="lookup-panel" id="tab-url" style="display:none;">
             <p>Paste a webpage URL to extract reference details.</p>
             <textarea class="lookup-textarea" id="urlInput" placeholder="https://www.nature.com/articles/nature04244"></textarea>
-            <select class="lookup-select" id="urlFormatSelect">
-                <option value="Harvard">Harvard</option>
-                <option value="APA">APA</option>
-                <option value="MLA">MLA</option>
-                <option value="Chicago">Chicago</option>
-                <option value="Vancouver">Vancouver</option>
-                <option value="IEEE">IEEE</option>
-            </select>
+            <div class="style-picker">
+                <input type="text" class="style-picker-search" id="urlStyleSearch" placeholder="🔍 Style — Harvard, APA..." oninput="filterStyles('url')" onfocus="openStyleDropdown('url')" onblur="closeStyleDropdown('url',300)">
+                <div class="style-picker-dropdown" id="urlStyleDropdown"></div>
+                <input type="hidden" id="urlFormatSelect" value="Harvard">
+            </div>
             <div class="modal-buttons">
                 <button class="btn btn-confirm-orange" onclick="lookupByURL()">Extract reference</button>
                 <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
@@ -546,14 +488,11 @@
         <div class="lookup-panel" id="tab-title" style="display:none;">
             <p>Enter a title or author name to find the reference and DOI.</p>
             <textarea class="lookup-textarea" id="titleInput" placeholder="Quantum teleportation between light and matter"></textarea>
-            <select class="lookup-select" id="titleFormatSelect">
-                <option value="Harvard">Harvard</option>
-                <option value="APA">APA</option>
-                <option value="MLA">MLA</option>
-                <option value="Chicago">Chicago</option>
-                <option value="Vancouver">Vancouver</option>
-                <option value="IEEE">IEEE</option>
-            </select>
+            <div class="style-picker">
+                <input type="text" class="style-picker-search" id="titleStyleSearch" placeholder="🔍 Style — Harvard, APA..." oninput="filterStyles('title')" onfocus="openStyleDropdown('title')" onblur="closeStyleDropdown('title',300)">
+                <div class="style-picker-dropdown" id="titleStyleDropdown"></div>
+                <input type="hidden" id="titleFormatSelect" value="Harvard">
+            </div>
             <div class="modal-buttons">
                 <button class="btn btn-confirm-orange" onclick="lookupByTitle()">Find reference</button>
                 <button class="btn btn-cancel" onclick="closeModal('lookupModal')">Cancel</button>
@@ -566,24 +505,21 @@
 <div class="modal-overlay" id="ideaModal">
     <div class="modal modal-wide">
         <h3>💡 Search by idea</h3>
-        <p>Describe a research topic or question and Refinr will find real academic papers for you.</p>
+        <p>Describe a research topic and Refinr will find real academic papers for you.</p>
         <div id="ideaSearchPanel">
             <input type="text" class="auth-input" id="ideaInput" placeholder="e.g. climate change effects on agriculture in Africa">
-            <select class="lookup-select" id="ideaFormatSelect" style="margin-top:4px;">
-                <option value="Harvard">Harvard</option>
-                <option value="APA">APA</option>
-                <option value="MLA">MLA</option>
-                <option value="Chicago">Chicago</option>
-                <option value="Vancouver">Vancouver</option>
-                <option value="IEEE">IEEE</option>
-            </select>
+            <div class="style-picker" style="margin-top:8px;">
+                <input type="text" class="style-picker-search" id="ideaStyleSearch" placeholder="🔍 Style — Harvard, APA..." oninput="filterStyles('idea')" onfocus="openStyleDropdown('idea')" onblur="closeStyleDropdown('idea',300)">
+                <div class="style-picker-dropdown" id="ideaStyleDropdown"></div>
+                <input type="hidden" id="ideaFormatSelect" value="Harvard">
+            </div>
             <div style="display:flex;gap:8px;margin-bottom:12px;">
-    <input type="number" class="auth-input" id="yearFrom" placeholder="From year (e.g. 2015)" style="margin-bottom:0;">
-    <input type="number" class="auth-input" id="yearTo" placeholder="To year (e.g. 2024)" style="margin-bottom:0;">
-</div>
+                <input type="number" class="auth-input" id="yearFrom" placeholder="From year (e.g. 2015)" style="margin-bottom:0;">
+                <input type="number" class="auth-input" id="yearTo" placeholder="To year (e.g. 2024)" style="margin-bottom:0;">
+            </div>
             <div id="ideaError" class="auth-error"></div>
             <div class="modal-buttons">
-                <button class="btn btn-confirm-teal" id="ideaSearchBtn" onclick="searchByIdea()">Search — 2 credits</button>
+                <button class="btn" style="background:#0891B2;color:white;flex:1;" id="ideaSearchBtn" onclick="searchByIdea()">Search — 2 credits</button>
                 <button class="btn btn-cancel" onclick="closeModal('ideaModal')">Cancel</button>
             </div>
         </div>
@@ -592,7 +528,7 @@
             <div class="idea-results" id="ideaResultsList"></div>
             <div id="ideaError2" class="auth-error"></div>
             <div class="modal-buttons">
-                <button class="btn btn-confirm-teal" onclick="loadIdeaReferences()">Load selected into references</button>
+                <button class="btn" style="background:#0891B2;color:white;flex:1;" onclick="loadIdeaReferences()">Load selected into references</button>
                 <button class="btn btn-cancel" onclick="resetIdeaModal()">Search again</button>
             </div>
         </div>
@@ -612,16 +548,12 @@
     </div>
 </div>
 
-<!-- Credits Purchase Modal -->
+<!-- Credits Modal -->
 <div class="modal-overlay" id="creditsModal">
     <div class="modal">
         <h3>🎯 Get more verification credits</h3>
         <p>Credits are used for verification and search. Formatting, lookup, and in-text citations are always free.</p>
-        <div style="background:var(--output-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:0.78rem;color:var(--muted);line-height:1.8;">
-            <strong style="color:var(--text);display:block;margin-bottom:4px;">How credits work</strong>
-            1–20 references = 1 credit &nbsp;·&nbsp; 21–50 = 2 credits &nbsp;·&nbsp; 51–100 = 3 credits &nbsp;·&nbsp; 100+ = 4 credits &nbsp;·&nbsp; Search by idea = 2 credits &nbsp;·&nbsp; Journal analysis = 10 credits
-        </div>
-        <div id="creditsPackages" style="display:grid;gap:10px;margin-bottom:20px;">
+        <div id="creditsPackages">
             <div class="credit-package" data-package="pack_20" onclick="selectPackage(this)">
                 <div class="pkg-left"><span class="pkg-credits">20 credits</span><span class="pkg-desc">Great for a single project</span></div>
                 <span class="pkg-price" data-ngn="₦2,000" data-usd="$2">₦2,000</span>
@@ -639,9 +571,9 @@
                 <span class="pkg-price" data-ngn="₦15,000" data-usd="$15">₦15,000</span>
             </div>
         </div>
-        <div id="creditsError" class="auth-error"></div>
+        <div id="creditsError" class="auth-error" style="margin-top:12px;"></div>
         <div id="creditsSuccess" class="auth-success"></div>
-        <div class="modal-buttons" id="creditsBuyButtons">
+        <div class="modal-buttons" style="margin-top:12px;" id="creditsBuyButtons">
             <button class="btn btn-confirm" onclick="initializePayment()">Pay with Paystack</button>
             <button class="btn btn-cancel" onclick="closeModal('creditsModal')">Cancel</button>
         </div>
@@ -649,7 +581,7 @@
             <button onclick="showVerifyForm()" style="background:none;border:none;color:var(--muted);font-family:'Poppins',sans-serif;font-size:0.78rem;cursor:pointer;text-decoration:underline;">I paid but didn't receive credits</button>
         </div>
         <div id="verifyPayForm" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
-            <p style="font-size:0.82rem;margin-bottom:10px;">Paste your Paystack payment reference and we'll check and credit your account.</p>
+            <p style="font-size:0.82rem;margin-bottom:10px;">Paste your Paystack payment reference to verify and receive your credits.</p>
             <input type="text" class="auth-input" id="verifyReference" placeholder="e.g. T123456789012345">
             <div class="modal-buttons">
                 <button class="btn btn-confirm-green" onclick="manualVerify()">Verify & credit me</button>
@@ -659,746 +591,7 @@
     </div>
 </div>
 
-<script>
-    let currentUser = null;
-    let currentSession = null;
-    let currentShareUrl = '';
-    let userCurrency = 'NGN';
-    let selectedPackage = 'pack_50';
-    let citationStyle = 'parenthetical';
-    let ideaPapers = [];
-    let ideaFormatted = '';
-
-    const SUPABASE_URL = 'https://fyvjsdpknqkgnkvuxzfn.supabase.co';
-    const SUPABASE_ANON_KEY_PUB = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5dmpzZHBrbnFrZ25rdXh6Zm4iLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0NjA0NjA3MCwiZXhwIjoyMDYxNjIyMDcwfQ.khqPCDcByNnameK_m2GZCrMixFkFB9CjvbMfGcijFak';
-
-    const savedTheme = localStorage.getItem('refinr-theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('themeBtn').textContent = '☀️ Dark';
-    }
-
-    window.addEventListener('load', async function() {
-        const savedSession = localStorage.getItem('refinr-session');
-        const savedUser = localStorage.getItem('refinr-user');
-        if (savedSession && savedUser) {
-            currentSession = JSON.parse(savedSession);
-            currentUser = JSON.parse(savedUser);
-            updateUIForLoggedInUser(currentUser);
-        }
-        loadSharedReport();
-        detectUserCurrency();
-
-        // Auto-verify pending Paystack payment
-        const pendingRef = localStorage.getItem('refinr-pending-ref');
-        if (pendingRef && currentUser) {
-            try {
-                const res = await fetch('/api/paystack', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'verify', reference: pendingRef, user_id: currentUser.id })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    localStorage.removeItem('refinr-pending-ref');
-                    updateCreditsDisplay(data.new_balance);
-                    showCreditToast(data.credits_added, data.new_balance);
-                }
-            } catch (e) {}
-        }
-    });
-
-    const glow = document.getElementById('cursorGlow');
-    document.addEventListener('mousemove', function(e) { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
-    document.addEventListener('click', function(e) {
-        const avatar = document.getElementById('userAvatar');
-        const dropdown = document.getElementById('userDropdown');
-        if (avatar && !avatar.contains(e.target)) dropdown.classList.remove('visible');
-    });
-
-    function toggleTheme() {
-        const html = document.documentElement;
-        const btn = document.getElementById('themeBtn');
-        if (html.getAttribute('data-theme') === 'light') { html.setAttribute('data-theme', 'dark'); btn.textContent = '☀️ Dark'; localStorage.setItem('refinr-theme', 'dark'); }
-        else { html.setAttribute('data-theme', 'light'); btn.textContent = '🌙 Dark'; localStorage.setItem('refinr-theme', 'light'); }
-    }
-
-    function updateUIForLoggedInUser(user) {
-        document.getElementById('authButtons').style.display = 'none';
-        document.getElementById('userAvatar').classList.add('visible');
-        const initial = (user.full_name || user.email || '?')[0].toUpperCase();
-        document.getElementById('avatarInitial').textContent = initial;
-        document.getElementById('avatarName').textContent = user.full_name || user.email.split('@')[0];
-        updateCreditsDisplay(user.credits !== undefined ? user.credits : 5);
-    }
-
-    function updateCreditsDisplay(credits) {
-        document.getElementById('creditsCount').textContent = credits;
-        document.getElementById('creditsInModal').textContent = credits;
-        document.getElementById('dropdownCredits').textContent = credits;
-        if (currentUser) { currentUser.credits = credits; localStorage.setItem('refinr-user', JSON.stringify(currentUser)); }
-    }
-
-    function toggleDropdown() { document.getElementById('userDropdown').classList.toggle('visible'); }
-
-    function togglePassword(inputId, btn) {
-        const input = document.getElementById(inputId);
-        const isPassword = input.type === 'password';
-        input.type = isPassword ? 'text' : 'password';
-        btn.innerHTML = isPassword
-            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
-            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-    }
-
-    function handleGoogleAuth() {
-        const redirectTo = window.location.origin + window.location.pathname;
-        window.location.href = SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo);
-    }
-
-    async function handleGoogleCallback(accessToken, refreshToken) {
-        if (!accessToken || accessToken.length < 20) return;
-        try {
-            const userRes = await fetch(SUPABASE_URL + '/auth/v1/user', { headers: { 'Authorization': 'Bearer ' + accessToken, 'apikey': SUPABASE_ANON_KEY_PUB } });
-            if (!userRes.ok) return;
-            const userData = await userRes.json();
-            if (!userData.id) return;
-            currentSession = { access_token: accessToken, refresh_token: refreshToken };
-            localStorage.setItem('refinr-session', JSON.stringify(currentSession));
-            const profileRes = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'signin', email: userData.email, provider: 'google', access_token: accessToken }) });
-            const profileData = await profileRes.json();
-            currentUser = profileData.user || { id: userData.id, email: userData.email, full_name: userData.user_metadata?.full_name || userData.email.split('@')[0], credits: 5 };
-            localStorage.setItem('refinr-user', JSON.stringify(currentUser));
-            updateUIForLoggedInUser(currentUser);
-        } catch (e) { console.log('Google callback error:', e); }
-    }
-
-    function openAuthModal(tab) {
-        document.getElementById('authModal').classList.add('visible');
-        switchAuthTab(tab);
-        document.getElementById('authError').classList.remove('visible');
-        document.getElementById('authSuccess').classList.remove('visible');
-    }
-
-    function switchAuthTab(tab) {
-        document.getElementById('signinForm').style.display = tab === 'signin' ? 'block' : 'none';
-        document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-        document.getElementById('signinTab').classList.toggle('active', tab === 'signin');
-        document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
-        document.getElementById('authError').classList.remove('visible');
-        document.getElementById('authSuccess').classList.remove('visible');
-    }
-
-    async function handleSignIn() {
-        const email = document.getElementById('signinEmail').value.trim();
-        const password = document.getElementById('signinPassword').value;
-        const errorEl = document.getElementById('authError');
-        if (!email || !password) { errorEl.textContent = 'Please enter your email and password.'; errorEl.classList.add('visible'); return; }
-        const btn = event.currentTarget; btn.textContent = 'Signing in...'; btn.disabled = true;
-        try {
-            const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'signin', email, password }) });
-            const data = await response.json();
-            if (data.error) { errorEl.textContent = data.error; errorEl.classList.add('visible'); btn.textContent = 'Sign in'; btn.disabled = false; return; }
-            currentUser = data.user; currentSession = data.session;
-            localStorage.setItem('refinr-session', JSON.stringify(data.session));
-            localStorage.setItem('refinr-user', JSON.stringify(data.user));
-            updateUIForLoggedInUser(data.user); closeModal('authModal');
-        } catch (error) { errorEl.textContent = 'Something went wrong. Please try again.'; errorEl.classList.add('visible'); btn.textContent = 'Sign in'; btn.disabled = false; }
-    }
-
-    async function handleSignUp() {
-        const name = document.getElementById('signupName').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
-        const password = document.getElementById('signupPassword').value;
-        const errorEl = document.getElementById('authError');
-        const successEl = document.getElementById('authSuccess');
-        if (!email || !password) { errorEl.textContent = 'Please enter your email and password.'; errorEl.classList.add('visible'); return; }
-        if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; errorEl.classList.add('visible'); return; }
-        const btn = event.currentTarget; btn.textContent = 'Creating account...'; btn.disabled = true;
-        try {
-            const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'signup', email, password, full_name: name }) });
-            const data = await response.json();
-            if (data.error) { errorEl.textContent = data.error; errorEl.classList.add('visible'); btn.textContent = 'Create free account'; btn.disabled = false; return; }
-            const signinResponse = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'signin', email, password }) });
-            const signinData = await signinResponse.json();
-            if (signinData.user) {
-                currentUser = signinData.user; currentSession = signinData.session;
-                localStorage.setItem('refinr-session', JSON.stringify(signinData.session));
-                localStorage.setItem('refinr-user', JSON.stringify(signinData.user));
-                updateUIForLoggedInUser(signinData.user); closeModal('authModal');
-            } else { successEl.textContent = 'Account created! Please sign in.'; successEl.classList.add('visible'); switchAuthTab('signin'); btn.textContent = 'Create free account'; btn.disabled = false; }
-        } catch (error) { errorEl.textContent = 'Something went wrong. Please try again.'; errorEl.classList.add('visible'); btn.textContent = 'Create free account'; btn.disabled = false; }
-    }
-
-    async function refreshSession() {
-        const saved = localStorage.getItem('refinr-session');
-        if (!saved) return false;
-        const session = JSON.parse(saved);
-        if (!session.refresh_token) return false;
-        try {
-            const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'refresh', refresh_token: session.refresh_token }) });
-            const data = await response.json();
-            if (data.session) { currentSession = data.session; localStorage.setItem('refinr-session', JSON.stringify(data.session)); return true; }
-            return false;
-        } catch (e) { return false; }
-    }
-
-    async function signOut() {
-        localStorage.removeItem('refinr-session'); localStorage.removeItem('refinr-user');
-        currentUser = null; currentSession = null;
-        document.getElementById('authButtons').style.display = 'flex';
-        document.getElementById('userAvatar').classList.remove('visible');
-        document.getElementById('userDropdown').classList.remove('visible');
-        updateCreditsDisplay(5);
-    }
-
-    function copyReferralCode() {
-        if (currentUser && currentUser.referral_code) {
-            navigator.clipboard.writeText(currentUser.referral_code).then(function() { alert('Referral code copied: ' + currentUser.referral_code + '\n\nShare this with colleagues and students!'); });
-        }
-        document.getElementById('userDropdown').classList.remove('visible');
-    }
-
-    function createSplash(e) {
-        const colours = ['#1B3A6B','#2D9B6F','#7C3AED','#D97706','#00FFFF','#F59E0B','#EF4444','#EC4899'];
-        for (let i = 0; i < 16; i++) {
-            const particle = document.createElement('div');
-            const colour = colours[Math.floor(Math.random() * colours.length)];
-            const angle = (i / 16) * 360 + Math.random() * 20;
-            const distance = 30 + Math.random() * 70;
-            const size = 5 + Math.random() * 8;
-            particle.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:' + size + 'px;height:' + size + 'px;background:' + colour + ';border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.55s ease-out;transform:translate(-50%,-50%);opacity:1;';
-            document.body.appendChild(particle);
-            requestAnimationFrame(function() { requestAnimationFrame(function() { const rad = (angle * Math.PI) / 180; particle.style.transform = 'translate(calc(-50% + ' + (Math.cos(rad) * distance) + 'px), calc(-50% + ' + (Math.sin(rad) * distance) + 'px))'; particle.style.opacity = '0'; }); });
-            setTimeout(function() { particle.remove(); }, 600);
-        }
-    }
-
-    function showProgress(label, percent) {
-        const pc = document.getElementById('progressContainer');
-        pc.classList.add('visible');
-        document.getElementById('progressLabel').textContent = label;
-        document.getElementById('progressBar').style.width = percent + '%';
-        pc.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function hideProgress() {
-        setTimeout(function() { document.getElementById('progressContainer').classList.remove('visible'); document.getElementById('progressBar').style.width = '0%'; }, 3000);
-    }
-
-    function loadExample() {
-        document.getElementById('referencesInput').value = 'smith j 2020 academic writing oxford press\njones mary 2019 research methods cambridge university press london\nbrown t 2021 scientific writing wiley\nSmith J 2020 Academic Writing Oxford Press\nSherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.';
-    }
-
-    function switchTab(tab, e) {
-        document.querySelectorAll('.lookup-tab').forEach(function(t) { t.classList.remove('active'); });
-        document.querySelectorAll('.lookup-panel').forEach(function(p) { p.style.display = 'none'; });
-        document.getElementById('tab-' + tab).style.display = 'block';
-        if (e && e.currentTarget) e.currentTarget.classList.add('active');
-    }
-
-    function openCleanModal() {
-        if (!document.getElementById('referencesInput').value.trim()) { alert('Please paste your references first.'); return; }
-        document.getElementById('cleanModal').classList.add('visible');
-    }
-
-    function calculateCreditsNeeded(referenceText) {
-        if (!referenceText || !referenceText.trim()) return 0;
-        const lines = referenceText.trim().split('\n').filter(function(l) { return l.trim().length > 5; });
-        const count = lines.length;
-        if (count <= 20) return 1;
-        if (count <= 50) return 2;
-        if (count <= 100) return 3;
-        return 4;
-    }
-
-    function updateVerifyCostPreview() {
-        const text = document.getElementById('referencesInput').value || '';
-        const lines = text.trim().split('\n').filter(function(l) { return l.trim().length > 5; });
-        const credits = calculateCreditsNeeded(text);
-        const preview = document.getElementById('creditCostPreview');
-        if (preview && lines.length > 0) {
-            document.getElementById('refCountDisplay').textContent = lines.length;
-            document.getElementById('creditCostDisplay').textContent = credits;
-            preview.classList.add('visible');
-        }
-    }
-
-    function openVerifyModal() {
-        if (!document.getElementById('referencesInput').value.trim()) { alert('Please paste your references first.'); return; }
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const credits = parseInt(document.getElementById('creditsCount').textContent);
-        if (credits <= 0) { openCreditsModal(); return; }
-        document.getElementById('creditsInModal').textContent = credits;
-        updateVerifyCostPreview();
-        document.getElementById('verifyModal').classList.add('visible');
-    }
-
-    function openIntextModal() {
-        if (!document.getElementById('referencesInput').value.trim()) { alert('Please paste your references first.'); return; }
-        document.getElementById('intextModal').classList.add('visible');
-    }
-
-    function setCitationStyle(style) {
-        citationStyle = style;
-        document.getElementById('toggleParenthetical').classList.toggle('active', style === 'parenthetical');
-        document.getElementById('toggleNarrative').classList.toggle('active', style === 'narrative');
-    }
-
-    function openLookupModal() { document.getElementById('lookupModal').classList.add('visible'); }
-
-    function openIdeaModal() {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const credits = parseInt(document.getElementById('creditsCount').textContent);
-        if (credits < 2) { openCreditsModal(); return; }
-        resetIdeaModal();
-        document.getElementById('ideaModal').classList.add('visible');
-    }
-
-    function resetIdeaModal() {
-        document.getElementById('ideaSearchPanel').style.display = 'block';
-        document.getElementById('ideaResultsPanel').style.display = 'none';
-        document.getElementById('ideaError').classList.remove('visible');
-        document.getElementById('ideaInput').value = '';
-        ideaPapers = []; ideaFormatted = '';
-    }
-
-    function closeModal(modalId) { document.getElementById(modalId).classList.remove('visible'); }
-
-    function showOutput(title, content) {
-        document.getElementById('outputTitle').textContent = title;
-        document.getElementById('outputContent').textContent = content;
-        document.getElementById('outputCard').classList.add('visible');
-        const shareBtn = document.getElementById('shareBtn');
-        const noShare = ['Cleaning...', 'Generating...', 'Looking up...', 'Starting...', 'Searching...', 'Extracting...', 'Fetching...'];
-        shareBtn.style.display = noShare.some(function(t) { return title.includes(t); }) ? 'none' : 'flex';
-        const acceptBtn = document.getElementById('acceptSuggestionsBtn');
-        if (acceptBtn) acceptBtn.style.display = (content && content.includes('✏️ Suggested correction:')) ? 'flex' : 'none';
-        document.getElementById('outputCard').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // ── ACCEPT ALL SUGGESTIONS ─────────────────────────────
-    function acceptSuggestions() {
-        const content = document.getElementById('outputContent').textContent;
-        const inputBox = document.getElementById('referencesInput');
-        const blocks = content.split('\n\n');
-        const corrections = {};
-        for (let i = 0; i < blocks.length; i++) {
-            const block = blocks[i];
-            if (!block.includes('⚠️ MISMATCH')) continue;
-            const refMatch = block.match(/Reference:\s*(.+?)(?:\n|$)/);
-            const corrMatch = block.match(/✏️ Suggested correction:\s*([\s\S]+?)(?:\n\n|$)/);
-            if (refMatch && corrMatch) corrections[refMatch[1].trim()] = corrMatch[1].trim();
-        }
-        const count = Object.keys(corrections).length;
-        if (count === 0) { alert('No suggestions found to apply.'); return; }
-        let currentInput = inputBox.value;
-        let applied = 0;
-        for (const [original, correction] of Object.entries(corrections)) {
-            if (currentInput.includes(original)) { currentInput = currentInput.replace(original, correction); applied++; }
-        }
-        inputBox.value = currentInput;
-        document.getElementById('outputContent').textContent = content + '\n\n─────────────────────────────\n✅ ' + applied + ' correction(s) applied to your references above. Click "Clean references" to reformat, or "Verify" to re-check.';
-        document.getElementById('acceptSuggestionsBtn').style.display = 'none';
-        inputBox.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function copyResults(e) {
-        const content = document.getElementById('outputContent').textContent;
-        navigator.clipboard.writeText(content).then(function() {
-            createSplash(e);
-            const btn = e.currentTarget;
-            const tooltip = btn.querySelector('.tooltip');
-            const svg = btn.querySelector('svg');
-            tooltip.textContent = 'Copied!';
-            if (svg) svg.style.stroke = '#2D9B6F';
-            setTimeout(function() { tooltip.textContent = 'Copy'; if (svg) svg.style.stroke = 'currentColor'; }, 2000);
-        });
-    }
-
-    async function shareReport(e) {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const content = document.getElementById('outputContent').textContent;
-        const title = document.getElementById('outputTitle').textContent;
-        document.getElementById('shareUrlBox').textContent = 'Generating link...';
-        document.getElementById('shareModal').classList.add('visible');
-        try {
-            const response = await fetch('/api/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reportData: { title, content, date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) } }) });
-            const data = await response.json();
-            if (data.binId) { currentShareUrl = window.location.origin + '?report=' + data.binId; document.getElementById('shareUrlBox').textContent = currentShareUrl; }
-            else document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.';
-        } catch (err) { document.getElementById('shareUrlBox').textContent = 'Failed to generate link. Please try again.'; }
-    }
-
-    function copyShareLink() {
-        if (currentShareUrl) {
-            navigator.clipboard.writeText(currentShareUrl).then(function() {
-                const btn = event.currentTarget; btn.textContent = '✅ Copied!';
-                setTimeout(function() { btn.textContent = 'Copy link'; }, 2000);
-            });
-        }
-    }
-
-    async function cleanReferences() {
-        closeModal('cleanModal');
-        const references = document.getElementById('referencesInput').value.trim();
-        const format = document.getElementById('formatSelect').value;
-        showProgress('Cleaning your references...', 40);
-        try {
-            const response = await fetch('/api/clean', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ references, format }) });
-            const data = await response.json();
-            document.getElementById('progressBar').style.width = '100%';
-            showOutput('Cleaned References — ' + format, data.result);
-            hideProgress();
-        } catch (err) { showOutput('Error', 'Something went wrong. Please try again.'); hideProgress(); }
-    }
-
-    async function deductCredits(amount, description) {
-        try {
-            const creditResponse = await fetch('/api/credits', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentSession.access_token },
-                body: JSON.stringify({ action: 'deduct', amount, description })
-            });
-            const creditData = await creditResponse.json();
-            if (creditResponse.status === 401) {
-                const refreshed = await refreshSession();
-                if (!refreshed) { await signOut(); alert('Session expired. Please sign in again.'); openAuthModal('signin'); return false; }
-                const retry = await fetch('/api/credits', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentSession.access_token }, body: JSON.stringify({ action: 'deduct', amount, description }) });
-                const retryData = await retry.json();
-                if (retryData.error) { alert(retryData.error); return false; }
-                updateCreditsDisplay(retryData.credits); return true;
-            }
-            if (creditData.error) {
-                if (creditData.credits === 0 || (creditData.error && creditData.error.includes('Insufficient'))) openCreditsModal();
-                else alert(creditData.error);
-                return false;
-            }
-            updateCreditsDisplay(creditData.credits); return true;
-        } catch (err) { console.log('Credit error:', err); return false; }
-    }
-
-    async function verifyReferences() {
-        closeModal('verifyModal');
-        const referencesText = document.getElementById('referencesInput').value.trim();
-        const referenceList = referencesText.split('\n').filter(function(r) { return r.trim().length > 0; });
-        const creditsNeeded = calculateCreditsNeeded(referencesText);
-        if (currentUser && currentSession) {
-            const ok = await deductCredits(creditsNeeded, 'Reference verification (' + referenceList.length + ' references)');
-            if (!ok) return;
-        }
-        showProgress('Verifying reference 0 of ' + referenceList.length + '...', 0);
-        document.getElementById('outputTitle').textContent = 'Verification Report';
-        document.getElementById('outputContent').textContent = 'Starting verification...';
-        document.getElementById('outputCard').classList.add('visible');
-        document.getElementById('shareBtn').style.display = 'none';
-        document.getElementById('acceptSuggestionsBtn').style.display = 'none';
-        const results = [];
-        for (let i = 0; i < referenceList.length; i++) {
-            const ref = referenceList[i].trim();
-            if (!ref) continue;
-            document.getElementById('progressLabel').textContent = 'Verifying reference ' + (i + 1) + ' of ' + referenceList.length + '...';
-            document.getElementById('progressBar').style.width = Math.round(((i + 1) / referenceList.length) * 100) + '%';
-            if (i > 0) await new Promise(r => setTimeout(r, 150));
-try {
-    const response = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reference: ref }) });
-                const data = await response.json();
-                results.push(data.result);
-            } catch (err) {
-    results.push('⚠️ ERROR checking — ' + ref + ' (' + err.message + ')');
-}
-            document.getElementById('outputContent').textContent = results.join('\n\n');
-        }
-        const total = results.length;
-const confirmed = results.filter(function(r) { return r.includes('✅ CONFIRMED'); }).length;
-const mismatches = results.filter(function(r) { return r.includes('⚠️ MISMATCH'); }).length;
-const notFound = results.filter(function(r) { return r.includes('❌ NOT FOUND'); }).length;
-const unverifiable = results.filter(function(r) { return r.includes('⚪ UNVERIFIABLE'); }).length;
-const verifiable = total - unverifiable;
-const score = verifiable > 0 ? Math.round((confirmed / verifiable) * 100) : 0;
-const scoreText = '📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: ' + score + '% (of verifiable references)\n✅ Confirmed: ' + confirmed + ' of ' + verifiable + ' verifiable\n⚠️ Mismatches found: ' + mismatches + '\n❌ Not found in database: ' + notFound + '\n⚪ Unverifiable (blogs, preprints, incomplete): ' + unverifiable + '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n' + results.join('\n\n');
-        document.getElementById('progressBar').style.width = '100%';
-        showOutput('Verification Report', scoreText);
-        hideProgress();
-    }
-
-    async function generateIntext() {
-        closeModal('intextModal');
-        const input = document.getElementById('referencesInput').value.trim();
-        if (!input) { alert('Please paste your references first.'); return; }
-        showProgress('Generating ' + citationStyle + ' citations...', 40);
-        try {
-            const response = await fetch('/api/intext', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ references: input, style: citationStyle }) });
-            const data = await response.json();
-            document.getElementById('progressBar').style.width = '100%';
-            showOutput('In-text Citations — ' + (citationStyle === 'narrative' ? 'Narrative' : 'Parenthetical'), data.result);
-            hideProgress();
-        } catch (err) { showOutput('Error', 'Something went wrong. Please try again.'); hideProgress(); }
-    }
-
-    // ── SEARCH BY IDEA ──────────────────────────────────────
-   async function searchByIdea() {
-    if (!currentUser) { 
-        openAuthModal('signin'); 
-        return; 
-    }
-
-    const idea = document.getElementById('ideaInput').value.trim();
-    const format = document.getElementById('ideaFormatSelect').value;
-    const errorEl = document.getElementById('ideaError');
-
-    errorEl.classList.remove('visible');
-
-    if (!idea) {
-        errorEl.textContent = 'Please enter a research idea or topic.';
-        errorEl.classList.add('visible');
-        return;
-    }
-
-    const btn = document.getElementById('ideaSearchBtn');
-    btn.textContent = 'Searching...';
-    btn.disabled = true;
-
-    const ok = await deductCredits(2, 'Search by idea: ' + idea.substring(0, 50));
-
-    if (!ok) {
-        btn.textContent = 'Search — 2 credits';
-        btn.disabled = false;
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/searchbyidea', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                idea,
-                format,
-                yearFrom: document.getElementById('yearFrom').value || null,
-                yearTo: document.getElementById('yearTo').value || null
-            })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.error || 'Search failed');
-        }
-
-        if (!data.papers || data.papers.length === 0) {
-            errorEl.textContent = 'No papers found. Try different keywords.';
-            errorEl.classList.add('visible');
-            btn.textContent = 'Search — 2 credits';
-            btn.disabled = false;
-            return;
-        }
-
-        ideaPapers = data.papers;
-        ideaFormatted = data.formatted;
-
-        renderIdeaResults(data.papers, data.total, format);
-
-    } catch (err) {
-        errorEl.textContent = err.message;
-        errorEl.classList.add('visible');
-    } finally {
-        btn.textContent = 'Search — 2 credits';
-        btn.disabled = false;
-    }
-}
-
-    function renderIdeaResults(papers, total, format) {
-        document.getElementById('ideaSearchPanel').style.display = 'none';
-        document.getElementById('ideaResultsPanel').style.display = 'block';
-        document.getElementById('ideaResultsMeta').textContent = 'Found ' + total.toLocaleString() + ' papers. Showing top ' + papers.length + ' — click to select, then load into your references.';
-        const list = document.getElementById('ideaResultsList');
-        list.innerHTML = '';
-        papers.forEach(function(paper, i) {
-            const card = document.createElement('div');
-            card.className = 'idea-result-card selected';
-            card.dataset.index = i;
-            card.onclick = function() { card.classList.toggle('selected'); };
-            const authors = paper.authors.slice(0, 3).join(', ') + (paper.authors.length > 3 ? ' et al.' : '');
-            const doiLink = paper.doiUrl ? ' · <a href="' + escapeHtml(paper.doiUrl) + '" target="_blank" onclick="event.stopPropagation()" style="color:#0891B2;text-decoration:none;">View paper ↗</a>' : '';
-const abstractHtml = paper.abstract ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5;">' + escapeHtml(paper.abstract.substring(0, 200)) + (paper.abstract.length > 200 ? '...' : '') + '</div>' : '';
-card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '</div><div class="idea-result-meta">' + escapeHtml(authors) + ' · ' + (paper.year || 'n.d.') + (paper.journal ? ' · ' + escapeHtml(paper.journal) : '') + (paper.doi ? ' · DOI: ' + escapeHtml(paper.doi) : '') + doiLink + '</div>' + abstractHtml;
-            list.appendChild(card);
-        });
-    }
-
-    function escapeHtml(str) {
-        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function loadIdeaReferences() {
-        const selected = document.querySelectorAll('.idea-result-card.selected');
-        if (selected.length === 0) { document.getElementById('ideaError2').textContent = 'Please select at least one paper.'; document.getElementById('ideaError2').classList.add('visible'); return; }
-        const selectedIndices = Array.from(selected).map(function(c) { return parseInt(c.dataset.index); });
-        const formattedLines = ideaFormatted.split('\n').filter(function(l) { return l.trim(); });
-        const selectedRefs = selectedIndices.map(function(i) { return formattedLines[i] ? formattedLines[i].replace(/^\d+\.\s*/, '') : ''; }).filter(Boolean);
-        const existing = document.getElementById('referencesInput').value.trim();
-        document.getElementById('referencesInput').value = existing ? existing + '\n' + selectedRefs.join('\n') : selectedRefs.join('\n');
-        closeModal('ideaModal');
-        showOutput('Search by Idea — References loaded', selectedRefs.join('\n\n') + '\n\n─────────────────────────────\n💡 ' + selectedRefs.length + ' reference(s) loaded into your input box. Click "Clean references" to format them.');
-        document.getElementById('referencesInput').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    async function lookupIdentifiers() {
-        closeModal('lookupModal');
-        const identifiers = document.getElementById('doiInput').value.trim();
-        const format = document.getElementById('lookupFormatSelect').value;
-        if (!identifiers) { alert('Please paste your DOIs or ISBNs first.'); return; }
-        const lines = identifiers.split('\n').filter(function(l) { return l.trim().length > 0; });
-        showProgress('Looking up ' + lines.length + ' identifiers...', 20);
-        try {
-            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'identifiers', identifiers, format }) });
-            const data = await response.json();
-            document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = '✅ Lookup complete — ' + lines.length + ' identifiers processed';
-            const lookupResults = data.results.join('\n');
-            showOutput('DOI/ISBN Lookup — ' + format, lookupResults);
-            document.getElementById('referencesInput').value = data.results.map(function(r) { return r.replace(/^✅\s*/, '').replace(/^❌[^\n]*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
-            document.getElementById('outputContent').textContent = lookupResults + '\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.';
-            hideProgress();
-        } catch (err) { showOutput('Error', 'Something went wrong. Please try again.'); hideProgress(); }
-    }
-
-    async function lookupByURL() {
-        closeModal('lookupModal');
-        const urls = document.getElementById('urlInput').value.trim();
-        const format = document.getElementById('urlFormatSelect').value;
-        if (!urls) { alert('Please paste at least one URL.'); return; }
-        const urlList = urls.split('\n').filter(function(u) { return u.trim().length > 0; });
-        showProgress('Extracting ' + urlList.length + ' URL(s)...', 20);
-        try {
-            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'url', urls, format }) });
-            const data = await response.json();
-            document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = '✅ Extracted ' + urlList.length + ' reference(s)';
-            const results = data.results || ['Could not extract reference'];
-            showOutput('URL Lookup — ' + format, results.join('\n\n'));
-            document.getElementById('referencesInput').value = results.map(function(r) { return r.replace(/^✅\s*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
-            hideProgress();
-        } catch (err) { showOutput('Error', 'Could not extract reference from URL.'); hideProgress(); }
-    }
-
-    async function lookupByTitle() {
-        closeModal('lookupModal');
-        const titles = document.getElementById('titleInput').value.trim();
-        const format = document.getElementById('titleFormatSelect').value;
-        if (!titles) { alert('Please enter a title or author name.'); return; }
-        const titleList = titles.split('\n').filter(function(t) { return t.trim().length > 0; });
-        showProgress('Searching for ' + titleList.length + ' reference(s)...', 20);
-        try {
-            const response = await fetch('/api/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'title', titles, format }) });
-            const data = await response.json();
-            document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('progressLabel').textContent = '✅ Found ' + titleList.length + ' reference(s)';
-            const results = data.results || ['Could not find reference'];
-            showOutput('Title Lookup — ' + format, results.join('\n\n'));
-            document.getElementById('referencesInput').value = results.map(function(r) { return r.replace(/^✅\s*/, '').trim(); }).filter(function(r) { return r.length > 0; }).join('\n');
-            hideProgress();
-        } catch (err) { showOutput('Error', 'Could not find reference.'); hideProgress(); }
-    }
-
-    async function loadSharedReport() {
-        const params = new URLSearchParams(window.location.search);
-        const reportId = params.get('report');
-        if (reportId) {
-            try {
-                const response = await fetch('/api/report?id=' + reportId);
-                const data = await response.json();
-                if (data.reportData) { showOutput(data.reportData.title + ' — ' + data.reportData.date, data.reportData.content); document.getElementById('shareBtn').style.display = 'none'; }
-            } catch (err) { console.log('Could not load shared report'); }
-        }
-    }
-
-    async function detectUserCurrency() {
-        try {
-            const res = await fetch('https://ipapi.co/json/');
-            const data = await res.json();
-            userCurrency = (data.country_code === 'NG') ? 'NGN' : 'USD';
-            updatePackagePrices();
-        } catch (e) { userCurrency = 'NGN'; }
-    }
-
-    function updatePackagePrices() {
-        document.querySelectorAll('.pkg-price').forEach(function(el) { el.textContent = userCurrency === 'USD' ? el.dataset.usd : el.dataset.ngn; });
-    }
-
-    function openCreditsModal() {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        document.getElementById('creditsError').classList.remove('visible');
-        document.getElementById('creditsSuccess').classList.remove('visible');
-        hideVerifyForm(); updatePackagePrices();
-        document.getElementById('creditsModal').classList.add('visible');
-    }
-
-    function selectPackage(el) {
-        document.querySelectorAll('.credit-package').forEach(function(p) { p.classList.remove('selected'); });
-        el.classList.add('selected'); selectedPackage = el.dataset.package;
-    }
-
-    async function initializePayment() {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const errorEl = document.getElementById('creditsError');
-        const btn = document.querySelector('#creditsBuyButtons .btn-confirm');
-        errorEl.classList.remove('visible'); btn.textContent = 'Loading...'; btn.disabled = true;
-        try {
-            const res = await fetch('/api/paystack', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'initialize', package_id: selectedPackage, email: currentUser.email, user_id: currentUser.id, currency: userCurrency }) });
-            const data = await res.json();
-            if (!res.ok || !data.authorization_url) throw new Error(data.error || 'Could not initialize payment');
-            localStorage.setItem('refinr-pending-ref', data.reference);
-            window.location.href = data.authorization_url;
-        } catch (err) { errorEl.textContent = err.message; errorEl.classList.add('visible'); btn.textContent = 'Pay with Paystack'; btn.disabled = false; }
-    }
-
-    function showVerifyForm() {
-        document.getElementById('verifyPayForm').style.display = 'block';
-        document.getElementById('creditsBuyButtons').style.display = 'none';
-        document.getElementById('creditsPackages').style.display = 'none';
-    }
-
-    function hideVerifyForm() {
-        document.getElementById('verifyPayForm').style.display = 'none';
-        document.getElementById('creditsBuyButtons').style.display = 'flex';
-        document.getElementById('creditsPackages').style.display = 'grid';
-        const ref = document.getElementById('verifyReference');
-        if (ref) ref.value = '';
-    }
-
-    async function manualVerify() {
-        if (!currentUser) { openAuthModal('signin'); return; }
-        const reference = document.getElementById('verifyReference').value.trim();
-        const errorEl = document.getElementById('creditsError');
-        const successEl = document.getElementById('creditsSuccess');
-        const btn = document.querySelector('#verifyPayForm .btn-confirm-green');
-        errorEl.classList.remove('visible'); successEl.classList.remove('visible');
-        if (!reference) { errorEl.textContent = 'Please enter your payment reference.'; errorEl.classList.add('visible'); return; }
-        btn.textContent = 'Checking...'; btn.disabled = true;
-        try {
-            const res = await fetch('/api/paystack', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'verify', reference, user_id: currentUser.id }) });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Verification failed');
-            successEl.textContent = '✅ ' + data.credits_added + ' credits added! Your new balance is ' + data.new_balance + ' credits.';
-            successEl.classList.add('visible');
-            localStorage.removeItem('refinr-pending-ref');
-            updateCreditsDisplay(data.new_balance); hideVerifyForm();
-        } catch (err) { errorEl.textContent = err.message; errorEl.classList.add('visible'); }
-        finally { btn.textContent = 'Verify & credit me'; btn.disabled = false; }
-    }
-
-    function showCreditToast(added, balance) {
-        const toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2D9B6F;color:white;padding:12px 24px;border-radius:10px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.2);';
-        toast.textContent = '✅ ' + added + ' credits added! Balance: ' + balance + ' credits';
-        document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 5000);
-    }
-</script>
-
-<!-- PDF Upload Modal -->
+<!-- Upload Modal -->
 <div class="modal-overlay" id="uploadModal">
     <div class="modal modal-wide">
         <h3>📄 Upload PDF or Word document</h3>
@@ -1409,9 +602,7 @@ card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '
                 <p>PDF or Word document — max 10MB</p>
             </div>
             <div id="uploadError" class="auth-error"></div>
-            <div class="modal-buttons">
-                <button class="btn btn-cancel" onclick="closeModal('uploadModal')">Cancel</button>
-            </div>
+            <div class="modal-buttons"><button class="btn btn-cancel" onclick="closeModal('uploadModal')">Cancel</button></div>
         </div>
         <div id="uploadReadingPanel" style="display:none;text-align:center;padding:20px 0;">
             <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
@@ -1420,21 +611,33 @@ card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '
         </div>
         <div id="uploadOptionsPanel" style="display:none;">
             <div id="uploadDocInfo" style="background:var(--output-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);"></div>
+            <div class="style-detect-banner" id="styleDetectBanner">
+                <p id="styleDetectMsg">We detected your references may be in <strong id="styleDetectName">Harvard</strong> format. What would you like to do?</p>
+                <div class="style-detect-actions">
+                    <button class="btn-keep-style" onclick="keepDetectedStyle()">Keep this style</button>
+                    <button class="btn-convert-style" onclick="showStyleConvertPicker()">Convert to different style</button>
+                </div>
+            </div>
+            <div id="uploadStylePickerWrap" style="display:none;margin-bottom:12px;">
+                <div class="style-picker">
+                    <input type="text" class="style-picker-search" id="uploadStyleSearch" placeholder="🔍 Search style to convert to..." oninput="filterStyles('upload')" onfocus="openStyleDropdown('upload')" onblur="closeStyleDropdown('upload',300)">
+                    <div class="style-picker-dropdown" id="uploadStyleDropdown"></div>
+                    <input type="hidden" id="uploadFormatSelect" value="Harvard">
+                </div>
+            </div>
             <div id="uploadOptions"></div>
             <div id="uploadError2" class="auth-error"></div>
         </div>
     </div>
 </div>
 
-<!-- Deep Dive Processing Modal -->
+<!-- Deep Dive Modal -->
 <div class="modal-overlay" id="deepdiveModal">
     <div class="modal">
         <h3>🔬 Deep dive analysis running...</h3>
         <p>Claude is performing a thorough analysis of your references. This may take up to 60 seconds.</p>
         <div style="margin:20px 0;">
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="deepdiveBar" style="width:0%;transition:width 1s ease;"></div>
-            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="deepdiveBar" style="width:0%;transition:width 1s ease;"></div></div>
             <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;text-align:center;" id="deepdiveLabel">Initialising analysis...</p>
         </div>
         <p style="font-size:0.78rem;color:var(--muted);text-align:center;">Please don't close this window</p>
@@ -1442,265 +645,475 @@ card.innerHTML = '<div class="idea-result-title">' + escapeHtml(paper.title) + '
 </div>
 
 <script>
-// ── PDF UPLOAD ──────────────────────────────────────────────
-let uploadedReferences = [];
-let uploadedDocType = '';
-let uploadedTitle = '';
+var currentUser=null,currentSession=null,currentShareUrl='',userCurrency='NGN',selectedPackage='pack_50',citationStyle='parenthetical',ideaPapers=[],ideaFormatted='',cslIndex=null,detectedStyleKey=null,uploadedReferences=[],uploadedDocType='',uploadedTitle='';
 
-function openUploadModal() {
-    if (!currentUser) { openAuthModal('signin'); return; }
-    resetUploadModal();
-    document.getElementById('uploadModal').classList.add('visible');
-}
+var savedTheme=localStorage.getItem('refinr-theme');
+if(savedTheme==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeBtn').textContent='☀️ Dark';}
 
-function resetUploadModal() {
-    document.getElementById('uploadPanel').style.display = 'block';
-    document.getElementById('uploadReadingPanel').style.display = 'none';
-    document.getElementById('uploadOptionsPanel').style.display = 'none';
-    document.getElementById('uploadError').classList.remove('visible');
-    document.getElementById('pdfFileInput').value = '';
-    uploadedReferences = []; uploadedDocType = ''; uploadedTitle = '';
-}
+window.addEventListener('load',async function(){
+    var ss=localStorage.getItem('refinr-session'),su=localStorage.getItem('refinr-user');
+    if(ss&&su){currentSession=JSON.parse(ss);currentUser=JSON.parse(su);updateUIForLoggedInUser(currentUser);}
+    loadSharedReport();detectUserCurrency();loadCslIndex();
+    var pr=localStorage.getItem('refinr-pending-ref');
+    if(pr&&currentUser){try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',reference:pr,user_id:currentUser.id})});var d=await r.json();if(r.ok&&d.success){localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);showCreditToast(d.credits_added,d.new_balance);}}catch(e){}}
+});
 
-function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadDropzone').classList.add('dragging'); }
-function handleDragLeave(e) { document.getElementById('uploadDropzone').classList.remove('dragging'); }
-function handleDrop(e) {
-    e.preventDefault();
-    document.getElementById('uploadDropzone').classList.remove('dragging');
-    const file = e.dataTransfer.files[0];
-    if (file) processUploadedFile(file);
-}
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) processUploadedFile(file);
-}
-
-async function processUploadedFile(file) {
-    const errorEl = document.getElementById('uploadError');
-    errorEl.classList.remove('visible');
-
-    // Validate file type
-    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx)$/i)) {
-        errorEl.textContent = 'Please upload a PDF or Word document (.pdf, .doc, .docx)';
-        errorEl.classList.add('visible');
-        return;
+async function loadCslIndex(){
+    try{var r=await fetch('/lib/csl-index.json');if(r.ok){cslIndex=await r.json();initStylePickers();}
+    }catch(e){
+        cslIndex={groups:[{group:'Most Popular',styles:[
+            {id:'harvard-cite-them-right',name:'Harvard (Cite Them Right)',shortName:'Harvard'},
+            {id:'apa',name:'APA 7th Edition',shortName:'APA 7'},
+            {id:'modern-language-association',name:'MLA 9th Edition',shortName:'MLA'},
+            {id:'chicago-author-date',name:'Chicago Author-Date',shortName:'Chicago'},
+            {id:'vancouver',name:'Vancouver',shortName:'Vancouver'},
+            {id:'ieee',name:'IEEE',shortName:'IEEE'},
+            {id:'nature',name:'Nature',shortName:'Nature'},
+            {id:'_clean_only',name:'Clean and alphabetize only',shortName:'Clean only',special:true},
+            {id:'_number_only',name:'Number my references',shortName:'Numbered',special:true}
+        ]}]};
+        initStylePickers();
     }
+}
 
-    if (file.size > 10 * 1024 * 1024) {
-        errorEl.textContent = 'File is too large. Maximum size is 10MB.';
-        errorEl.classList.add('visible');
-        return;
-    }
+var PICKERS={
+    clean:{s:'cleanStyleSearch',d:'cleanStyleDropdown',h:'formatSelect'},
+    lookup:{s:'lookupStyleSearch',d:'lookupStyleDropdown',h:'lookupFormatSelect'},
+    url:{s:'urlStyleSearch',d:'urlStyleDropdown',h:'urlFormatSelect'},
+    title:{s:'titleStyleSearch',d:'titleStyleDropdown',h:'titleFormatSelect'},
+    idea:{s:'ideaStyleSearch',d:'ideaStyleDropdown',h:'ideaFormatSelect'},
+    upload:{s:'uploadStyleSearch',d:'uploadStyleDropdown',h:'uploadFormatSelect'}
+};
 
-    // Only PDF supported for now (Word coming soon)
-    if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
-        errorEl.textContent = 'Word document support coming soon. Please upload a PDF for now.';
-        errorEl.classList.add('visible');
-        return;
-    }
+function initStylePickers(){Object.keys(PICKERS).forEach(function(k){var el=document.getElementById(PICKERS[k].s);if(el){el.value='Harvard';renderSD(k,'');}});}
 
-    // Show reading panel
-    document.getElementById('uploadPanel').style.display = 'none';
-    document.getElementById('uploadReadingPanel').style.display = 'block';
+function getAllStyles(){if(!cslIndex)return[];var a=[];cslIndex.groups.forEach(function(g){g.styles.forEach(function(s){a.push({group:g.group,id:s.id,name:s.name,shortName:s.shortName,special:s.special});});});return a;}
 
-    try {
-        // Convert to base64
-        const base64 = await new Promise(function(resolve, reject) {
-            const reader = new FileReader();
-            reader.onload = function() { resolve(reader.result.split(',')[1]); };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
+function renderSD(pk,q){
+    var cfg=PICKERS[pk];if(!cfg)return;
+    var dd=document.getElementById(cfg.d);if(!dd)return;
+    var all=getAllStyles(),ql=(q||'').toLowerCase().trim();
+    var filtered=ql?all.filter(function(s){return s.name.toLowerCase().includes(ql)||(s.shortName&&s.shortName.toLowerCase().includes(ql))||s.group.toLowerCase().includes(ql);}):all;
+    var byG={};filtered.forEach(function(s){if(!byG[s.group])byG[s.group]=[];byG[s.group].push(s);});
+    var html='',cv=document.getElementById(cfg.h)?document.getElementById(cfg.h).value:'Harvard';
+    Object.keys(byG).forEach(function(g){
+        html+='<div class="style-group-label">'+esc(g)+'</div>';
+        byG[g].forEach(function(s){
+            html+='<div class="style-option'+(s.name===cv||s.id===cv?' selected':'')+'" onclick="selStyle(\''+pk+'\',\''+esc(s.name)+'\',\''+esc(s.id)+'\')"><span>'+esc(s.name)+'</span><span class="style-option-short">'+esc(s.shortName||'')+'</span></div>';
         });
+    });
+    if(!html)html='<div style="padding:12px 14px;color:var(--muted);font-size:0.85rem;">No styles found.</div>';
+    dd.innerHTML=html;
+}
 
-        const res = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'extract', fileData: base64, fileName: file.name })
-        });
+function selStyle(pk,name,id){var cfg=PICKERS[pk];if(!cfg)return;var se=document.getElementById(cfg.s),he=document.getElementById(cfg.h);if(se)se.value=name;if(he)he.value=name;closeSD(pk,0);}
+function filterStyles(pk){var cfg=PICKERS[pk];if(!cfg)return;renderSD(pk,document.getElementById(cfg.s).value);openSD(pk);}
+function openStyleDropdown(pk){openSD(pk);}
+function openSD(pk){var cfg=PICKERS[pk];if(!cfg)return;renderSD(pk,document.getElementById(cfg.s).value);document.getElementById(cfg.d).classList.add('open');}
+function closeStyleDropdown(pk,delay){closeSD(pk,delay);}
+function closeSD(pk,delay){setTimeout(function(){var cfg=PICKERS[pk];if(cfg){var dd=document.getElementById(cfg.d);if(dd)dd.classList.remove('open');}},delay||0);}
+function getStyle(pk){var cfg=PICKERS[pk];if(!cfg)return'Harvard';var he=document.getElementById(cfg.h);return he?he.value:'Harvard';}
 
-        const data = await res.json();
+function esc(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-        if (!res.ok) throw new Error(data.error || 'Could not read document');
-        if (!data.references || data.references.length === 0) throw new Error('No references found in this document');
+function linkify(text){
+    var e=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return e.replace(/(https?:\/\/[^\s,;>\])"&]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
 
-        uploadedReferences = data.references;
-        uploadedDocType = data.documentType;
-        uploadedTitle = data.title || file.name;
+var glow=document.getElementById('cursorGlow');
+document.addEventListener('mousemove',function(e){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';});
+document.addEventListener('click',function(e){var av=document.getElementById('userAvatar'),dd=document.getElementById('userDropdown');if(av&&!av.contains(e.target))dd.classList.remove('visible');});
 
-        showUploadOptions(data);
+function toggleTheme(){var h=document.documentElement,b=document.getElementById('themeBtn');if(h.getAttribute('data-theme')==='light'){h.setAttribute('data-theme','dark');b.textContent='☀️ Dark';localStorage.setItem('refinr-theme','dark');}else{h.setAttribute('data-theme','light');b.textContent='🌙 Dark';localStorage.setItem('refinr-theme','light');}}
 
-    } catch (err) {
-        document.getElementById('uploadReadingPanel').style.display = 'none';
-        document.getElementById('uploadPanel').style.display = 'block';
-        errorEl.textContent = err.message;
-        errorEl.classList.add('visible');
+function updateUIForLoggedInUser(user){
+    document.getElementById('authButtons').style.display='none';
+    document.getElementById('userAvatar').classList.add('visible');
+    var i=(user.full_name||user.email||'?')[0].toUpperCase();
+    document.getElementById('avatarInitial').textContent=i;
+    document.getElementById('avatarName').textContent=user.full_name||user.email.split('@')[0];
+    updateCreditsDisplay(user.credits!==undefined?user.credits:5);
+}
+
+function updateCreditsDisplay(c){
+    document.getElementById('creditsCount').textContent=c;
+    document.getElementById('creditsInModal').textContent=c;
+    document.getElementById('dropdownCredits').textContent=c;
+    if(currentUser){currentUser.credits=c;localStorage.setItem('refinr-user',JSON.stringify(currentUser));}
+}
+
+function toggleDropdown(){document.getElementById('userDropdown').classList.toggle('visible');}
+
+function openAuthModal(tab){document.getElementById('authModal').classList.add('visible');switchAuthTab(tab);document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
+function switchAuthTab(tab){document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';document.getElementById('signinTab').classList.toggle('active',tab==='signin');document.getElementById('signupTab').classList.toggle('active',tab==='signup');document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
+
+async function handleSignIn(){
+    var email=document.getElementById('signinEmail').value.trim(),password=document.getElementById('signinPassword').value,errorEl=document.getElementById('authError');
+    if(!email||!password){errorEl.textContent='Please enter your email and password.';errorEl.classList.add('visible');return;}
+    var btn=event.currentTarget;btn.textContent='Signing in...';btn.disabled=true;
+    try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signin',email,password})});var d=await r.json();
+    if(d.error){errorEl.textContent=d.error;errorEl.classList.add('visible');btn.textContent='Sign in';btn.disabled=false;return;}
+    currentUser=d.user;currentSession=d.session;localStorage.setItem('refinr-session',JSON.stringify(d.session));localStorage.setItem('refinr-user',JSON.stringify(d.user));updateUIForLoggedInUser(d.user);closeModal('authModal');
+    }catch(e){errorEl.textContent='Something went wrong. Please try again.';errorEl.classList.add('visible');btn.textContent='Sign in';btn.disabled=false;}
+}
+
+async function handleSignUp(){
+    var name=document.getElementById('signupName').value.trim(),email=document.getElementById('signupEmail').value.trim(),password=document.getElementById('signupPassword').value,errorEl=document.getElementById('authError'),successEl=document.getElementById('authSuccess');
+    if(!email||!password){errorEl.textContent='Please enter your email and password.';errorEl.classList.add('visible');return;}
+    if(password.length<6){errorEl.textContent='Password must be at least 6 characters.';errorEl.classList.add('visible');return;}
+    var btn=event.currentTarget;btn.textContent='Creating account...';btn.disabled=true;
+    try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signup',email,password,full_name:name})});var d=await r.json();
+    if(d.error){errorEl.textContent=d.error;errorEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;return;}
+    var sr=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signin',email,password})});var sd=await sr.json();
+    if(sd.user){currentUser=sd.user;currentSession=sd.session;localStorage.setItem('refinr-session',JSON.stringify(sd.session));localStorage.setItem('refinr-user',JSON.stringify(sd.user));updateUIForLoggedInUser(sd.user);closeModal('authModal');}
+    else{successEl.textContent='Account created! Please sign in.';successEl.classList.add('visible');switchAuthTab('signin');btn.textContent='Create free account';btn.disabled=false;}
+    }catch(e){errorEl.textContent='Something went wrong. Please try again.';errorEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;}
+}
+
+async function refreshSession(){
+    var s=localStorage.getItem('refinr-session');if(!s)return false;
+    var session=JSON.parse(s);if(!session.refresh_token)return false;
+    try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'refresh',refresh_token:session.refresh_token})});var d=await r.json();
+    if(d.session){currentSession=d.session;localStorage.setItem('refinr-session',JSON.stringify(d.session));return true;}return false;}catch(e){return false;}
+}
+
+async function signOut(){localStorage.removeItem('refinr-session');localStorage.removeItem('refinr-user');currentUser=null;currentSession=null;document.getElementById('authButtons').style.display='flex';document.getElementById('userAvatar').classList.remove('visible');document.getElementById('userDropdown').classList.remove('visible');updateCreditsDisplay(5);}
+
+function copyReferralCode(){if(currentUser&&currentUser.referral_code){navigator.clipboard.writeText(currentUser.referral_code).then(function(){alert('Referral code copied: '+currentUser.referral_code+'\n\nShare this with colleagues and students!');});}document.getElementById('userDropdown').classList.remove('visible');}
+
+function createSplash(e){
+    if(!e||!e.clientX)return;
+    var colours=['#1B3A6B','#2D9B6F','#7C3AED','#D97706','#00FFFF','#F59E0B','#EF4444','#EC4899'];
+    for(var i=0;i<16;i++){
+        var p=document.createElement('div'),c=colours[Math.floor(Math.random()*colours.length)],a=(i/16)*360+Math.random()*20,dist=30+Math.random()*70,sz=5+Math.random()*8;
+        p.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;width:'+sz+'px;height:'+sz+'px;background:'+c+';border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.55s ease-out;transform:translate(-50%,-50%);opacity:1;';
+        document.body.appendChild(p);
+        requestAnimationFrame(function(){requestAnimationFrame(function(){var rad=(a*Math.PI)/180;p.style.transform='translate(calc(-50% + '+(Math.cos(rad)*dist)+'px), calc(-50% + '+(Math.sin(rad)*dist)+'px))';p.style.opacity='0';});});
+        setTimeout(function(){p.remove();},600);
     }
 }
 
-function showUploadOptions(data) {
-    document.getElementById('uploadReadingPanel').style.display = 'none';
-    document.getElementById('uploadOptionsPanel').style.display = 'block';
+function showProgress(label,pct){var pc=document.getElementById('progressContainer');pc.classList.add('visible');document.getElementById('progressLabel').textContent=label;document.getElementById('progressBar').style.width=pct+'%';pc.scrollIntoView({behavior:'smooth'});}
+function hideProgress(){setTimeout(function(){document.getElementById('progressContainer').classList.remove('visible');document.getElementById('progressBar').style.width='0%';},3000);}
 
-    const isFullPaper = data.documentType === 'full_paper';
-    const credits = parseInt(document.getElementById('creditsCount').textContent);
-    const verifyCredits = calculateCreditsNeeded(data.references.join('\n'));
+function loadExample(){document.getElementById('referencesInput').value='smith j 2020 academic writing oxford press\njones mary 2019 research methods cambridge university press london\nbrown t 2021 scientific writing wiley\nSmith J 2020 Academic Writing Oxford Press\nSherson, J.F., Krauter, H., Olsson, R.K., Julsgaard, B., Hammerer, K., Cirac, I. and Polzik, E.S., 2006. Quantum teleportation between light and matter. Nature, 443(7111), pp.557-560.';}
 
-    document.getElementById('uploadDocInfo').innerHTML =
-        '<strong style="color:var(--text);display:block;margin-bottom:4px;">' +
-        (isFullPaper ? '📄 Full academic paper detected' : '📋 Reference list detected') +
-        '</strong>' +
-        (data.title ? 'Title: ' + data.title + '<br>' : '') +
-        data.references.length + ' references found — ' + data.summary;
+function switchTab(tab,e){document.querySelectorAll('.lookup-tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.lookup-panel').forEach(function(p){p.style.display='none';});document.getElementById('tab-'+tab).style.display='block';if(e&&e.currentTarget)e.currentTarget.classList.add('active');}
 
-    const optionsEl = document.getElementById('uploadOptions');
+function openCleanModal(){if(!document.getElementById('referencesInput').value.trim()){alert('Please paste your references first.');return;}document.getElementById('cleanModal').classList.add('visible');}
+function openVerifyModal(){if(!document.getElementById('referencesInput').value.trim()){alert('Please paste your references first.');return;}if(!currentUser){openAuthModal('signin');return;}var c=parseInt(document.getElementById('creditsCount').textContent);if(c<=0){openCreditsModal();return;}document.getElementById('creditsInModal').textContent=c;document.getElementById('verifyModal').classList.add('visible');}
+function openIntextModal(){if(!document.getElementById('referencesInput').value.trim()){alert('Please paste your references first.');return;}document.getElementById('intextModal').classList.add('visible');}
+function setCitationStyle(s){citationStyle=s;document.getElementById('toggleParenthetical').classList.toggle('active',s==='parenthetical');document.getElementById('toggleNarrative').classList.toggle('active',s==='narrative');}
+function openLookupModal(){document.getElementById('lookupModal').classList.add('visible');}
+function openIdeaModal(){if(!currentUser){openAuthModal('signin');return;}var c=parseInt(document.getElementById('creditsCount').textContent);if(c<2){openCreditsModal();return;}resetIdeaModal();document.getElementById('ideaModal').classList.add('visible');}
+function resetIdeaModal(){document.getElementById('ideaSearchPanel').style.display='block';document.getElementById('ideaResultsPanel').style.display='none';document.getElementById('ideaError').classList.remove('visible');document.getElementById('ideaInput').value='';ideaPapers=[];ideaFormatted='';}
+function closeModal(id){document.getElementById(id).classList.remove('visible');}
 
-    if (isFullPaper) {
-        optionsEl.innerHTML = `
-            <div class="pdf-option" onclick="runDeepDive()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">🔬 Deep dive analysis</span>
-                    <span class="pdf-option-badge badge-premium">10 credits</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Claude performs a thorough audit of all ${data.references.length} references. Checks credibility, flags weak or suspicious citations, checks if references support the claims they're cited for, identifies over-reliance patterns, and produces a supervisor-ready report with an overall credibility score.
-                </div>
-            </div>
-            <div class="pdf-option" onclick="runExtractAndVerify()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">🔍 Extract & verify references</span>
-                    <span class="pdf-option-badge badge-credits">${verifyCredits} credit${verifyCredits > 1 ? 's' : ''}</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Extracts all ${data.references.length} references from the paper and checks each one against CrossRef and OpenAlex (370M+ records). Returns an accuracy score and flags any mismatches or errors.
-                </div>
-            </div>
-            <div class="pdf-option" onclick="runExtractAndFormat()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">✨ Extract & format references</span>
-                    <span class="pdf-option-badge badge-free">Free</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Extracts all ${data.references.length} references from the paper and loads them into Refinr so you can clean, format, or reformat them in any citation style.
-                </div>
-            </div>`;
-    } else {
-        optionsEl.innerHTML = `
-            <div class="pdf-option" onclick="runDeepDive()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">🔬 Deep dive analysis</span>
-                    <span class="pdf-option-badge badge-premium">10 credits</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Claude performs a thorough quality audit of all ${data.references.length} references. Checks credibility, flags weak or non-academic sources, identifies formatting issues and over-reliance patterns, and produces a supervisor-ready report with an overall credibility score.
-                </div>
-            </div>
-            <div class="pdf-option" onclick="runExtractAndVerify()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">🔍 Verify references</span>
-                    <span class="pdf-option-badge badge-credits">${verifyCredits} credit${verifyCredits > 1 ? 's' : ''}</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Checks each of the ${data.references.length} references against CrossRef and OpenAlex (370M+ academic records). Returns an accuracy score and flags mismatches.
-                </div>
-            </div>
-            <div class="pdf-option" onclick="runExtractAndFormat()">
-                <div class="pdf-option-header">
-                    <span class="pdf-option-title">✨ Format my references</span>
-                    <span class="pdf-option-badge badge-free">Free</span>
-                </div>
-                <div class="pdf-option-desc">
-                    Loads all ${data.references.length} references into Refinr so you can clean and format them in Harvard, APA, MLA, Chicago, Vancouver, or IEEE.
-                </div>
-            </div>`;
+function showOutput(title,content){
+    document.getElementById('outputTitle').textContent=title;
+    document.getElementById('outputContent').innerHTML=linkify(content);
+    document.getElementById('outputCard').classList.add('visible');
+    var noShare=['Cleaning...','Generating...','Looking up...','Starting...','Searching...','Extracting...','Fetching...'];
+    document.getElementById('shareBtn').style.display=noShare.some(function(t){return title.includes(t);})?'none':'flex';
+    var ab=document.getElementById('acceptSuggestionsBtn');
+    if(ab)ab.style.display=(content&&content.includes('✏️ Suggested correction:'))?'flex':'none';
+    document.getElementById('outputCard').scrollIntoView({behavior:'smooth'});
+}
+
+function acceptSuggestions(){
+    var content=document.getElementById('outputContent').textContent;
+    var inputBox=document.getElementById('referencesInput');
+    var blocks=content.split('\n\n');var corrections={};
+    blocks.forEach(function(block){
+        if(!block.includes('⚠️ MISMATCH'))return;
+        var rm=block.match(/⚠️ MISMATCH — (.+?)(?:\n|$)/);
+        var cm=block.match(/✏️ Suggested correction:\s*([\s\S]+?)(?:\n\n|$)/);
+        if(rm&&cm)corrections[rm[1].trim()]=cm[1].trim();
+    });
+    var count=Object.keys(corrections).length;
+    if(count===0){alert('No suggestions found to apply.');return;}
+    var current=inputBox.value,applied=0;
+    for(var orig in corrections){if(current.includes(orig)){current=current.replace(orig,corrections[orig]);applied++;}}
+    inputBox.value=current;
+    document.getElementById('outputContent').innerHTML=linkify(content+'\n\n─────────────────────────────\n✅ '+applied+' correction(s) applied. Click "Clean references" to reformat.');
+    document.getElementById('acceptSuggestionsBtn').style.display='none';
+    inputBox.scrollIntoView({behavior:'smooth'});
+}
+
+function copyResults(e){
+    var content=document.getElementById('outputContent').textContent;
+    navigator.clipboard.writeText(content).then(function(){
+        if(e&&e.clientX)createSplash(e);
+        var btn=e&&e.currentTarget?e.currentTarget:null;
+        if(btn){var tooltip=btn.querySelector('.tooltip'),svg=btn.querySelector('svg');if(tooltip)tooltip.textContent='Copied!';if(svg)svg.style.stroke='#2D9B6F';setTimeout(function(){if(tooltip)tooltip.textContent='Copy';if(svg)svg.style.stroke='currentColor';},2000);}
+    });
+}
+
+async function shareReport(e){
+    if(!currentUser){openAuthModal('signin');return;}
+    var content=document.getElementById('outputContent').textContent,title=document.getElementById('outputTitle').textContent;
+    document.getElementById('shareUrlBox').textContent='Generating link...';document.getElementById('shareModal').classList.add('visible');
+    try{var r=await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reportData:{title,content,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}})});var d=await r.json();
+    if(d.binId){currentShareUrl=window.location.origin+'?report='+d.binId;document.getElementById('shareUrlBox').textContent=currentShareUrl;}
+    else document.getElementById('shareUrlBox').textContent='Failed to generate link. Please try again.';}
+    catch(err){document.getElementById('shareUrlBox').textContent='Failed to generate link. Please try again.';}
+}
+
+function copyShareLink(){if(currentShareUrl){navigator.clipboard.writeText(currentShareUrl).then(function(){var b=event.currentTarget;b.textContent='✅ Copied!';setTimeout(function(){b.textContent='Copy link';},2000);});}}
+
+async function cleanReferences(){
+    closeModal('cleanModal');
+    var references=document.getElementById('referencesInput').value.trim(),format=getStyle('clean');
+    showProgress('Cleaning your references in '+format+'...',40);
+    try{var r=await fetch('/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({references,format})});var d=await r.json();
+    document.getElementById('progressBar').style.width='100%';showOutput('Cleaned References — '+format,d.result||d.error||'Something went wrong.');hideProgress();}
+    catch(err){showOutput('Error','Something went wrong. Please try again.');hideProgress();}
+}
+
+async function deductCredits(amount,description){
+    try{var cr=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description})});var cd=await cr.json();
+    if(cr.status===401){var ref=await refreshSession();if(!ref){await signOut();alert('Session expired. Please sign in again.');openAuthModal('signin');return false;}
+    var rt=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description})});var rd=await rt.json();if(rd.error){alert(rd.error);return false;}updateCreditsDisplay(rd.credits);return true;}
+    if(cd.error){if(cd.credits===0||cd.error.includes('Insufficient'))openCreditsModal();else alert(cd.error);return false;}
+    updateCreditsDisplay(cd.credits);return true;}
+    catch(err){console.log('Credit error:',err);return false;}
+}
+
+async function verifyReferences(){
+    closeModal('verifyModal');
+    var referencesText=document.getElementById('referencesInput').value.trim();
+    var referenceList=referencesText.split('\n').filter(function(r){return r.trim().length>0;});
+    var creditsNeeded=referenceList.length<=20?1:referenceList.length<=50?2:referenceList.length<=100?3:4;
+    if(currentUser&&currentSession){var ok=await deductCredits(creditsNeeded,'Reference verification ('+referenceList.length+' references)');if(!ok)return;}
+    showProgress('Verifying reference 0 of '+referenceList.length+'...',0);
+    document.getElementById('outputTitle').textContent='Verification Report';
+    document.getElementById('outputContent').innerHTML='Starting verification...';
+    document.getElementById('outputCard').classList.add('visible');
+    document.getElementById('shareBtn').style.display='none';
+    document.getElementById('acceptSuggestionsBtn').style.display='none';
+    var results=[];
+    for(var i=0;i<referenceList.length;i++){
+        var ref=referenceList[i].trim();if(!ref)continue;
+        document.getElementById('progressLabel').textContent='Verifying reference '+(i+1)+' of '+referenceList.length+'...';
+        document.getElementById('progressBar').style.width=Math.round(((i+1)/referenceList.length)*100)+'%';
+        if(i>0)await new Promise(function(r){setTimeout(r,150);});
+        try{var r=await fetch('/api/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference:ref,format:'Harvard'})});var d=await r.json();results.push(d.result);}
+        catch(err){results.push('⚠️ ERROR checking — '+ref);}
+        document.getElementById('outputContent').innerHTML=linkify(results.join('\n\n'));
     }
+    var total=results.length,confirmed=results.filter(function(r){return r&&r.includes('✅ CONFIRMED');}).length,mismatches=results.filter(function(r){return r&&r.includes('⚠️ MISMATCH');}).length,notFound=results.filter(function(r){return r&&r.includes('❌ NOT FOUND');}).length;
+    var score=total>0?Math.round((confirmed/total)*100):0;
+    var scoreText='📊 ACCURACY REPORT\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOverall Score: '+score+'%\n✅ Confirmed: '+confirmed+' of '+total+'\n⚠️ Mismatches found: '+mismatches+'\n❌ Not found in database: '+notFound+'\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDETAILED RESULTS:\n\n'+results.join('\n\n');
+    document.getElementById('progressBar').style.width='100%';
+    showOutput('Verification Report',scoreText);
+    if(mismatches>0)document.getElementById('acceptSuggestionsBtn').style.display='flex';
+    hideProgress();
 }
 
-// Option handlers
-function runExtractAndFormat() {
-    closeModal('uploadModal');
-    document.getElementById('referencesInput').value = uploadedReferences.join('\n');
-    document.getElementById('referencesInput').scrollIntoView({ behavior: 'smooth' });
-    showOutput('References extracted from PDF', uploadedReferences.join('\n\n') + '\n\n─────────────────────────────\n💡 ' + uploadedReferences.length + ' references loaded. Click "Clean references" to format them.');
+async function generateIntext(){
+    closeModal('intextModal');
+    var input=document.getElementById('referencesInput').value.trim();if(!input){alert('Please paste your references first.');return;}
+    showProgress('Generating '+citationStyle+' citations...',40);
+    try{var r=await fetch('/api/intext',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({references:input,style:citationStyle})});var d=await r.json();
+    document.getElementById('progressBar').style.width='100%';showOutput('In-text Citations — '+(citationStyle==='narrative'?'Narrative':'Parenthetical'),d.result);hideProgress();}
+    catch(err){showOutput('Error','Something went wrong. Please try again.');hideProgress();}
 }
 
-async function runExtractAndVerify() {
-    closeModal('uploadModal');
-    document.getElementById('referencesInput').value = uploadedReferences.join('\n');
-    // Trigger verify flow
-    const credits = parseInt(document.getElementById('creditsCount').textContent);
-    if (!currentUser) { openAuthModal('signin'); return; }
-    if (credits <= 0) { openCreditsModal(); return; }
-    document.getElementById('creditsInModal').textContent = credits;
-    updateVerifyCostPreview();
-    document.getElementById('verifyModal').classList.add('visible');
+async function searchByIdea(){
+    if(!currentUser){openAuthModal('signin');return;}
+    var idea=document.getElementById('ideaInput').value.trim(),format=getStyle('idea'),errorEl=document.getElementById('ideaError');
+    errorEl.classList.remove('visible');if(!idea){errorEl.textContent='Please enter a research idea or topic.';errorEl.classList.add('visible');return;}
+    var btn=document.getElementById('ideaSearchBtn');btn.textContent='Searching...';btn.disabled=true;
+    var ok=await deductCredits(2,'Search by idea: '+idea.substring(0,50));if(!ok){btn.textContent='Search — 2 credits';btn.disabled=false;return;}
+    try{var r=await fetch('/api/searchbyidea',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idea,format,yearFrom:document.getElementById('yearFrom').value||null,yearTo:document.getElementById('yearTo').value||null})});var d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Search failed');if(!d.papers||d.papers.length===0){errorEl.textContent='No papers found. Try different keywords.';errorEl.classList.add('visible');btn.textContent='Search — 2 credits';btn.disabled=false;return;}
+    ideaPapers=d.papers;ideaFormatted=d.formatted;renderIdeaResults(d.papers,d.total,format);}
+    catch(err){errorEl.textContent=err.message;errorEl.classList.add('visible');}
+    finally{btn.textContent='Search — 2 credits';btn.disabled=false;}
 }
 
-async function runDeepDive() {
-    const credits = parseInt(document.getElementById('creditsCount').textContent);
-    if (credits < 10) {
-        document.getElementById('uploadError2').textContent = 'You need 10 credits for deep dive analysis. You have ' + credits + '.';
-        document.getElementById('uploadError2').classList.add('visible');
-        setTimeout(function() { closeModal('uploadModal'); openCreditsModal(); }, 1500);
-        return;
-    }
-
-    closeModal('uploadModal');
-
-    // Show deep dive processing modal
-    document.getElementById('deepdiveModal').classList.add('visible');
-    animateDeepDiveBar();
-
-    // Deduct credits
-    const ok = await deductCredits(10, 'Deep dive analysis — ' + (uploadedTitle || 'document'));
-    if (!ok) { closeModal('deepdiveModal'); return; }
-
-    try {
-        const res = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'deepdive',
-                references: uploadedReferences,
-                documentType: uploadedDocType,
-                title: uploadedTitle
-            })
-        });
-
-        const data = await res.json();
-        closeModal('deepdiveModal');
-
-        if (!res.ok) throw new Error(data.error || 'Analysis failed');
-
-        showOutput('🔬 Deep Dive Analysis Report', data.result);
-
-    } catch (err) {
-        closeModal('deepdiveModal');
-        showOutput('Error', 'Deep dive analysis failed. Please try again. Your credits have not been deducted.');
-    }
+function renderIdeaResults(papers,total,format){
+    document.getElementById('ideaSearchPanel').style.display='none';document.getElementById('ideaResultsPanel').style.display='block';
+    document.getElementById('ideaResultsMeta').textContent='Found '+total.toLocaleString()+' papers. Showing top '+papers.length+' — click to select, then load into your references.';
+    var list=document.getElementById('ideaResultsList');list.innerHTML='';
+    papers.forEach(function(paper,i){
+        var card=document.createElement('div');card.className='idea-result-card selected';card.dataset.index=i;
+        card.onclick=function(){card.classList.toggle('selected');};
+        var authors=paper.authors.slice(0,3).join(', ')+(paper.authors.length>3?' et al.':'');
+        var doiLink=paper.doiUrl?' · <a href="'+esc(paper.doiUrl)+'" target="_blank" onclick="event.stopPropagation()" style="color:#0891B2;text-decoration:none;">View paper ↗</a>':'';
+        var abstractHtml=paper.abstract?'<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5;">'+esc(paper.abstract.substring(0,200))+(paper.abstract.length>200?'...':'')+'</div>':'';
+        card.innerHTML='<div class="idea-result-title">'+esc(paper.title)+'</div><div class="idea-result-meta">'+esc(authors)+' · '+(paper.year||'n.d.')+(paper.journal?' · '+esc(paper.journal):'')+(paper.doi?' · DOI: '+esc(paper.doi):'')+doiLink+'</div>'+abstractHtml;
+        list.appendChild(card);
+    });
 }
 
-function animateDeepDiveBar() {
-    const bar = document.getElementById('deepdiveBar');
-    const label = document.getElementById('deepdiveLabel');
-    const stages = [
-        { pct: 10, text: 'Reading references...' },
-        { pct: 25, text: 'Checking academic credibility...' },
-        { pct: 45, text: 'Analysing citation patterns...' },
-        { pct: 65, text: 'Identifying weak sources...' },
-        { pct: 80, text: 'Generating recommendations...' },
-        { pct: 90, text: 'Writing supervisor report...' }
-    ];
-    let i = 0;
-    const interval = setInterval(function() {
-        if (i >= stages.length) { clearInterval(interval); return; }
-        bar.style.width = stages[i].pct + '%';
-        label.textContent = stages[i].text;
-        i++;
-    }, 8000);
+function loadIdeaReferences(){
+    var selected=document.querySelectorAll('.idea-result-card.selected');
+    if(selected.length===0){document.getElementById('ideaError2').textContent='Please select at least one paper.';document.getElementById('ideaError2').classList.add('visible');return;}
+    var indices=Array.from(selected).map(function(c){return parseInt(c.dataset.index);});
+    var lines=ideaFormatted.split('\n').filter(function(l){return l.trim();});
+    var refs=indices.map(function(i){return lines[i]?lines[i].replace(/^\d+\.\s*/,''):'';}).filter(Boolean);
+    var existing=document.getElementById('referencesInput').value.trim();
+    document.getElementById('referencesInput').value=existing?existing+'\n'+refs.join('\n'):refs.join('\n');
+    closeModal('ideaModal');
+    showOutput('Search by Idea — References loaded',refs.join('\n\n')+'\n\n─────────────────────────────\n💡 '+refs.length+' reference(s) loaded. Click "Clean references" to format them.');
+    document.getElementById('referencesInput').scrollIntoView({behavior:'smooth'});
+}
+
+async function lookupIdentifiers(){
+    closeModal('lookupModal');
+    var identifiers=document.getElementById('doiInput').value.trim(),format=getStyle('lookup');
+    if(!identifiers){alert('Please paste your DOIs or ISBNs first.');return;}
+    var lines=identifiers.split('\n').filter(function(l){return l.trim().length>0;});
+    showProgress('Looking up '+lines.length+' identifiers...',20);
+    try{var r=await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'identifiers',identifiers,format})});var d=await r.json();
+    document.getElementById('progressBar').style.width='100%';document.getElementById('progressLabel').textContent='✅ Lookup complete — '+lines.length+' identifiers processed';
+    var lr=d.results.join('\n');showOutput('DOI/ISBN Lookup — '+format,lr);
+    document.getElementById('referencesInput').value=d.results.map(function(r){return r.replace(/^✅\s*/,'').replace(/^❌[^\n]*/,'').trim();}).filter(function(r){return r.length>0;}).join('\n');
+    document.getElementById('outputContent').innerHTML=linkify(lr+'\n\n─────────────────────────────\n💡 References loaded into input box above. Click "Clean references" to format them.');
+    hideProgress();}
+    catch(err){showOutput('Error','Something went wrong. Please try again.');hideProgress();}
+}
+
+async function lookupByURL(){
+    closeModal('lookupModal');
+    var urls=document.getElementById('urlInput').value.trim(),format=getStyle('url');
+    if(!urls){alert('Please paste at least one URL.');return;}
+    var urlList=urls.split('\n').filter(function(u){return u.trim().length>0;});
+    showProgress('Extracting '+urlList.length+' URL(s)...',20);
+    try{var r=await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'url',urls,format})});var d=await r.json();
+    document.getElementById('progressBar').style.width='100%';document.getElementById('progressLabel').textContent='✅ Extracted '+urlList.length+' reference(s)';
+    var results=d.results||['Could not extract reference'];showOutput('URL Lookup — '+format,results.join('\n\n'));
+    document.getElementById('referencesInput').value=results.map(function(r){return r.replace(/^✅\s*/,'').trim();}).filter(function(r){return r.length>0;}).join('\n');
+    hideProgress();}catch(err){showOutput('Error','Could not extract reference from URL.');hideProgress();}
+}
+
+async function lookupByTitle(){
+    closeModal('lookupModal');
+    var titles=document.getElementById('titleInput').value.trim(),format=getStyle('title');
+    if(!titles){alert('Please enter a title or author name.');return;}
+    var titleList=titles.split('\n').filter(function(t){return t.trim().length>0;});
+    showProgress('Searching for '+titleList.length+' reference(s)...',20);
+    try{var r=await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'title',titles,format})});var d=await r.json();
+    document.getElementById('progressBar').style.width='100%';document.getElementById('progressLabel').textContent='✅ Found '+titleList.length+' reference(s)';
+    var results=d.results||['Could not find reference'];showOutput('Title Lookup — '+format,results.join('\n\n'));
+    document.getElementById('referencesInput').value=results.map(function(r){return r.replace(/^✅\s*/,'').trim();}).filter(function(r){return r.length>0;}).join('\n');
+    hideProgress();}catch(err){showOutput('Error','Could not find reference.');hideProgress();}
+}
+
+async function loadSharedReport(){
+    var params=new URLSearchParams(window.location.search),reportId=params.get('report');
+    if(reportId){try{var r=await fetch('/api/report?id='+reportId);var d=await r.json();if(d.reportData){showOutput(d.reportData.title+' — '+d.reportData.date,d.reportData.content);document.getElementById('shareBtn').style.display='none';}}catch(err){console.log('Could not load shared report');}}
+}
+
+async function detectUserCurrency(){try{var r=await fetch('https://ipapi.co/json/');var d=await r.json();userCurrency=(d.country_code==='NG')?'NGN':'USD';updatePackagePrices();}catch(e){userCurrency='NGN';}}
+function updatePackagePrices(){document.querySelectorAll('.pkg-price').forEach(function(el){el.textContent=userCurrency==='USD'?el.dataset.usd:el.dataset.ngn;});}
+
+function openCreditsModal(){if(!currentUser){openAuthModal('signin');return;}document.getElementById('creditsError').classList.remove('visible');document.getElementById('creditsSuccess').classList.remove('visible');hideVerifyForm();updatePackagePrices();document.getElementById('creditsModal').classList.add('visible');}
+function selectPackage(el){document.querySelectorAll('.credit-package').forEach(function(p){p.classList.remove('selected');});el.classList.add('selected');selectedPackage=el.dataset.package;}
+
+async function initializePayment(){
+    if(!currentUser){openAuthModal('signin');return;}
+    var errorEl=document.getElementById('creditsError'),btn=document.querySelector('#creditsBuyButtons .btn-confirm');
+    errorEl.classList.remove('visible');btn.textContent='Loading...';btn.disabled=true;
+    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'initialize',package_id:selectedPackage,email:currentUser.email,user_id:currentUser.id,currency:userCurrency})});var d=await r.json();
+    if(!r.ok||!d.authorization_url)throw new Error(d.error||'Could not initialize payment');
+    localStorage.setItem('refinr-pending-ref',d.reference);window.location.href=d.authorization_url;}
+    catch(err){errorEl.textContent=err.message;errorEl.classList.add('visible');btn.textContent='Pay with Paystack';btn.disabled=false;}
+}
+
+function showVerifyForm(){document.getElementById('verifyPayForm').style.display='block';document.getElementById('creditsBuyButtons').style.display='none';document.getElementById('creditsPackages').style.display='none';}
+function hideVerifyForm(){document.getElementById('verifyPayForm').style.display='none';document.getElementById('creditsBuyButtons').style.display='flex';document.getElementById('creditsPackages').style.display='block';var r=document.getElementById('verifyReference');if(r)r.value='';}
+
+async function manualVerify(){
+    if(!currentUser){openAuthModal('signin');return;}
+    var reference=document.getElementById('verifyReference').value.trim(),errorEl=document.getElementById('creditsError'),successEl=document.getElementById('creditsSuccess'),btn=document.querySelector('#verifyPayForm .btn-confirm-green');
+    errorEl.classList.remove('visible');successEl.classList.remove('visible');
+    if(!reference){errorEl.textContent='Please enter your payment reference.';errorEl.classList.add('visible');return;}
+    btn.textContent='Checking...';btn.disabled=true;
+    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',reference,user_id:currentUser.id})});var d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Verification failed');
+    successEl.textContent='✅ '+d.credits_added+' credits added! Your new balance is '+d.new_balance+' credits.';successEl.classList.add('visible');
+    localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);hideVerifyForm();}
+    catch(err){errorEl.textContent=err.message;errorEl.classList.add('visible');}
+    finally{btn.textContent='Verify & credit me';btn.disabled=false;}
+}
+
+function showCreditToast(added,balance){
+    var t=document.createElement('div');t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2D9B6F;color:white;padding:12px 24px;border-radius:10px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.2);';
+    t.textContent='✅ '+added+' credits added! Balance: '+balance+' credits';document.body.appendChild(t);setTimeout(function(){t.remove();},5000);
+}
+
+function openUploadModal(){if(!currentUser){openAuthModal('signin');return;}resetUploadModal();document.getElementById('uploadModal').classList.add('visible');}
+function resetUploadModal(){document.getElementById('uploadPanel').style.display='block';document.getElementById('uploadReadingPanel').style.display='none';document.getElementById('uploadOptionsPanel').style.display='none';document.getElementById('uploadError').classList.remove('visible');document.getElementById('pdfFileInput').value='';uploadedReferences=[];uploadedDocType='';uploadedTitle='';detectedStyleKey=null;document.getElementById('styleDetectBanner').classList.remove('visible');document.getElementById('uploadStylePickerWrap').style.display='none';}
+
+function handleDragOver(e){e.preventDefault();document.getElementById('uploadDropzone').classList.add('dragging');}
+function handleDragLeave(e){document.getElementById('uploadDropzone').classList.remove('dragging');}
+function handleDrop(e){e.preventDefault();document.getElementById('uploadDropzone').classList.remove('dragging');var f=e.dataTransfer.files[0];if(f)processUploadedFile(f);}
+function handleFileUpload(event){var f=event.target.files[0];if(f)processUploadedFile(f);}
+
+async function processUploadedFile(file){
+    var errorEl=document.getElementById('uploadError');errorEl.classList.remove('visible');
+    var validTypes=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if(!validTypes.includes(file.type)&&!file.name.match(/\.(pdf|doc|docx)$/i)){errorEl.textContent='Please upload a PDF or Word document.';errorEl.classList.add('visible');return;}
+    if(file.size>10*1024*1024){errorEl.textContent='File is too large. Maximum size is 10MB.';errorEl.classList.add('visible');return;}
+    if(!file.type.includes('pdf')&&!file.name.endsWith('.pdf')){errorEl.textContent='Word document support coming soon. Please upload a PDF for now.';errorEl.classList.add('visible');return;}
+    document.getElementById('uploadPanel').style.display='none';document.getElementById('uploadReadingPanel').style.display='block';
+    try{
+        var base64=await new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(reader.result.split(',')[1]);};reader.onerror=reject;reader.readAsDataURL(file);});
+        var r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'extract',fileData:base64,fileName:file.name})});var d=await r.json();
+        if(!r.ok)throw new Error(d.error||'Could not read document');if(!d.references||d.references.length===0)throw new Error('No references found in this document');
+        uploadedReferences=d.references;uploadedDocType=d.documentType;uploadedTitle=d.title||file.name;
+        detectStyleFromReferences(d.references);showUploadOptions(d);
+    }catch(err){document.getElementById('uploadReadingPanel').style.display='none';document.getElementById('uploadPanel').style.display='block';errorEl.textContent=err.message;errorEl.classList.add('visible');}
+}
+
+function detectStyleFromReferences(references){
+    var sample=references.slice(0,5),text=sample.join('\n'),scores={harvard:0,apa:0,mla:0,chicago:0,vancouver:0,ieee:0};
+    if((text.match(/^\s*\[\d+\]/gm)||[]).length>1)scores.ieee+=5;
+    if((text.match(/^\s*\d+\.\s+[A-Z]/gm)||[]).length>1)scores.vancouver+=4;
+    if((text.match(/\([12]\d{3}\)/g)||[]).length>1&&(text.match(/'[^']{10,}'/g)||[]).length>0)scores.harvard+=4;
+    if((text.match(/[A-Z][a-z]+,\s[A-Z]\.\s\(\d{4}\)/g)||[]).length>0)scores.apa+=4;
+    if((text.match(/"[^"]{15,}"/g)||[]).length>1&&scores.ieee===0)scores.mla+=3;
+    if(text.includes('https://doi.org/'))scores.apa+=2;
+    if((text.match(/\bvol\.\s?\d+/g)||[]).length>0&&(text.match(/\bno\.\s?\d+/g)||[]).length>0)scores.harvard+=2;
+    var styleMap={harvard:'Harvard (Cite Them Right)',apa:'APA 7th Edition',mla:'MLA 9th Edition',chicago:'Chicago Author-Date',vancouver:'Vancouver',ieee:'IEEE'};
+    var top=Object.keys(scores).sort(function(a,b){return scores[b]-scores[a];})[0],topScore=scores[top];
+    if(topScore>=3){detectedStyleKey=top;var sn=styleMap[top];document.getElementById('styleDetectName').textContent=sn;document.getElementById('styleDetectBanner').classList.add('visible');selStyle('upload',sn,top);}
+}
+
+function keepDetectedStyle(){document.getElementById('styleDetectBanner').classList.remove('visible');}
+function showStyleConvertPicker(){document.getElementById('uploadStylePickerWrap').style.display='block';}
+
+function showUploadOptions(data){
+    document.getElementById('uploadReadingPanel').style.display='none';document.getElementById('uploadOptionsPanel').style.display='block';
+    var isFullPaper=data.documentType==='full_paper';
+    var verifyCredits=data.references.length<=20?1:data.references.length<=50?2:data.references.length<=100?3:4;
+    document.getElementById('uploadDocInfo').innerHTML='<strong style="color:var(--text);display:block;margin-bottom:4px;">'+(isFullPaper?'📄 Full academic paper detected':'📋 Reference list detected')+'</strong>'+(data.title?'Title: '+esc(data.title)+'<br>':'')+data.references.length+' references found — '+esc(data.summary||'');
+    document.getElementById('uploadOptions').innerHTML=
+        '<div class="pdf-option" onclick="runDeepDive()"><div class="pdf-option-header"><span class="pdf-option-title">🔬 Deep dive analysis</span><span class="pdf-option-badge badge-premium">10 credits</span></div><div class="pdf-option-desc">Claude performs a thorough quality audit of all '+data.references.length+' references. Checks credibility, flags weak sources, and produces a supervisor-ready report.</div></div>'+
+        '<div class="pdf-option" onclick="runExtractAndVerify()"><div class="pdf-option-header"><span class="pdf-option-title">🔍 Verify references</span><span class="pdf-option-badge badge-credits">'+verifyCredits+' credit'+(verifyCredits>1?'s':'')+'</span></div><div class="pdf-option-desc">Checks all '+data.references.length+' references against CrossRef and OpenAlex (370M+ records). Returns an accuracy score and flags mismatches.</div></div>'+
+        '<div class="pdf-option" onclick="runExtractAndFormat()"><div class="pdf-option-header"><span class="pdf-option-title">✨ Format references</span><span class="pdf-option-badge badge-free">Free</span></div><div class="pdf-option-desc">Loads all '+data.references.length+' references into Refinr so you can clean and format them in any citation style.</div></div>';
+}
+
+function runExtractAndFormat(){closeModal('uploadModal');document.getElementById('referencesInput').value=uploadedReferences.join('\n');document.getElementById('referencesInput').scrollIntoView({behavior:'smooth'});showOutput('References extracted from PDF',uploadedReferences.join('\n\n')+'\n\n─────────────────────────────\n💡 '+uploadedReferences.length+' references loaded. Click "Clean references" to format them.');}
+async function runExtractAndVerify(){closeModal('uploadModal');document.getElementById('referencesInput').value=uploadedReferences.join('\n');if(!currentUser){openAuthModal('signin');return;}var c=parseInt(document.getElementById('creditsCount').textContent);if(c<=0){openCreditsModal();return;}document.getElementById('creditsInModal').textContent=c;document.getElementById('verifyModal').classList.add('visible');}
+async function runDeepDive(){
+    var c=parseInt(document.getElementById('creditsCount').textContent);
+    if(c<10){document.getElementById('uploadError2').textContent='You need 10 credits for deep dive analysis. You have '+c+'.';document.getElementById('uploadError2').classList.add('visible');setTimeout(function(){closeModal('uploadModal');openCreditsModal();},1500);return;}
+    closeModal('uploadModal');document.getElementById('deepdiveModal').classList.add('visible');animateDeepDiveBar();
+    var ok=await deductCredits(10,'Deep dive analysis — '+(uploadedTitle||'document'));if(!ok){closeModal('deepdiveModal');return;}
+    try{var r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'deepdive',references:uploadedReferences,documentType:uploadedDocType,title:uploadedTitle})});var d=await r.json();
+    closeModal('deepdiveModal');if(!r.ok)throw new Error(d.error||'Analysis failed');showOutput('🔬 Deep Dive Analysis Report',d.result);}
+    catch(err){closeModal('deepdiveModal');showOutput('Error','Deep dive analysis failed. Please try again.');}
+}
+
+function animateDeepDiveBar(){
+    var bar=document.getElementById('deepdiveBar'),label=document.getElementById('deepdiveLabel');
+    var stages=[{p:10,t:'Reading references...'},{p:25,t:'Checking academic credibility...'},{p:45,t:'Analysing citation patterns...'},{p:65,t:'Identifying weak sources...'},{p:80,t:'Generating recommendations...'},{p:90,t:'Writing supervisor report...'}];
+    var i=0;var interval=setInterval(function(){if(i>=stages.length){clearInterval(interval);return;}bar.style.width=stages[i].p+'%';label.textContent=stages[i].t;i++;},8000);
 }
 </script>
-
 </body>
 </html>
