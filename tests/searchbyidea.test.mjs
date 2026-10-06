@@ -52,3 +52,20 @@ test('frontend loads selected references by stable ID, independent of array posi
     vm.createContext(context);vm.runInContext(html.slice(start,end),context);
     context.loadIdeaReferences();assert.equal(input.value,'Existing reference\nFirst reference');assert.equal(closed,true);
 });
+
+test('API serializes only safe source errors for partial and total failure',async()=>{
+    const sensitive='Bearer fake-review-secret https://user:password@private.invalid/internal\n at internalFunction (/srv/private.js:42)';
+    try {
+        for(const partial of [true,false]) {
+            globalThis.fetch=async value=>{
+                if(partial && new URL(value).hostname==='api.openalex.org') return {ok:true,json:async()=>({results:[oa],meta:{count:1}})};
+                if(new URL(value).hostname==='raw.githubusercontent.com') return {ok:false,status:503};
+                throw Error(sensitive);
+            };
+            const r=await request({idea:'learning'});
+            assert.equal(r.statusCode,partial?200:502);
+            assert.deepEqual(r.data.sourceStatus.crossref,{status:'error',error:'Source temporarily unavailable'});
+            assert.ok(!JSON.stringify(r.data).includes('private.invalid'));assert.ok(!JSON.stringify(r.data).includes('fake-review-secret'));assert.ok(!JSON.stringify(r.data).includes('internalFunction'));
+        }
+    } finally {globalThis.fetch=originalFetch;}
+});
