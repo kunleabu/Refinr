@@ -636,10 +636,10 @@ async function searchByIdea(){
 
 function renderIdeaResults(papers,total,format){
     document.getElementById('ideaSearchPanel').style.display='none';document.getElementById('ideaResultsPanel').style.display='block';
-    document.getElementById('ideaResultsMeta').textContent='Found '+total.toLocaleString()+' papers. Showing top '+papers.length+' — click to select, then load into your references.';
+    document.getElementById('ideaResultsMeta').textContent='Retrieved '+total.toLocaleString()+' unique papers. Showing '+papers.length+' — click to select, then load into your references.';
     var list=document.getElementById('ideaResultsList');list.innerHTML='';
     papers.forEach(function(paper,i){
-        var card=document.createElement('div');card.className='idea-result-card selected';card.dataset.index=i;
+        var card=document.createElement('div');card.className='idea-result-card selected';card.dataset.paperId=paper.id;
         card.onclick=function(){card.classList.toggle('selected');};
         var authors=paper.authors.slice(0,3).join(', ')+(paper.authors.length>3?' et al.':'');
         var doiLink=paper.doiUrl?' · <a href="'+esc(paper.doiUrl)+'" target="_blank" onclick="event.stopPropagation()" style="color:#0891B2;text-decoration:none;">View paper ↗</a>':'';
@@ -652,9 +652,8 @@ function renderIdeaResults(papers,total,format){
 function loadIdeaReferences(){
     var selected=document.querySelectorAll('.idea-result-card.selected');
     if(selected.length===0){document.getElementById('ideaError2').textContent='Please select at least one paper.';document.getElementById('ideaError2').classList.add('visible');return;}
-    var indices=Array.from(selected).map(function(c){return parseInt(c.dataset.index);});
-    var lines=ideaFormatted.split('\n').filter(function(l){return l.trim();});
-    var refs=indices.map(function(i){return lines[i]?lines[i].replace(/^\d+\.\s*/,''):'';}).filter(Boolean);
+    var byId=new Map(ideaPapers.map(function(p){return [p.id,p];}));
+    var refs=Array.from(selected).map(function(c){var paper=byId.get(c.dataset.paperId);return paper?paper.formatted:'';}).filter(Boolean);
     var existing=document.getElementById('referencesInput').value.trim();
     document.getElementById('referencesInput').value=existing?existing+'\n'+refs.join('\n'):refs.join('\n');
     closeModal('ideaModal');
