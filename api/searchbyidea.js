@@ -2,9 +2,13 @@
 import { formatSingle } from '../lib/formatter.js';
 import { searchPapers, validateSearch } from '../lib/retrieval/search.js';
 import { toCSL } from '../lib/retrieval/papers.js';
+import { createResearchHandler } from '../lib/research/orchestration.js';
+
+const researchHandler = createResearchHandler();
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
+    if (Object.hasOwn(req.body || {}, 'action')) return researchHandler(req, res);
     const { idea, format='Harvard', yearFrom, yearTo, continuation } = req.body || {};
     const options = {query:idea,yearFrom,yearTo,continuation};
     try { validateSearch(options); }

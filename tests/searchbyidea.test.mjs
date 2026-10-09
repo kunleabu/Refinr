@@ -69,3 +69,19 @@ test('API serializes only safe source errors for partial and total failure',asyn
         }
     } finally {globalThis.fetch=originalFetch;}
 });
+
+test('explicit actions use the session dispatcher; disabled/unknown actions never call scholarly sources',async()=>{
+    const prior=process.env.SEARCH_BY_IDEA_SESSIONS_ENABLED;
+    let calls=0;
+    try {
+        delete process.env.SEARCH_BY_IDEA_SESSIONS_ENABLED;
+        globalThis.fetch=async()=>{calls++;throw Error('Must not fetch');};
+        assert.equal((await request({action:'session.get',sessionId:'11111111-1111-4111-8111-111111111111'})).statusCode,503);
+        assert.equal((await request({action:'unknown',idea:'learning'})).statusCode,400);
+        assert.equal((await request({action:null,idea:'learning'})).statusCode,400);
+        assert.equal(calls,0);
+    } finally {
+        globalThis.fetch=originalFetch;
+        if(prior===undefined)delete process.env.SEARCH_BY_IDEA_SESSIONS_ENABLED;else process.env.SEARCH_BY_IDEA_SESSIONS_ENABLED=prior;
+    }
+});
