@@ -1,8 +1,71 @@
 # Phase 2A isolated Supabase staging procedure and validation evidence
 
-The original checklist remains authoritative. The final dated section records approved core database completion and local integration evidence; actual Auth/PostgREST/API/Vercel portions remain deferred. Do not interpret historical NOT RUN statements as overriding that dated evidence.
+The approval record below is the current Phase 2A validation status. The original procedure and earlier dated evidence are retained as history; their deferred / NOT RUN statements describe those earlier stages and do not override the completed Gate 2 validation. The original safety boundaries continue to apply to future work.
 
 This document is a plan and manual checklist, not a request to run commands automatically. Architecture approval covers isolated validation only. STOP before creating/configuring any remote resource, applying SQL, making Auth users, modifying staging settings or deploying a preview until the human approves the specific staging target and action. No production credentials, users, data, Supabase project or Paystack behavior may be used. No new API function or billing model is authorized.
+
+## Phase 2A closure and Gate 2 approval — 2026-10-15
+
+- **Phase:** Search by Idea Phase 2A
+- **Status:** APPROVED
+- **Approved implementation checkpoint:** `1d50040d8da8c8df203e3e9026e5e4b4e0c8369a`
+- **Development branch:** `feature/search-by-idea-v2-phase1`
+- **Gate 2 final result:** PASS
+- **Validation target:** isolated Refinr Staging Supabase project `rqwtphusjztwtlbmkmgf`, through the exact approved Vercel Preview: <https://refinr-7ulj5hpng-kunleabudigifyng-gmailcoms-projects.vercel.app>.
+- **Production:** neither used nor modified. Approval is for this implementation checkpoint and staging validation; it does not authorize production enablement, merge, or deployment.
+
+### What Phase 2A contains and Gate 2 proved
+
+Phase 2A adds authenticated, persisted research sessions and context revisions, server-authoritative ownership, canonical session papers with lifecycle state, and durable logical acquisition receipts with replay/idempotency. Explicit actions are dispatched through the existing Search by Idea API; deterministic OpenAlex/Crossref retrieval and citation formatting support acquisition and presentation. The implemented request contract is documented in [the integration plan](phase2a-integration-plan.md#implemented-request-contract). Future charging and conversational features are outside this checkpoint.
+
+Real end-to-end validation exercised normal staging Supabase Auth → exact Preview API → Phase 2A application code → staging database → scholarly sources → persisted results and supported lifecycle/cleanup behavior. The initial Gate 2 run and targeted lifecycle completion together established:
+
+| Area | Validated behavior |
+| --- | --- |
+| Authentication | Normal staging authentication; unauthenticated request rejection; invalid bearer rejection. |
+| Sessions and ownership | Authenticated session creation/read, user ownership isolation, cross-user mutation protection, and forged identity protection. |
+| Context and concurrency | Context revision advancement and optimistic concurrency / stale revision rejection without overwriting newer state. |
+| Scholarly acquisition | One real main validation acquisition exercised OpenAlex and Crossref. OpenAlex returned **20 papers**, Crossref returned **20 papers**, and the canonical persisted corpus contained **36 papers**. Source counts are before canonical reconciliation. |
+| Persistence and presentation | Canonical corpus persistence, presentation matching the persisted corpus, stable paper identity, and deduplication in the tested batch. |
+| Replay/idempotency | Replay recognized the same logical acquisition, reused its durable receipt and results, and left the canonical corpus unchanged. Conflicting reuse of the request identity was rejected. |
+| Paper lifecycle | Present/view behavior and persisted save, reject, and cite state, with exposed paper versions advancing. |
+| Rejected-paper suppression | Within the tested unchanged context, a supported presentation request targeting only a rejected paper returned no papers; rejection remained persisted. The paper had no saved/cited suppression state. This is the observed scope, not a claim about every future context or retrieval path. |
+| Cleanup/cascade | Supported session deletion succeeded; subsequent session and paper-list requests returned SESSION_NOT_FOUND. The existing session cascade design removes dependent research data. Temporary state from both validation runs was cleaned up, while synthetic Auth users and shared staging infrastructure were preserved. |
+
+Previously passed areas were accepted during lifecycle completion rather than rerun. The completion fixture used one temporary session and one legitimate acquisition solely to obtain lifecycle test papers. No credits, Paystack, billing, AI/Deep Dive, or production behavior was tested. Both runs ended with a clean Git working tree.
+
+### Earlier 503 observation and its resolution
+
+During the initial lifecycle run, one SAVE mutation returned HTTP 503 `PERSISTENCE_UNAVAILABLE` even though a subsequent read established that the mutation had committed. A separate initial cleanup attempt encountered `AUTH_UNAVAILABLE` and later recovered; eventual cleanup succeeded.
+
+Diagnostic inspection established that commit-then-503 is structurally possible when the database RPC commits but its acknowledgement becomes unavailable or unreadable. SAVE has no post-mutation database read. The implementation exposes uncertain write semantics through `outcomeUnknown` where applicable; the original test harness did not retain that field or sufficient timing/correlation evidence to establish the historical transport cause conclusively. `AUTH_UNAVAILABLE` occurs during bearer verification before cleanup repository access.
+
+No product defect requiring a code fix was established. A targeted lifecycle completion run subsequently returned HTTP 200 for SAVE, REJECT, and CITE, verified their persisted state and version advancement, and observed no transient dependency failures. Cleanup succeeded. Gate 2 therefore ultimately **passed**.
+
+Improved dependency/correlation observability is a future hardening consideration that may make uncertain distributed-write outcomes easier to diagnose if they recur. It is not a current implementation requirement or an unresolved prerequisite for this approval. An uncertain write should be evaluated by reading current persisted state before any safe, version-guarded retry; a lost acknowledgement does not establish rollback.
+
+### Boundaries and future work
+
+Phase 2A approval does **not** mean implementation of any of the following:
+
+- New 3-credit initial acquisition model or 1-credit major-pull model.
+- Conversational refinement layer, voice interaction, or homepage research router.
+- Autonomous research agent, literature-review generation, or general chatbot behavior.
+- Broad UI/UX redesign.
+- Production enablement.
+
+These remain outside the approved implementation checkpoint. Existing legacy credit behavior must not be mistaken for the future charging model.
+
+### Architectural principles carried forward
+
+- Retrieve deterministically.
+- Interpret selectively.
+- Generate only when necessary.
+- Credits attach to a logical acquisition entitlement, not an HTTP request, displayed page, context revision, or technical attempt. This is future charging design, not implemented Phase 2A behavior.
+- Rejected papers should not automatically resurface; validation claims remain bounded by the tested suppression scope above.
+- Persistence and replay must remain truthful, including uncertain acknowledgements.
+- User ownership is server-authoritative.
+- Production remains gated until explicitly approved.
 
 ## 1. Safest practical isolation
 
