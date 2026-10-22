@@ -14,7 +14,7 @@ const paper = { id: 'doi:10.1234/fixture', title: 'A scholarly paper about small
  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
  let checks = 0;
  const check = (value, label) => { assert.ok(value, label); checks++; };
- async function setup({ loggedIn = false, width = 1280, report = false } = {}) {
+ async function setup({ loggedIn = false, width = 1280, report = false, profileState = 'actual' } = {}) {
   const context = await browser.newContext({ viewport: { width, height: width <= 390 ? 740 : 900 }, reducedMotion: 'reduce' });
   const page = await context.newPage(); page.setDefaultTimeout(8000); const requests = [], errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -30,7 +30,7 @@ const paper = { id: 'doi:10.1234/fixture', title: 'A scholarly paper about small
    const body = req.postDataJSON(); requests.push({ endpoint: url.pathname, body, headers: req.headers() });
    let data;
    switch (url.pathname) {
-    case '/api/auth': data = body.password === 'wrong-password' ? { error: 'Invalid fixture credentials' } : { user, session }; break;
+    case '/api/auth': if(body.action==='profile'&&profileState!=='actual'){await new Promise(resolve=>setTimeout(resolve,250));return route.fulfill({status:profileState==='zero'?200:503,contentType:'application/json',body:JSON.stringify(profileState==='zero'?{user:{...user,credits:0}}:{error:'Unavailable'})});} data = body.password === 'wrong-password' ? { error: 'Invalid fixture credentials' } : { user, session }; break;
     case '/api/credits': data = { credits: 23 }; break;
     case '/api/searchbyidea': data = { papers: [paper], total: 1, formatted: paper.formatted }; break;
     case '/api/clean': data = { result: 'Cleaned fixture reference.' }; break;
@@ -54,6 +54,36 @@ const paper = { id: 'doi:10.1234/fixture', title: 'A scholarly paper about small
   await page.locator(signup ? '#signupForm .btn-confirm' : '#signinForm .btn-confirm').click();
  }
  try {
+  // Focused regressions: authoritative balance states, keyboard choices and mobile styles.
+  for(const profileState of ['unavailable','zero']){
+   const {page,context}=await setup({loggedIn:true,profileState});
+   check(await page.locator('#creditsCount').textContent()==='Loading…','Restored balance loads instead of trusting cached credits');
+   await page.waitForFunction(()=>document.getElementById('creditsCount').textContent!=='Loading…');
+   for(const id of ['creditsCount','dropdownCredits','creditsInModal'])check(await page.locator('#'+id).textContent()===(profileState==='zero'?'0':'Unavailable'),'Balance state '+id+' '+profileState);
+   await context.close();
+  }
+  for(const width of [360,390,430]){
+   const {page,context,requests,errors}=await setup({width,loggedIn:true});
+   await page.getByRole('button',{name:'Account menu'}).click();await page.getByRole('button',{name:'Copy referral code',exact:false}).focus();await page.keyboard.press('Escape');
+   check(await page.locator('#accountTrigger').evaluate(el=>el===document.activeElement&&el.getAttribute('aria-expanded')==='false'),'Escape restores account trigger');
+   await page.getByRole('button',{name:'Get more credits'}).click();
+   for(const [pack,key] of [['pack_20','Enter'],['pack_100','Space']]){await page.locator('[data-package="'+pack+'"]').focus();await page.keyboard.press(key);check(await page.locator('[data-package="'+pack+'"]').getAttribute('aria-pressed')==='true','Keyboard package '+key);}
+   check(!requests.some(r=>r.endpoint==='/api/paystack'),'Package selection does not initiate payment');await page.keyboard.press('Escape');
+   for(const pk of ['clean','lookup','url','title','idea','upload']){
+    await page.evaluate(pk=>{document.querySelectorAll('.modal-overlay').forEach(el=>el.classList.remove('visible'));var cfg=PICKERS[pk],input=document.getElementById(cfg.s);input.closest('.modal-overlay').classList.add('visible');for(var el=input.parentElement;el&&!el.classList.contains('modal-overlay');el=el.parentElement)el.style.display='block';},pk);
+    const input=page.locator('#'+({clean:'cleanStyleSearch',lookup:'lookupStyleSearch',url:'urlStyleSearch',title:'titleStyleSearch',idea:'ideaStyleSearch',upload:'uploadStyleSearch'}[pk]));
+    await input.fill('');await page.keyboard.press('ArrowDown');
+    const options=page.locator('#'+pk+'StyleDropdown button');
+    check(await options.first().evaluate(el=>el===document.activeElement),'ArrowDown focuses style '+pk);
+    await page.keyboard.press('ArrowDown');await page.keyboard.press('Space');
+    check(await input.inputValue()!=='','Space selects style');
+    await input.fill('');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');check(await input.evaluate(el=>el===document.activeElement),'Enter restores style input');
+    await input.fill('');await page.keyboard.press('ArrowDown');await options.last().focus();
+    check(await options.last().evaluate(el=>{el.scrollIntoView({block:'nearest'});var r=el.getBoundingClientRect(),m=el.closest('.modal');return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&m.scrollWidth<=m.clientWidth;}),width+' '+pk+' last style reachable without overflow');
+    await page.keyboard.press('Escape');check(await input.evaluate(el=>el===document.activeElement),'Style Escape returns input');
+   }
+   check(errors.length===0,'Focused regressions no JS errors '+errors.join());await context.close();
+  }
   // A: anonymous intent, failure/cancellation, sign in and signup, no premature charge.
   for (const signup of [false, true]) {
    const { page, context, requests, errors } = await setup();
