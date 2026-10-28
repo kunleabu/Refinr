@@ -39,13 +39,13 @@ export default async function handler(req, res) {
         { headers: serviceHeaders }
       )
       const profiles = await profileRes.json()
-      let profile = profiles[0]
+      let profile = profileRes.ok && Array.isArray(profiles) ? profiles[0] : null
 
       // Create profile if first time Google signin
-      if (!profile) {
+      if (profileRes.ok && Array.isArray(profiles) && !profile) {
         const referralCode = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase()
         const displayName = userData.user_metadata?.full_name || userData.email?.split('@')[0] || ''
-        await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+        const created = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
           method: 'POST',
           headers: { ...serviceHeaders, 'Prefer': 'return=representation' },
           body: JSON.stringify({
@@ -56,7 +56,8 @@ export default async function handler(req, res) {
             referral_code: referralCode
           })
         })
-        profile = { credits: 5, full_name: displayName, referral_code: referralCode }
+        const rows = created.ok ? await created.json() : [];
+        profile = Array.isArray(rows) ? rows[0] : null
       }
 
       return res.status(200).json({
@@ -64,9 +65,9 @@ export default async function handler(req, res) {
         user: {
           id: userData.id,
           email: userData.email,
-          full_name: profile.full_name || '',
-          credits: profile.credits ?? 5,
-          referral_code: profile.referral_code || ''
+          full_name: profile?.full_name || '',
+          credits: profile?.credits ?? null,
+          referral_code: profile?.referral_code || ''
         }
       })
     }
@@ -112,14 +113,14 @@ export default async function handler(req, res) {
         { headers: { 'Authorization': `Bearer ${data.access_token}`, 'apikey': SUPABASE_ANON_KEY } }
       )
       const profiles = await profileResponse.json()
-      const profile = profiles[0]
+      const profile = profileResponse.ok && Array.isArray(profiles) ? profiles[0] : null
       return res.status(200).json({
         message: 'Signed in successfully',
         user: {
           id: data.user.id,
           email: data.user.email,
           full_name: profile?.full_name || '',
-          credits: profile?.credits ?? 5,
+          credits: profile?.credits ?? null,
           referral_code: profile?.referral_code || ''
         },
         session: { access_token: data.access_token, refresh_token: data.refresh_token }
@@ -169,13 +170,13 @@ export default async function handler(req, res) {
         { headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY } }
       )
       const profiles = await profileResponse.json()
-      const profile = profiles[0]
+      const profile = profileResponse.ok && Array.isArray(profiles) ? profiles[0] : null
       return res.status(200).json({
         user: {
           id: user.id,
           email: user.email,
           full_name: profile?.full_name || '',
-          credits: profile?.credits ?? 5,
+          credits: profile?.credits ?? null,
           referral_code: profile?.referral_code || '',
           total_verifications: profile?.total_verifications || 0,
           member_since: profile?.created_at
