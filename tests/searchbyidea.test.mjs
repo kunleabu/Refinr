@@ -16,7 +16,6 @@ test('API preserves response contract, stable IDs, style selection and real cite
         const url=new URL(value);urls.push(url);
         if(url.hostname==='api.openalex.org') return {ok:true,json:async()=>({results:[oa],meta:{count:100,next_cursor:'next'}})};
         if(url.hostname==='api.crossref.org') return {ok:true,json:async()=>({message:{items:[cr],'total-results':100}})};
-        // Exercise the existing formatter's built-in CSL/locale fallback without live network.
         return {ok:false,status:503};
     };
     try {
@@ -26,8 +25,25 @@ test('API preserves response contract, stable IDs, style selection and real cite
         assert.ok(p.formatted.includes('Learning in schools'));assert.ok(p.formatted.includes('Smith'));
         assert.equal(p.formatted,r.data.formatted);assert.deepEqual(p.authors,['Smith, Jane']);
         assert.equal(p.sourceRecords.length,2);assert.equal(p.formattingError,null);
+        assert.equal(r.data.preview,false);assert.equal(r.data.previewLimit,null);assert.equal(r.data.acquiredCount,1);
         assert.ok(urls.some(u=>u.pathname.endsWith('/apa.csl')));
         assert.ok(urls.every(u=>['api.openalex.org','api.crossref.org','raw.githubusercontent.com'].includes(u.hostname)));
+    } finally {globalThis.fetch=originalFetch;}
+});
+test('anonymous preview returns only five real ranked papers while reporting acquired corpus size and source status',async()=>{
+    const works=Array.from({length:8},(_,i)=>({id:`https://openalex.org/W${i+10}`,doi:`https://doi.org/10.5555/${i}`,title:`Learning evidence ${i}`,publication_year:2020,authorships:[{author:{display_name:'Jane Smith'}}]}));
+    try {
+        globalThis.fetch=async value=>{
+            const url=new URL(value);
+            if(url.hostname==='api.openalex.org')return {ok:true,json:async()=>({results:works,meta:{count:8}})};
+            if(url.hostname==='api.crossref.org')return {ok:true,json:async()=>({message:{items:[],'total-results':0}})};
+            return {ok:false,status:503};
+        };
+        const r=await request({idea:'learning',preview:true});
+        assert.equal(r.statusCode,200);assert.equal(r.data.preview,true);assert.equal(r.data.previewLimit,5);
+        assert.equal(r.data.papers.length,5);assert.equal(r.data.acquiredCount,8);
+        assert.equal(r.data.sourceStatus.openalex.status,'ok');assert.equal(r.data.sourceStatus.crossref.status,'ok');
+        assert.equal(r.data.continuation.query,'learning');
     } finally {globalThis.fetch=originalFetch;}
 });
 test('API handles partial failure and both-source failure explicitly',async()=>{
@@ -38,9 +54,9 @@ test('API handles partial failure and both-source failure explicitly',async()=>{
         const failed=await request({idea:'learning'});assert.equal(failed.statusCode,502);assert.equal(failed.data.sourceStatus.openalex.status,'error');
     } finally {globalThis.fetch=originalFetch;}
 });
-test('API rejects malformed requests and mismatched continuation',async()=>{
+test('API rejects malformed requests, invalid preview flags and mismatched continuation',async()=>{
     assert.equal((await request({},'GET')).statusCode,405);
-    for(const body of [{},{idea:42},{idea:'x',yearFrom:2022,yearTo:2020},{idea:'x',continuation:{version:1,query:'different'}}]) assert.equal((await request(body)).statusCode,400);
+    for(const body of [{},{idea:42},{idea:'x',preview:'yes'},{idea:'x',yearFrom:2022,yearTo:2020},{idea:'x',continuation:{version:1,query:'different'}}]) assert.equal((await request(body)).statusCode,400);
 });
 test('frontend loads selected references by stable ID, independent of array position and citation newlines',async()=>{
     const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
