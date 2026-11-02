@@ -26,6 +26,7 @@ test('API preserves response contract, stable IDs, style selection and real cite
         assert.equal(p.formatted,r.data.formatted);assert.deepEqual(p.authors,['Smith, Jane']);
         assert.equal(p.sourceRecords.length,2);assert.equal(p.formattingError,null);
         assert.equal(r.data.preview,false);assert.equal(r.data.previewLimit,null);assert.equal(r.data.acquiredCount,1);
+        assert.equal(r.data.incomplete,false);assert.deepEqual(r.data.failedSources,[]);
         assert.ok(urls.some(u=>u.pathname.endsWith('/apa.csl')));
         assert.ok(urls.every(u=>['api.openalex.org','api.crossref.org','raw.githubusercontent.com'].includes(u.hostname)));
     } finally {globalThis.fetch=originalFetch;}
@@ -43,6 +44,7 @@ test('anonymous preview returns only five real ranked papers while reporting acq
         assert.equal(r.statusCode,200);assert.equal(r.data.preview,true);assert.equal(r.data.previewLimit,5);
         assert.equal(r.data.papers.length,5);assert.equal(r.data.acquiredCount,8);
         assert.equal(r.data.sourceStatus.openalex.status,'ok');assert.equal(r.data.sourceStatus.crossref.status,'ok');
+        assert.equal(r.data.incomplete,false);assert.deepEqual(r.data.failedSources,[]);
         assert.equal(r.data.continuation.query,'learning');
     } finally {globalThis.fetch=originalFetch;}
 });
@@ -50,8 +52,10 @@ test('API handles partial failure and both-source failure explicitly',async()=>{
     try {
         globalThis.fetch=async value=>new URL(value).hostname==='api.openalex.org'?{ok:true,json:async()=>({results:[oa],meta:{count:1}})}:{ok:false,status:503};
         const partial=await request({idea:'learning'});assert.equal(partial.statusCode,200);assert.equal(partial.data.sourceStatus.crossref.status,'error');assert.equal(partial.data.papers.length,1);
+        assert.equal(partial.data.incomplete,true);assert.deepEqual(partial.data.failedSources,['crossref']);
         globalThis.fetch=async()=>({ok:false,status:503});
         const failed=await request({idea:'learning'});assert.equal(failed.statusCode,502);assert.equal(failed.data.sourceStatus.openalex.status,'error');
+        assert.equal(failed.data.incomplete,true);assert.deepEqual(failed.data.failedSources.sort(),['crossref','openalex']);
     } finally {globalThis.fetch=originalFetch;}
 });
 test('API rejects malformed requests, invalid preview flags and mismatched continuation',async()=>{
