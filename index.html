@@ -582,6 +582,7 @@ async function handleSignUp(){
     var btn=event.currentTarget;btn.textContent='Creating account...';btn.disabled=true;
     try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signup',email,password,full_name:name})});var d=await r.json();
     if(d.error){errorEl.textContent=d.error;errorEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;return;}
+    if(d.requiresEmailConfirmation){switchAuthTab('signin');successEl.textContent='Account created. Check your email and confirm your address before signing in.';successEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;return;}
     var sr=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signin',email,password})});var sd=await sr.json();
     if(sd.user){currentUser=sd.user;currentSession=sd.session;localStorage.setItem('refinr-session',JSON.stringify(sd.session));localStorage.setItem('refinr-user',JSON.stringify(sd.user));updateUIForLoggedInUser(sd.user);btn.textContent='Create free account';btn.disabled=false;closeModal('authModal',true);resumeResearchIntent();}
     else{switchAuthTab('signin');successEl.textContent='Account created! Please sign in.';successEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;}
