@@ -385,9 +385,8 @@ function exploreResearch(e){
     var input=document.getElementById('researchQuestion'),question=input.value.trim();
     if(!question){input.setCustomValidity('Enter a research question to begin.');input.reportValidity();return;}
     input.setCustomValidity('');
-    pendingIntent={route:'idea',question:question};
-    if(!currentUser){openAuthModal('signin');return;}
-    resumeResearchIntent();
+    localStorage.setItem('refinr-research-question',question);
+    location.href='/research.html?q='+encodeURIComponent(question);
 }
 function resumeResearchIntent(){
     if(!pendingIntent||!currentUser)return;
