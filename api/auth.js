@@ -91,7 +91,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: data.error?.message || data.msg || 'Signup failed' })
       }
       return res.status(200).json({
-        message: 'Account created successfully',
+        message: data.session ? 'Account created successfully' : 'Account created. Please confirm your email before signing in.',
+        requiresEmailConfirmation: !data.session,
         user: { id: data.user?.id, email: data.user?.email },
         session: data.session
       })
