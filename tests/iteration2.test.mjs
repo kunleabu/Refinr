@@ -39,7 +39,7 @@ test('source provenance and incomplete-source messaging remain visible', () => {
 test('signup requiring email confirmation is explained without automatic password retry', async () => {
   const auth = await readFile(new URL('../api/auth.js', import.meta.url), 'utf8');
   const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-  assert.match(auth, /requiresEmailConfirmation: !data\.session/);
+  assert.match(auth, /requiresEmailConfirmation: !data\.access_token/);
   assert.match(home, /if\(d\.requiresEmailConfirmation\)/);
   assert.match(home, /Check your email and confirm your address/);
 });
