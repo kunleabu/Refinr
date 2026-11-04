@@ -47,3 +47,12 @@ test('signup requiring email confirmation is explained without automatic passwor
 test('cached user without token sees anonymous papers instead of a login error', () => {
   assert.match(html, /currentUser&&currentSession&&currentSession\.access_token\)\?await signedInSearch\(\):await anonymousSearch\(\)/);
 });
+
+test('signup return restores previous anonymous search instead of discarding evidence', () => {
+  assert.match(html, /refinr-pending-research/);
+  assert.match(html, /pending\.question===question/);
+  assert.match(html, /pending\.papers/);
+  assert.match(html, /Your earlier research/);
+  assert.match(html, /pending\.yearFrom/);
+  assert.match(html, /pending\.format/);
+});
