@@ -17,10 +17,10 @@ test('signed-in workspace prefers persisted research sessions', () => {
   assert.match(html, /Authorization':'Bearer '/);
 });
 
-test('disabled session gate falls back to current production search', () => {
+test('disabled session gate falls back to free anonymous preview', () => {
   assert.match(html, /e\.code!==\'RESEARCH_SESSIONS_DISABLED\'/);
-  assert.match(html, /return legacySearch\(\)/);
-  assert.match(html, /amount:2/);
+  assert.match(html, /return anonymousSearch\(\)/);
+  assert.doesNotMatch(html, /await deductSearchCredits\(\);var data=await researchAction/);
 });
 
 test('research handoff to references remains stable-id based', () => {
