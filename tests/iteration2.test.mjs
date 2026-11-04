@@ -43,3 +43,7 @@ test('signup requiring email confirmation is explained without automatic passwor
   assert.match(home, /if\(d\.requiresEmailConfirmation\)/);
   assert.match(home, /Check your email and confirm your address/);
 });
+
+test('cached user without token sees anonymous papers instead of a login error', () => {
+  assert.match(html, /currentUser&&currentSession&&currentSession\.access_token\)\?await signedInSearch\(\):await anonymousSearch\(\)/);
+});
