@@ -17,9 +17,9 @@ test('signed-in workspace prefers persisted research sessions', () => {
   assert.match(html, /Authorization':'Bearer '/);
 });
 
-test('disabled session gate falls back to free anonymous preview', () => {
+test('disabled session gate preserves authenticated credit-based search', () => {
   assert.match(html, /e\.code!==\'RESEARCH_SESSIONS_DISABLED\'/);
-  assert.match(html, /return anonymousSearch\(\)/);
+  assert.match(html, /return legacySearch\(\)/);
   assert.doesNotMatch(html, /await deductSearchCredits\(\);var data=await researchAction/);
 });
 
