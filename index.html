@@ -55,7 +55,7 @@ body:has(.modal-overlay.visible){overflow:hidden}
 <header>
   <div class="header-inner">
     <div class="header-left"><button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle light or dark theme">🌙 Dark</button></div>
-    <div class="header-brand">
+    <div class="header-brand" style="position:static;transform:none;order:-1;margin-right:auto">
       <div class="brand-mark" aria-hidden="true"><span>R</span></div>
       <h1>REFINR</h1>
     </div>
@@ -69,6 +69,7 @@ body:has(.modal-overlay.visible){overflow:hidden}
   </div>
 </header>
 <main class="container">
+  <section id="researchHome" style="display:none;padding:32px 0 20px"><p class="eyebrow">YOUR RESEARCH WORKSPACE</p><h2 id="researchWelcome">Welcome back</h2><p>Start a new research question, return to saved work, or continue with references.</p><div id="savedResearchList"></div></section>
   <section class="front-door" id="frontDoor" aria-labelledby="frontDoorTitle">
     <p class="eyebrow">Discover · Understand · Reference</p>
     <h2 id="frontDoorTitle">Research starts with a question.</h2>
@@ -532,7 +533,8 @@ document.addEventListener('click',function(e){var av=document.getElementById('us
 
 function toggleTheme(){var h=document.documentElement,b=document.getElementById('themeBtn');if(h.getAttribute('data-theme')==='light'){h.setAttribute('data-theme','dark');b.textContent='☀️ Light';localStorage.setItem('refinr-theme','dark');}else{h.setAttribute('data-theme','light');b.textContent='🌙 Dark';localStorage.setItem('refinr-theme','light');}}
 
-function updateUIForLoggedInUser(user){
+function updateResearchHome(){var panel=document.getElementById('researchHome');if(!panel)return;panel.style.display=currentUser?'block':'none';var door=document.getElementById('frontDoor');if(door){door.querySelector('#frontDoorTitle').textContent=currentUser?'What will you research today?':'Research starts with a question.';}if(!currentUser)return;document.getElementById('researchWelcome').textContent='Welcome back'+(currentUser.full_name?', '+currentUser.full_name.split(' ')[0]:'')+'.';var list=document.getElementById('savedResearchList');list.textContent='';try{var saved=JSON.parse(localStorage.getItem('refinr-saved-research-'+currentUser.id)||'[]');if(saved.length){var title=document.createElement('h3');title.textContent='Saved in this browser';list.appendChild(title);saved.forEach(function(item){var a=document.createElement('a');a.href='/research.html?q='+encodeURIComponent(item.question);a.textContent=item.question;a.style.cssText='display:block;padding:12px;margin:8px 0;border:1px solid var(--border);border-radius:12px';list.appendChild(a);});}}catch(e){}} 
+function updateUIForLoggedInUser(user){updateResearchHome();
     document.getElementById('questionAuthNote').textContent='Review filters before searching.';
     document.getElementById('creditsBar').style.display='flex';
     document.getElementById('authButtons').style.display='none';
@@ -597,7 +599,7 @@ async function refreshSession(){
     if(d.session){currentSession=d.session;localStorage.setItem('refinr-session',JSON.stringify(d.session));return true;}return false;}catch(e){return false;}
 }
 
-async function signOut(){localStorage.removeItem('refinr-session');localStorage.removeItem('refinr-user');currentUser=null;currentSession=null;document.getElementById('authButtons').style.display='flex';document.getElementById('userAvatar').classList.remove('visible');document.getElementById('userDropdown').classList.remove('visible');document.getElementById('accountTrigger').setAttribute('aria-expanded','false');updateCreditsDisplay(null);document.getElementById('creditsBar').style.display='none';document.getElementById('questionAuthNote').textContent='Sign in before searching.';pendingIntent=null;}
+async function signOut(){localStorage.removeItem('refinr-session');localStorage.removeItem('refinr-user');currentUser=null;currentSession=null;document.getElementById('authButtons').style.display='flex';document.getElementById('userAvatar').classList.remove('visible');document.getElementById('userDropdown').classList.remove('visible');document.getElementById('accountTrigger').setAttribute('aria-expanded','false');updateCreditsDisplay(null);document.getElementById('creditsBar').style.display='none';document.getElementById('questionAuthNote').textContent='Sign in before searching.';pendingIntent=null;updateResearchHome();}
 
 function copyReferralCode(){if(currentUser&&currentUser.referral_code){navigator.clipboard.writeText(currentUser.referral_code).then(function(){alert('Referral code copied: '+currentUser.referral_code+'\n\nShare this with colleagues and students!');});}document.getElementById('userDropdown').classList.remove('visible');}
 
