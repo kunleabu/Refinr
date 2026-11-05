@@ -76,7 +76,7 @@ body:has(.modal-overlay.visible){overflow:hidden}
     <form class="question-form" onsubmit="exploreResearch(event)">
       <label for="researchQuestion">What are you trying to find out?</label>
       <textarea id="researchQuestion" required placeholder="e.g. Why do small businesses in Nigeria struggle to survive their first five years?"></textarea>
-      <div class="question-actions"><button type="submit" class="btn explore-btn">Explore research <span aria-hidden="true">→</span></button><p class="question-note">Find academic papers. Follow the original sources.<br>Search uses 2 credits · <span id="questionAuthNote">Sign in before searching.</span></p></div>
+      <div class="question-actions"><button type="submit" class="btn explore-btn">Explore research <span aria-hidden="true">→</span></button><p class="question-note">Find academic papers. Follow the original sources.<br><span id="questionAuthNote">Preview 5 real papers free. Sign up only when you want to continue.</span></p></div>
     </form>
     <nav class="intent-routes" aria-label="Start with what you have"><p>Or start with what you have</p><div class="route-buttons"><button class="route-btn" onclick="focusReferences()">References</button><button class="route-btn" onclick="openLookupModal()">DOI / Title</button><button class="route-btn" onclick="openUploadModal()">PDF</button></div></nav>
   </section>
@@ -112,16 +112,16 @@ body:has(.modal-overlay.visible){overflow:hidden}
         <div id="authSuccess" class="auth-success"></div>
         <div id="signinForm">
             <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
+            <div style="position:relative"><input type="password" class="auth-input" id="signinPassword" placeholder="Password" style="padding-right:78px"><button type="button" onclick="toggleAuthPassword('signinPassword',this)" aria-label="Show password" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);padding:7px;background:transparent;border:0;color:var(--muted);cursor:pointer">Show</button></div>
             <div class="modal-buttons" style="margin-top:4px;">
                 <button class="btn btn-confirm" onclick="handleSignIn()">Sign in</button>
-                <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
+                <button class="btn btn-cancel" onclick="cancelAuthModal()">Cancel</button>
             </div>
         </div>
         <div id="signupForm" style="display:none;">
             <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
             <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
+            <div style="position:relative"><input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)" style="padding-right:78px"><button type="button" onclick="toggleAuthPassword('signupPassword',this)" aria-label="Show password" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);padding:7px;background:transparent;border:0;color:var(--muted);cursor:pointer">Show</button></div>
             <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
             <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You will get 5 free verification credits on signup</p>
             <div class="modal-buttons">
@@ -385,15 +385,43 @@ function exploreResearch(e){
     var input=document.getElementById('researchQuestion'),question=input.value.trim();
     if(!question){input.setCustomValidity('Enter a research question to begin.');input.reportValidity();return;}
     input.setCustomValidity('');
-    pendingIntent={route:'idea',question:question};
-    if(!currentUser){openAuthModal('signin');return;}
-    resumeResearchIntent();
+    localStorage.setItem('refinr-research-question',question);
+    location.href='/research.html?q='+encodeURIComponent(question);
 }
 function resumeResearchIntent(){
     if(!pendingIntent||!currentUser)return;
     var intent=pendingIntent;pendingIntent=null;
     if(intent.route==='idea')openIdeaModal(intent.question);
     else if(intent.route==='pdf')openUploadModal();
+}
+function resumeSavedResearchIntent(){
+    if(!currentUser)return false;
+    var target=localStorage.getItem('refinr-research-return');
+    if(!target)return false;
+    localStorage.removeItem('refinr-research-return');
+    location.href=target;
+    return true;
+}
+function handleEntryIntent(){
+    var entry=new URLSearchParams(location.search),intent=entry.get('intent'),auth=entry.get('auth');
+    if(intent==='references'){
+        try{
+            var papers=JSON.parse(localStorage.getItem('refinr-selected-research-references')||'[]');
+            var refs=papers.map(function(p){return p&&p.formatted||'';}).filter(Boolean);
+            if(refs.length){
+                var box=document.getElementById('referencesInput'),existing=box.value.trim();
+                box.value=existing?existing+'\n'+refs.join('\n'):refs.join('\n');
+                localStorage.removeItem('refinr-selected-research-references');
+                showOutput('Research — References loaded',refs.join('\n\n')+'\n\n─────────────────────────────\n💡 '+refs.length+' reference(s) loaded. Click “Clean references” to format them.');
+                document.getElementById('referenceWorkspace').scrollIntoView({behavior:preferredScrollBehavior(),block:'start'});
+            }
+        }catch(e){}
+    }
+    if(intent==='research'&&auth==='signup'&&!currentUser){
+        var context=document.getElementById('authContext');
+        if(context){context.hidden=false;context.textContent='Create your free account to continue the research you already started.';}
+        openAuthModal(auth==='signin'?'signin':'signup');
+    }else if(intent==='research'&&currentUser){resumeSavedResearchIntent();}
 }
 document.getElementById('researchQuestion').addEventListener('input',function(){this.setCustomValidity('');});
 // Existing modal open functions retain their contracts. Observe visibility to provide
@@ -430,7 +458,7 @@ if(savedTheme==='dark'){document.documentElement.setAttribute('data-theme','dark
 window.addEventListener('load',async function(){
     var ss=localStorage.getItem('refinr-session'),su=localStorage.getItem('refinr-user');
     if(ss&&su){currentSession=JSON.parse(ss);currentUser=JSON.parse(su);updateUIForLoggedInUser(currentUser);refreshCreditBalance();}
-    loadSharedReport();detectUserCurrency();loadCslIndex();
+    loadSharedReport();detectUserCurrency();loadCslIndex();handleEntryIntent();
     var pr=localStorage.getItem('refinr-pending-ref');
     if(pr&&currentUser){try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',reference:pr,user_id:currentUser.id})});var d=await r.json();if(r.ok&&d.success){localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);showCreditToast(d.credits_added,d.new_balance);}}catch(e){}}
 });
@@ -513,6 +541,7 @@ function updateUIForLoggedInUser(user){
     document.getElementById('avatarInitial').textContent=i;
     document.getElementById('avatarName').textContent=user.full_name||user.email.split('@')[0];
     updateCreditsDisplay(user.credits);
+    if(new URLSearchParams(location.search).get('intent')==='research')resumeSavedResearchIntent();
 }
 
 function updateCreditsDisplay(c){
@@ -534,6 +563,7 @@ document.getElementById('userAvatar').addEventListener('keydown',function(e){if(
 function toggleDropdown(){var open=document.getElementById('userDropdown').classList.toggle('visible');document.getElementById('accountTrigger').setAttribute('aria-expanded',String(open));}
 
 function openAuthModal(tab){var context=document.getElementById('authContext');context.hidden=!pendingIntent;context.textContent=pendingIntent&&pendingIntent.route==='idea'?'Sign in to explore your question. It is kept here for you; searching uses 2 credits.':'Sign in to analyse your PDF.';document.getElementById('authModal').classList.add('visible');switchAuthTab(tab);document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
+function toggleAuthPassword(id,button){var field=document.getElementById(id),visible=field.type==='password';field.type=visible?'text':'password';button.textContent=visible?'Hide':'Show';button.setAttribute('aria-label',visible?'Hide password':'Show password');}
 function switchAuthTab(tab){document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';document.getElementById('signinTab').classList.toggle('active',tab==='signin');document.getElementById('signupTab').classList.toggle('active',tab==='signup');document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
 
 async function handleSignIn(){
@@ -553,6 +583,7 @@ async function handleSignUp(){
     var btn=event.currentTarget;btn.textContent='Creating account...';btn.disabled=true;
     try{var r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signup',email,password,full_name:name})});var d=await r.json();
     if(d.error){errorEl.textContent=d.error;errorEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;return;}
+    if(d.requiresEmailConfirmation){switchAuthTab('signin');successEl.textContent='Account created. Check your email and confirm your address before signing in.';successEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;return;}
     var sr=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'signin',email,password})});var sd=await sr.json();
     if(sd.user){currentUser=sd.user;currentSession=sd.session;localStorage.setItem('refinr-session',JSON.stringify(sd.session));localStorage.setItem('refinr-user',JSON.stringify(sd.user));updateUIForLoggedInUser(sd.user);btn.textContent='Create free account';btn.disabled=false;closeModal('authModal',true);resumeResearchIntent();}
     else{switchAuthTab('signin');successEl.textContent='Account created! Please sign in.';successEl.classList.add('visible');btn.textContent='Create free account';btn.disabled=false;}
@@ -597,6 +628,7 @@ function setCitationStyle(s){citationStyle=s;document.getElementById('togglePare
 function openLookupModal(){document.getElementById('lookupModal').classList.add('visible');}
 function openIdeaModal(question){if(!currentUser){pendingIntent={route:'idea',question:question||document.getElementById('ideaInput').value};openAuthModal('signin');return;}var c=parseInt(document.getElementById('creditsCount').textContent);if(c<2){openCreditsModal();return;}resetIdeaModal();document.getElementById('ideaInput').value=question||'';document.getElementById('ideaModal').classList.add('visible');}
 function resetIdeaModal(){document.getElementById('ideaSearchPanel').style.display='block';document.getElementById('ideaResultsPanel').style.display='none';document.getElementById('ideaError').classList.remove('visible');document.getElementById('ideaInput').value='';ideaPapers=[];ideaFormatted='';if(document.getElementById('ideaModal').classList.contains('visible'))document.getElementById('ideaInput').focus();}
+function cancelAuthModal(){var target=localStorage.getItem('refinr-research-return');if(new URLSearchParams(location.search).get('intent')==='research'&&target&&target.startsWith('/research.html?')){closeModal('authModal');location.href=target;return;}closeModal('authModal');}
 function closeModal(id,preserveIntent){document.getElementById(id).classList.remove('visible');if(id==='authModal'){document.getElementById('authContext').hidden=true;if(!preserveIntent)pendingIntent=null;}}
 
 function showOutput(title,content){

@@ -87,13 +87,14 @@ export default async function handler(req, res) {
         body: JSON.stringify({ email, password, data: { full_name: full_name || '' } })
       })
       const data = await response.json()
-      if (data.error || data.msg) {
-        return res.status(400).json({ error: data.error?.message || data.msg || 'Signup failed' })
+      if (!response.ok || data.error || data.msg) {
+        return res.status(response.ok ? 400 : response.status).json({ error: data.error_description || data.error?.message || data.msg || data.message || 'Signup failed' })
       }
       return res.status(200).json({
-        message: 'Account created successfully',
+        message: data.access_token ? 'Account created successfully' : 'Account created. Please confirm your email before signing in.',
+        requiresEmailConfirmation: !data.access_token,
         user: { id: data.user?.id, email: data.user?.email },
-        session: data.session
+        session: data.access_token ? { access_token: data.access_token, refresh_token: data.refresh_token } : null
       })
     }
 
