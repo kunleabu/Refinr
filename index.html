@@ -112,16 +112,16 @@ body:has(.modal-overlay.visible){overflow:hidden}
         <div id="authSuccess" class="auth-success"></div>
         <div id="signinForm">
             <input type="email" class="auth-input" id="signinEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signinPassword" placeholder="Password">
+            <div style="position:relative"><input type="password" class="auth-input" id="signinPassword" placeholder="Password" style="padding-right:78px"><button type="button" onclick="toggleAuthPassword('signinPassword',this)" aria-label="Show password" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);padding:7px;background:transparent;border:0;color:var(--muted);cursor:pointer">Show</button></div>
             <div class="modal-buttons" style="margin-top:4px;">
                 <button class="btn btn-confirm" onclick="handleSignIn()">Sign in</button>
-                <button class="btn btn-cancel" onclick="closeModal('authModal')">Cancel</button>
+                <button class="btn btn-cancel" onclick="cancelAuthModal()">Cancel</button>
             </div>
         </div>
         <div id="signupForm" style="display:none;">
             <input type="text" class="auth-input" id="signupName" placeholder="Your name (optional)">
             <input type="email" class="auth-input" id="signupEmail" placeholder="Email address">
-            <input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)">
+            <div style="position:relative"><input type="password" class="auth-input" id="signupPassword" placeholder="Password (min 6 characters)" style="padding-right:78px"><button type="button" onclick="toggleAuthPassword('signupPassword',this)" aria-label="Show password" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);padding:7px;background:transparent;border:0;color:var(--muted);cursor:pointer">Show</button></div>
             <input type="text" class="auth-input" id="signupReferral" placeholder="Referral code (optional)">
             <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🎁 You will get 5 free verification credits on signup</p>
             <div class="modal-buttons">
@@ -420,7 +420,7 @@ function handleEntryIntent(){
     if(intent==='research'&&auth==='signup'&&!currentUser){
         var context=document.getElementById('authContext');
         if(context){context.hidden=false;context.textContent='Create your free account to continue the research you already started.';}
-        openAuthModal('signup');
+        openAuthModal(auth==='signin'?'signin':'signup');
     }else if(intent==='research'&&currentUser){resumeSavedResearchIntent();}
 }
 document.getElementById('researchQuestion').addEventListener('input',function(){this.setCustomValidity('');});
@@ -563,6 +563,7 @@ document.getElementById('userAvatar').addEventListener('keydown',function(e){if(
 function toggleDropdown(){var open=document.getElementById('userDropdown').classList.toggle('visible');document.getElementById('accountTrigger').setAttribute('aria-expanded',String(open));}
 
 function openAuthModal(tab){var context=document.getElementById('authContext');context.hidden=!pendingIntent;context.textContent=pendingIntent&&pendingIntent.route==='idea'?'Sign in to explore your question. It is kept here for you; searching uses 2 credits.':'Sign in to analyse your PDF.';document.getElementById('authModal').classList.add('visible');switchAuthTab(tab);document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
+function toggleAuthPassword(id,button){var field=document.getElementById(id),visible=field.type==='password';field.type=visible?'text':'password';button.textContent=visible?'Hide':'Show';button.setAttribute('aria-label',visible?'Hide password':'Show password');}
 function switchAuthTab(tab){document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';document.getElementById('signinTab').classList.toggle('active',tab==='signin');document.getElementById('signupTab').classList.toggle('active',tab==='signup');document.getElementById('authError').classList.remove('visible');document.getElementById('authSuccess').classList.remove('visible');}
 
 async function handleSignIn(){
@@ -627,6 +628,7 @@ function setCitationStyle(s){citationStyle=s;document.getElementById('togglePare
 function openLookupModal(){document.getElementById('lookupModal').classList.add('visible');}
 function openIdeaModal(question){if(!currentUser){pendingIntent={route:'idea',question:question||document.getElementById('ideaInput').value};openAuthModal('signin');return;}var c=parseInt(document.getElementById('creditsCount').textContent);if(c<2){openCreditsModal();return;}resetIdeaModal();document.getElementById('ideaInput').value=question||'';document.getElementById('ideaModal').classList.add('visible');}
 function resetIdeaModal(){document.getElementById('ideaSearchPanel').style.display='block';document.getElementById('ideaResultsPanel').style.display='none';document.getElementById('ideaError').classList.remove('visible');document.getElementById('ideaInput').value='';ideaPapers=[];ideaFormatted='';if(document.getElementById('ideaModal').classList.contains('visible'))document.getElementById('ideaInput').focus();}
+function cancelAuthModal(){var target=localStorage.getItem('refinr-research-return');if(new URLSearchParams(location.search).get('intent')==='research'&&target&&target.startsWith('/research.html?')){closeModal('authModal');location.href=target;return;}closeModal('authModal');}
 function closeModal(id,preserveIntent){document.getElementById(id).classList.remove('visible');if(id==='authModal'){document.getElementById('authContext').hidden=true;if(!preserveIntent)pendingIntent=null;}}
 
 function showOutput(title,content){
