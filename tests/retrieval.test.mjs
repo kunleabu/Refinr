@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeDOI,normalizeOpenAlex,normalizeCrossref,mergePapers,rankPapers,toCSL} from '../lib/retrieval/papers.js';
+import {normalizeDOI,normalizeOpenAlex,normalizeCrossref,mergePapers,rankPapers,toCSL,isResearchPaper} from '../lib/retrieval/papers.js';
 import {searchPapers,validateSearch} from '../lib/retrieval/search.js';
 import {sources} from '../lib/retrieval/sources.js';
-const oa={id:'https://openalex.org/W1',doi:'https://doi.org/10.1234/ABC',title:'Learning in schools',publication_year:2020,authorships:[{author:{display_name:'Jane Smith'}}],abstract_inverted_index:{Learning:[0],works:[1]},cited_by_count:10};
-const cr={DOI:'10.1234/abc',title:['Learning in schools'],issued:{'date-parts':[[2020]]},author:[{given:'Jane',family:'Smith'}],publisher:'Press',volume:'3',abstract:'<jats:p>Learning &amp; schools</jats:p>',score:99};
+const oa={type:'article',id:'https://openalex.org/W1',doi:'https://doi.org/10.1234/ABC',title:'Learning in schools',publication_year:2020,authorships:[{author:{display_name:'Jane Smith'}}],abstract_inverted_index:{Learning:[0],works:[1]},cited_by_count:10};
+const cr={type:'journal-article',DOI:'10.1234/abc',title:['Learning in schools'],issued:{'date-parts':[[2020]]},author:[{given:'Jane',family:'Smith'}],publisher:'Press',volume:'3',abstract:'<jats:p>Learning &amp; schools</jats:p>',score:99};
 const a=()=>normalizeOpenAlex(oa), b=()=>normalizeCrossref(cr);
 test('DOI normalization preserves valid suffix punctuation',()=>{assert.equal(normalizeDOI(' DOI:10.1234/AbC '),'10.1234/abc');assert.equal(normalizeDOI('https://dx.doi.org/10.1234%2FAbC'),'10.1234/abc');assert.equal(normalizeDOI('10.1234/a(b)'),'10.1234/a(b)');assert.equal(normalizeDOI('bad'),null);});
 test('OpenAlex normalization reconstructs inverted abstracts and preserves IDs',()=>{assert.equal(a().abstract,'Learning works');assert.equal(a().identifiers.openalex,oa.id);assert.equal(a().authors[0].family,'Smith');assert.equal(a().year,2020);});
@@ -122,4 +122,21 @@ test('source errors never expose thrown messages, stack traces or network detail
     const r=await searchPapers({query:'learning'},{adapters:{openalex:success([a()]),crossref:()=>{throw Error(secret)}}});
     assert.deepEqual(r.sourceStatus.crossref,{status:'error',error:'Source temporarily unavailable'});
     assert.ok(!JSON.stringify(r).includes(secret));assert.ok(!JSON.stringify(r).includes('private.invalid'));
+});
+
+test('book chapters and front matter are not paper search results',async()=>{
+ const chapter=normalizeCrossref({...cr,DOI:'10.1234/chapter',type:'book-chapter',title:['Chapter 8 BUSINESS GETS THE LAST MOVE']});
+ const contents=normalizeCrossref({...cr,DOI:'10.1234/contents',type:'journal-article',title:['CONTENTS']});
+ const book=normalizeOpenAlex({...oa,id:'https://openalex.org/W2',doi:null,type:'book',title:'Research book'});
+ const unknown=normalizeOpenAlex({...oa,id:'https://openalex.org/W3',doi:null,type:'other',title:'Miscellaneous record'});
+ assert.equal(chapter.type,'chapter');assert.equal(book.type,'book');assert.equal(unknown.type,'other');
+ assert.equal(isResearchPaper(chapter),false);assert.equal(isResearchPaper(contents),false);
+ const result=await searchPapers({query:'business'}, {adapters:{crossref:success([chapter,contents,book,unknown,b()])}});
+ assert.equal(result.papers.length,1);assert.equal(result.papers[0].title,'Learning in schools');
+});
+test('legitimate journal and conference papers remain discoverable',async()=>{
+ const conference=normalizeCrossref({...cr,DOI:'10.1234/conference',type:'proceedings-article',title:['Business innovation evidence']});
+ const journal=normalizeOpenAlex({...oa,type:'article'});
+ const result=await searchPapers({query:'business'}, {adapters:{crossref:success([conference,journal])}});
+ assert.equal(result.papers.length,2);assert.equal(conference.type,'paper-conference');
 });
