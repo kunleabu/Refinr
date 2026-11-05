@@ -50,7 +50,7 @@ test('cached user without token sees anonymous papers instead of a login error',
 
 test('signup return restores previous anonymous search instead of discarding evidence', () => {
   assert.match(html, /refinr-pending-research/);
-  assert.match(html, /pending\.question===question/);
+  assert.match(html, /pending\.question===question&&currentUser&&currentSession&&currentSession\.access_token/);
   assert.match(html, /pending\.papers/);
   assert.match(html, /Your earlier research/);
   assert.match(html, /pending\.yearFrom/);
