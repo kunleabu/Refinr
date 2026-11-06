@@ -67,6 +67,19 @@ header .header-right{min-width:0;flex:0 1 auto;order:2}
 [data-theme="light"] header .header-brand.refinr-home-link .refinr-header-name,body:not([data-theme="dark"]) header .header-brand.refinr-home-link .refinr-header-name{color:#f5fbff!important}
 @media(max-width:600px){header .header-inner{gap:8px}header .header-brand.refinr-home-link{gap:6px}header .header-brand.refinr-home-link img{width:43px!important;height:43px!important}header .header-brand.refinr-home-link .refinr-header-name{font-size:1.05rem!important;letter-spacing:.07em!important}}
 @media(max-width:380px){header .header-brand.refinr-home-link img{width:36px!important;height:36px!important}header .header-brand.refinr-home-link .refinr-header-name{font-size:.88rem!important}}
+
+/* Calm, original research messages. No fabricated testimonials or intrusive overlays. */
+.refinr-thoughts{max-width:740px;margin:22px auto 26px;padding:20px 24px 14px;border:1px solid var(--border);border-radius:18px;background:var(--card);text-align:center;box-shadow:0 8px 24px rgba(15,40,65,.05)}
+.refinr-thought-copy{min-height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:opacity .25s ease}
+.refinr-thought-copy.changing{opacity:.15}
+.refinr-thought-label{font-size:.67rem!important;letter-spacing:.17em!important;font-weight:800!important;color:var(--primary)!important;margin:0!important}
+.refinr-thought-line{font-family:Manrope,sans-serif;font-size:clamp(.98rem,1.8vw,1.22rem)!important;font-weight:700!important;line-height:1.55!important;color:var(--text)!important;margin:0!important}
+.refinr-thought-controls{display:flex;justify-content:center;gap:9px;margin-top:12px}
+.refinr-thought-dot{appearance:none;width:9px;height:9px;border-radius:100px;border:0;background:var(--muted);opacity:.42;padding:0;cursor:pointer;transition:width .2s,background .2s,opacity .2s}
+.refinr-thought-dot.active{width:25px;background:var(--primary);opacity:1}
+.refinr-thought-dot:focus-visible{outline:2px solid var(--primary);outline-offset:4px}
+@media(max-width:600px){.refinr-thoughts{padding:16px 14px 12px;margin:16px auto 20px}.refinr-thought-copy{min-height:110px}}
+@media(prefers-reduced-motion:reduce){.refinr-thought-copy,.refinr-thought-dot{transition:none!important}}
 </style>
 </head>
 <body>
@@ -91,6 +104,15 @@ header .header-right{min-width:0;flex:0 1 auto;order:2}
     <p class="eyebrow">Discover · Understand · Reference</p>
     <h2 id="frontDoorTitle">Research starts with a question.</h2>
     <p class="intro">Discover credible academic research, or work with references you already have.</p>
+    <aside class="refinr-thoughts" aria-label="Refinr research insights">
+      <div class="refinr-thought-copy" id="refinrThoughtCopy"><p class="refinr-thought-label" id="refinrThoughtLabel">A THOUGHT ON RESEARCH</p><p class="refinr-thought-line" id="refinrThoughtLine">Research doesn't end where knowledge exists. It begins where knowledge is missing.</p></div>
+      <div class="refinr-thought-controls" aria-label="Select a research message">
+        <button class="refinr-thought-dot active" type="button" data-thought="0" aria-label="Message 1" aria-pressed="true"></button>
+        <button class="refinr-thought-dot" type="button" data-thought="1" aria-label="Message 2" aria-pressed="false"></button>
+        <button class="refinr-thought-dot" type="button" data-thought="2" aria-label="Message 3" aria-pressed="false"></button>
+        <button class="refinr-thought-dot" type="button" data-thought="3" aria-label="Message 4" aria-pressed="false"></button>
+      </div>
+    </aside>
     <form class="question-form" onsubmit="exploreResearch(event)">
       <label for="researchQuestion">What are you trying to find out?</label>
       <textarea id="researchQuestion" required placeholder="e.g. Why do small businesses in Nigeria struggle to survive their first five years?"></textarea>
@@ -955,5 +977,34 @@ function animateDeepDiveBar(){
     var stages=[{p:10,t:'Reading references...'},{p:25,t:'Checking academic credibility...'},{p:45,t:'Analysing citation patterns...'},{p:65,t:'Identifying weak sources...'},{p:80,t:'Generating recommendations...'},{p:90,t:'Writing supervisor report...'}];
     var i=0;var interval=setInterval(function(){if(i>=stages.length){clearInterval(interval);return;}bar.style.width=stages[i].p+'%';label.textContent=stages[i].t;i++;},8000);
 }
-</script></body>
+</script><script>
+// Gentle rotating research messages; pause while users interact with the area.
+(function(){
+  var thoughts=[
+    ['A THOUGHT ON RESEARCH',"Research doesn't end where knowledge exists. It begins where knowledge is missing."],
+    ['A THOUGHT ON RESEARCH','The next great discovery may begin with a question nobody has answered.'],
+    ['DISCOVER WITH REFINR','Start with a question. Discover relevant academic papers and follow the original sources.'],
+    ['FROM DISCOVERY TO REFERENCES','Find evidence, save your research in this browser, and continue with references.']
+  ];
+  var panel=document.querySelector('.refinr-thoughts'),copy=document.getElementById('refinrThoughtCopy');
+  if(!panel||!copy)return;
+  var label=document.getElementById('refinrThoughtLabel'),line=document.getElementById('refinrThoughtLine');
+  var dots=Array.from(panel.querySelectorAll('.refinr-thought-dot'));
+  var active=0,timer=null,paused=false,reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(i){
+    active=i;label.textContent=thoughts[i][0];line.textContent=thoughts[i][1];
+    dots.forEach(function(dot,n){dot.classList.toggle('active',n===i);dot.setAttribute('aria-pressed',String(n===i));});
+  }
+  function stop(){if(timer){clearInterval(timer);timer=null;}}
+  function start(){stop();if(!paused&&!reduced&&!document.hidden)timer=setInterval(function(){show((active+1)%thoughts.length);},7500);}
+  dots.forEach(function(dot,i){dot.addEventListener('click',function(){show(i);start();});});
+  panel.addEventListener('mouseenter',function(){paused=true;stop();});
+  panel.addEventListener('mouseleave',function(){paused=false;start();});
+  panel.addEventListener('focusin',function(){paused=true;stop();});
+  panel.addEventListener('focusout',function(e){if(!panel.contains(e.relatedTarget)){paused=false;start();}});
+  document.addEventListener('visibilitychange',start);
+  start();
+})();
+</script>
+</body>
 </html>
