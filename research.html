@@ -41,6 +41,30 @@ try{currentUser=JSON.parse(localStorage.getItem('refinr-user')||'null');currentS
 if(!question){location.replace('/');}else{localStorage.setItem('refinr-research-question',question);document.getElementById('questionDisplay').textContent=question;}
 // Restore the anonymous search boundaries when returning from account creation.
 try{var pending=JSON.parse(localStorage.getItem('refinr-pending-research')||'null');if(pending&&pending.question===question){document.getElementById('yearFrom').value=pending.yearFrom||'';document.getElementById('yearTo').value=pending.yearTo||'';document.getElementById('style').value=pending.format||'Harvard';if(pending.query&&pending.query.startsWith(question)){document.getElementById('mustInclude').value=pending.query.slice(question.length).trim();}if(Array.isArray(pending.papers)&&pending.papers.length){ideaPapers=pending.papers;renderPapers(ideaPapers);document.getElementById('configure').classList.add('hidden');document.getElementById('evidence').classList.remove('hidden');document.getElementById('understandStep').classList.add('active');document.getElementById('resultHeading').textContent='Your earlier research';document.getElementById('resultMeta').textContent=ideaPapers.length+' papers from your previous preview. Continue researching to acquire more evidence.';document.getElementById('anonymousContinue').classList.toggle('hidden',!!(currentUser&&currentSession&&currentSession.access_token));document.getElementById('referenceBtn').classList.toggle('hidden',!(currentUser&&currentSession&&currentSession.access_token));document.getElementById('saveSignedInBtn').classList.toggle('hidden',!(currentUser&&currentSession&&currentSession.access_token));if(!(currentUser&&currentSession&&currentSession.access_token))document.getElementById('continueCopy').textContent='You can keep refining your search or sign in to continue.';}if(currentUser&&currentSession&&currentSession.access_token)localStorage.removeItem('refinr-pending-research');}}catch(e){}
+// Reopen previously saved browser research without running another search or charging credits.
+// Cloud persistence will replace this fallback once its production database is verified.
+try{
+  if(currentUser&&currentSession&&currentSession.access_token&&params.get('saved')==='1'){
+    var savedItems=JSON.parse(localStorage.getItem('refinr-saved-research-'+currentUser.id)||'[]');
+    var savedItem=Array.isArray(savedItems)?savedItems.find(function(x){return x.question===question&&Array.isArray(x.papers);}):null;
+    if(savedItem){
+      document.getElementById('yearFrom').value=savedItem.yearFrom||'';
+      document.getElementById('yearTo').value=savedItem.yearTo||'';
+      document.getElementById('style').value=savedItem.format||'Harvard';
+      if(savedItem.query&&savedItem.query.startsWith(question))document.getElementById('mustInclude').value=savedItem.query.slice(question.length).trim();
+      ideaPapers=savedItem.papers;renderPapers(ideaPapers);
+      document.getElementById('configure').classList.add('hidden');
+      document.getElementById('evidence').classList.remove('hidden');
+      document.getElementById('understandStep').classList.add('active');
+      document.getElementById('resultHeading').textContent='Your saved research';
+      document.getElementById('resultMeta').textContent=ideaPapers.length+' previously retrieved papers. Reopening does not use credits.';
+      document.getElementById('anonymousContinue').classList.add('hidden');
+      document.getElementById('referenceBtn').classList.toggle('hidden',!ideaPapers.length);
+      document.getElementById('saveSignedInBtn').classList.toggle('hidden',!ideaPapers.length);
+      document.getElementById('saveStatus').textContent='Restored from this browser. Cloud sync is not available yet.';
+    }else document.getElementById('configError').textContent='This saved research is not available in this browser. You can start a new search.';
+  }
+}catch(e){document.getElementById('configError').textContent='Could not reopen saved research from this browser.';}
 var savedTheme=localStorage.getItem('refinr-theme')||'light';document.documentElement.dataset.theme=savedTheme;syncTheme();
 document.getElementById('themeBtn').onclick=function(){document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('refinr-theme',document.documentElement.dataset.theme);syncTheme();};
 function syncTheme(){document.getElementById('themeBtn').textContent=document.documentElement.dataset.theme==='dark'?'Light':'Dark';}
