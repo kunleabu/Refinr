@@ -725,9 +725,10 @@ async function cleanReferences(){
 }
 
 async function deductCredits(amount,description){
-    try{var cr=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description})});var cd=await cr.json();
+    var requestId=globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():null;
+    try{var cr=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description,requestId})});var cd=await cr.json();
     if(cr.status===401){var ref=await refreshSession();if(!ref){await signOut();alert('Session expired. Please sign in again.');openAuthModal('signin');return false;}
-    var rt=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description})});var rd=await rt.json();if(rd.error){alert(rd.error);return false;}updateCreditsDisplay(rd.credits);return true;}
+    var rt=await fetch('/api/credits',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'deduct',amount,description,requestId})});var rd=await rt.json();if(rd.error){alert(rd.error);return false;}updateCreditsDisplay(rd.credits);return true;}
     if(cd.error){if(cd.credits===0||cd.error.includes('Insufficient'))openCreditsModal();else alert(cd.error);return false;}
     updateCreditsDisplay(cd.credits);return true;}
     catch(err){console.log('Credit error:',err);return false;}
