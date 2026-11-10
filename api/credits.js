@@ -3,7 +3,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' })
     }
 
-    const { action, amount, description } = req.body
+    const { action, amount, description } = req.body || {}
+    // Reject negative, fractional, non-numeric and oversized deductions before any database access.
+    // Never trust the client to provide a safe debit amount.
+    if (action === 'deduct' && amount !== undefined && (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000)) {
+        return res.status(400).json({ error: 'Invalid credit amount' })
+    }
     const token = req.headers.authorization?.replace('Bearer ', '')
 
     if (!token) return res.status(401).json({ error: 'Not authenticated' })
