@@ -3,6 +3,7 @@ import { formatSingle } from '../lib/formatter.js';
 import { searchPapers, validateSearch } from '../lib/retrieval/search.js';
 import { toCSL } from '../lib/retrieval/papers.js';
 import { createResearchHandler } from '../lib/research/orchestration.js';
+import { verifyActor, supabaseConfig, ResearchError } from '../lib/research/auth.js';
 
 const researchHandler = createResearchHandler();
 const ANONYMOUS_PREVIEW_LIMIT = 5;
@@ -12,6 +13,15 @@ export default async function handler(req, res) {
     if (Object.hasOwn(req.body || {}, 'action')) return researchHandler(req, res);
     const { idea, format='Harvard', yearFrom, yearTo, continuation, preview=false } = req.body || {};
     if (preview !== false && preview !== true) return res.status(400).json({error:'Invalid preview option'});
+    // Full legacy retrieval requires a verified user; anonymous callers always get the preview.
+    // Credit authorization still needs to be consolidated into a server-side transaction.
+    if (!preview) {
+        try { await verifyActor(req, { config: supabaseConfig() }); }
+        catch (err) {
+            if (err instanceof ResearchError) return res.status(err.status).json({error:err.code});
+            return res.status(503).json({error:'AUTH_UNAVAILABLE'});
+        }
+    }
     const options = {query:idea,yearFrom,yearTo,continuation};
     try { validateSearch(options); }
     catch(err) { return res.status(400).json({error:err.message}); }
