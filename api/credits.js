@@ -52,6 +52,43 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Could not fetch profile' })
         }
 
+        if (action === 'deduct' && process.env.REFINR_ATOMIC_CREDITS_ENABLED === 'true') {
+            const requestId = req.body?.requestId
+            if (typeof requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
+                return res.status(400).json({ error: 'A valid request ID is required' })
+            }
+            if (typeof description !== 'string' || !description.trim() || description.length > 250) {
+                return res.status(400).json({ error: 'Invalid credit description' })
+            }
+            const serviceKey = process.env.SUPABASE_SERVICE_KEY
+            if (!serviceKey) return res.status(503).json({ error: 'Credits temporarily unavailable' })
+            const rpc = await fetch(`${SUPABASE_URL}/rest/v1/rpc/refinr_debit_credits`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${serviceKey}`,
+                    'apikey': serviceKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    p_user_id: userId, p_amount: amount,
+                    p_description: description.trim(), p_request_id: requestId
+                })
+            })
+            if (!rpc.ok) {
+                const detail = await rpc.json().catch(() => ({}))
+                if (detail.message === 'INSUFFICIENT_CREDITS') {
+                    return res.status(400).json({ error: 'Insufficient credits' })
+                }
+                if (detail.message === 'REQUEST_ID_CONFLICT') {
+                    return res.status(409).json({ error: 'Request ID already used for a different operation' })
+                }
+                console.error('Atomic credit debit failed:', rpc.status, detail.code)
+                return res.status(503).json({ error: 'Credit operation unavailable. Please try again.' })
+            }
+            const balance = await rpc.json()
+            return res.status(200).json({ success: true, credits: balance })
+        }
+
         if (action === 'deduct') {
             const creditAmount = amount
 
