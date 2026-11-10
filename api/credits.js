@@ -6,10 +6,11 @@ export default async function handler(req, res) {
     const { action, amount, description } = req.body || {}
     // Reject negative, fractional, non-numeric and oversized deductions before any database access.
     // Never trust the client to provide a safe debit amount.
-    if (action === 'deduct' && amount !== undefined && (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000)) {
+    if (action === 'deduct' && (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000)) {
         return res.status(400).json({ error: 'Invalid credit amount' })
     }
-    const token = req.headers.authorization?.replace('Bearer ', '')
+    const match = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization || '')
+    const token = match?.[1]
 
     if (!token) return res.status(401).json({ error: 'Not authenticated' })
 
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
         }
 
         if (action === 'deduct') {
-            const creditAmount = amount || 1
+            const creditAmount = amount
 
             if (profile.credits < creditAmount) {
                 return res.status(400).json({
@@ -116,6 +117,7 @@ if (!Array.isArray(updateData) || updateData.length !== 1) {
         return res.status(400).json({ error: 'Invalid action' })
 
     } catch (error) {
-        return res.status(500).json({ error: `Server error: ${error.message}` })
+        console.error('Credits API error:', error.message)
+        return res.status(503).json({ error: 'Credits temporarily unavailable. Please try again.' })
     }
 }
