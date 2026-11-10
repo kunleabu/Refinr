@@ -64,7 +64,7 @@ export default async function handler(req, res) {
             // Deduct credits
            // Deduct credits
 const updateResponse = await fetch(
-    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
+    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&credits=eq.${profile.credits}`,
     {
         method: 'PATCH',
         headers: {
@@ -78,15 +78,12 @@ const updateResponse = await fetch(
 )
 
 const updateData = await updateResponse.json()
-console.log('Update response status:', updateResponse.status)
-console.log('Update response data:', JSON.stringify(updateData))
-
-if (!updateResponse.ok || !updateData || updateData.length === 0) {
-    return res.status(500).json({ 
-        error: 'Could not update credits',
-        details: JSON.stringify(updateData),
-        status: updateResponse.status
-    })
+if (!updateResponse.ok) {
+    return res.status(503).json({ error: 'Could not update credits. Please retry.' })
+}
+if (!Array.isArray(updateData) || updateData.length !== 1) {
+    // Another request changed the balance after it was read; never overwrite it.
+    return res.status(409).json({ error: 'Credit balance changed. Please retry.' })
 }
 
             // Log transaction
