@@ -134,7 +134,11 @@ export default async function handler(req, res) {
       if (status !== 'success') return res.status(200).end();
       const { user_id, credits, package_id } = metadata;
       if (!user_id || !credits) return res.status(200).end();
-      await creditUser(user_id, credits, event.data.reference, package_id);
+      const credited = await creditUser(user_id, credits, event.data.reference, package_id);
+      if (!credited.success) {
+        console.error('Paystack webhook credit application failed');
+        return res.status(503).json({ error: 'Credit application unavailable; retry delivery' });
+      }
     }
 
     return res.status(200).end();
