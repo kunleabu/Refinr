@@ -491,7 +491,7 @@ window.addEventListener('load',async function(){
     if(ss&&su){currentSession=JSON.parse(ss);currentUser=JSON.parse(su);updateUIForLoggedInUser(currentUser);refreshCreditBalance();}
     loadSharedReport();detectUserCurrency();loadCslIndex();handleEntryIntent();
     var pr=localStorage.getItem('refinr-pending-ref');
-    if(pr&&currentUser){try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',reference:pr,user_id:currentUser.id})});var d=await r.json();if(r.ok&&d.success){localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);showCreditToast(d.credits_added,d.new_balance);}}catch(e){}}
+    if(pr&&currentUser){try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'verify',reference:pr,user_id:currentUser.id})});var d=await r.json();if(r.ok&&d.success){localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);showCreditToast(d.credits_added,d.new_balance);}}catch(e){}}
 });
 
 async function loadCslIndex(){
@@ -873,7 +873,7 @@ async function initializePayment(){
     if(!currentUser){openAuthModal('signin');return;}
     var errorEl=document.getElementById('creditsError'),btn=document.querySelector('#creditsBuyButtons .btn-confirm');
     errorEl.classList.remove('visible');btn.textContent='Loading...';btn.disabled=true;
-    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'initialize',package_id:selectedPackage,email:currentUser.email,user_id:currentUser.id,currency:userCurrency})});var d=await r.json();
+    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'initialize',package_id:selectedPackage,email:currentUser.email,user_id:currentUser.id,currency:userCurrency})});var d=await r.json();
     if(!r.ok||!d.authorization_url)throw new Error(d.error||'Could not initialize payment');
     localStorage.setItem('refinr-pending-ref',d.reference);window.location.href=d.authorization_url;}
     catch(err){errorEl.textContent=err.message;errorEl.classList.add('visible');btn.textContent='Pay with Paystack';btn.disabled=false;}
@@ -888,7 +888,7 @@ async function manualVerify(){
     errorEl.classList.remove('visible');successEl.classList.remove('visible');
     if(!reference){errorEl.textContent='Please enter your payment reference.';errorEl.classList.add('visible');return;}
     btn.textContent='Checking...';btn.disabled=true;
-    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',reference,user_id:currentUser.id})});var d=await r.json();
+    try{var r=await fetch('/api/paystack',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({action:'verify',reference,user_id:currentUser.id})});var d=await r.json();
     if(!r.ok)throw new Error(d.error||'Verification failed');
     successEl.textContent='✅ '+d.credits_added+' credits added! Your new balance is '+d.new_balance+' credits.';successEl.classList.add('visible');
     localStorage.removeItem('refinr-pending-ref');updateCreditsDisplay(d.new_balance);hideVerifyForm();}
