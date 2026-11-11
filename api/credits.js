@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     // This guards the legacy endpoint and the feature-gated atomic path alike.
     if (action === 'deduct') {
         const verification = typeof description === 'string'
-            ? /^Reference verification \\(([1-9][0-9]*) references\\)$/.exec(description)
+            ? /^Reference verification \(([1-9][0-9]*) references\)$/.exec(description)
             : null
         const expected = verification
             ? (() => {
