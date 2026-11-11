@@ -19,6 +19,28 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { action } = req.body || {};
+  // User-initiated payment actions must be bound to the authenticated payer.
+  // Webhooks are authenticated separately by Paystack's signature.
+  if (action === 'initialize' || action === 'verify') {
+    const token = /^Bearer ([^\\s]+)$/i.exec(req.headers.authorization || '')?.[1];
+    if (!token) return res.status(401).json({ error: 'Authentication required' });
+    try {
+      const identity = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
+        headers: { Authorization: `Bearer ${token}`, apikey: process.env.SUPABASE_ANON_KEY }
+      });
+      if (!identity.ok) return res.status(401).json({ error: 'Invalid session' });
+      const user = await identity.json();
+      if (!user.id || user.id !== req.body?.user_id) {
+        return res.status(403).json({ error: 'Payment account mismatch' });
+      }
+      if (action === 'initialize' && (!user.email ||
+          user.email.toLowerCase() !== String(req.body?.email || '').toLowerCase())) {
+        return res.status(403).json({ error: 'Payment email mismatch' });
+      }
+    } catch {
+      return res.status(503).json({ error: 'Authentication temporarily unavailable' });
+    }
+  }
 
   // ── 1. INITIALIZE PAYMENT ──────────────────────────────────────────────────
   if (action === 'initialize') {
