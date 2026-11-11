@@ -9,6 +9,27 @@ export default async function handler(req, res) {
     if (action === 'deduct' && (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000)) {
         return res.status(400).json({ error: 'Invalid credit amount' })
     }
+    // Never accept a caller-selected debit price. Derive it from a recognized operation.
+    // This guards the legacy endpoint and the feature-gated atomic path alike.
+    if (action === 'deduct') {
+        const verification = typeof description === 'string'
+            ? /^Reference verification \\(([1-9][0-9]*) references\\)$/.exec(description)
+            : null
+        const expected = verification
+            ? (() => {
+                const count = Number(verification[1])
+                if (!Number.isSafeInteger(count) || count > 10000) return null
+                return count <= 20 ? 1 : count <= 50 ? 2 : count <= 100 ? 3 : 4
+            })()
+            : typeof description === 'string' && description.startsWith('Search by idea: ') && description.length <= 66
+                ? 2
+                : typeof description === 'string' && description.startsWith('Deep dive analysis — ') && description.length <= 250
+                    ? 10
+                    : null
+        if (expected === null || amount !== expected) {
+            return res.status(400).json({ error: 'Invalid credit operation or amount' })
+        }
+    }
     const match = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization || '')
     const token = match?.[1]
 
