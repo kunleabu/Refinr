@@ -154,6 +154,35 @@ const headers = {
   'Prefer': 'return=representation',
 };
 
+  if (process.env.REFINR_ATOMIC_PURCHASES_ENABLED === 'true') {
+    const pkg = PACKAGES[package_id];
+    if (!pkg || !Number.isSafeInteger(credits) || credits !== pkg.credits ||
+        typeof reference !== 'string' || !/^[a-zA-Z0-9_.-]{4,160}$/.test(reference)) {
+      return { success: false, error: 'Invalid purchase details' };
+    }
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/refinr_credit_purchase`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          p_user_id: user_id,
+          p_amount: pkg.credits,
+          p_reference: reference,
+          p_package_id: package_id
+        })
+      });
+      if (!response.ok) {
+        const detail = await response.json().catch(() => ({}));
+        console.error('Atomic purchase failed:', response.status, detail.code);
+        return { success: false, error: 'Could not apply verified purchase. Please retry.' };
+      }
+      return { success: true, new_balance: await response.json() };
+    } catch (err) {
+      console.error('Atomic purchase unavailable:', err);
+      return { success: false, error: 'Could not apply verified purchase. Please retry.' };
+    }
+  }
+
   try {
     // Duplicate check — never credit the same reference twice
     const dupCheck = await fetch(
