@@ -779,8 +779,9 @@ async function searchByIdea(){
     var idea=document.getElementById('ideaInput').value.trim(),format=getStyle('idea'),errorEl=document.getElementById('ideaError');
     errorEl.classList.remove('visible');if(!idea){errorEl.textContent='Please enter a research idea or topic.';errorEl.classList.add('visible');return;}
     var btn=document.getElementById('ideaSearchBtn');btn.textContent='Searching...';btn.disabled=true;
-    var ok=await deductCredits(2,'Search by idea: '+idea.substring(0,50));if(!ok){btn.textContent='Search — 2 credits';btn.disabled=false;return;}
-    try{var r=await fetch('/api/searchbyidea',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({idea,format,yearFrom:document.getElementById('yearFrom').value||null,yearTo:document.getElementById('yearTo').value||null})});var d=await r.json();
+    var serverCharged=false;try{var billing=await fetch('/api/searchbyidea');if(!billing.ok)throw Error('Billing unavailable');serverCharged=(await billing.json()).serverChargedSearch===true;}catch(e){errorEl.textContent='Billing unavailable. Please retry.';errorEl.classList.add('visible');btn.disabled=false;btn.textContent='Search — 2 credits';return;}
+    if(!serverCharged){var ok=await deductCredits(2,'Search by idea: '+idea.substring(0,50));if(!ok){btn.textContent='Search — 2 credits';btn.disabled=false;return;}}
+    try{var r=await fetch('/api/searchbyidea',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentSession.access_token},body:JSON.stringify({idea,format,requestId:crypto.randomUUID(),yearFrom:document.getElementById('yearFrom').value||null,yearTo:document.getElementById('yearTo').value||null})});var d=await r.json();
     if(!r.ok)throw new Error(d.error||'Search failed');if(!d.papers||d.papers.length===0){errorEl.textContent='No papers found. Try different keywords.';errorEl.classList.add('visible');btn.textContent='Search — 2 credits';btn.disabled=false;return;}
     ideaPapers=d.papers;ideaFormatted=d.formatted;renderIdeaResults(d.papers,d.total,format);}
     catch(err){errorEl.textContent=err.message;errorEl.classList.add('visible');}
