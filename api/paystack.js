@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   // User-initiated payment actions must be bound to the authenticated payer.
   // Webhooks are authenticated separately by Paystack's signature.
   if (action === 'initialize' || action === 'verify') {
-    const token = /^Bearer ([^\\s]+)$/i.exec(req.headers.authorization || '')?.[1];
+    const token = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization || '')?.[1];
     if (!token) return res.status(401).json({ error: 'Authentication required' });
     try {
       const identity = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
